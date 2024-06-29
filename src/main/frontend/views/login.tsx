@@ -23,6 +23,8 @@ export default function LoginView() {
       noForgotPassword
       i18n={loginI18n}
       onLogin={async ({ detail: { username, password } }) => {
+        loginError.value = false;
+
         const { defaultUrl, error, redirectUrl } = await login(username, password);
 
         if (error) {
