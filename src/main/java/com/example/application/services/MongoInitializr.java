@@ -62,6 +62,7 @@ public class MongoInitializr {
         IncomeEntity i1 = new IncomeEntity()
                 .setId(1L)
                 .setVersion(1)
+                .setUser(userRepository.findById(1L).orElseThrow())
                 .setAmount(BigDecimal.valueOf(2100.90))
                 .setCategory(IncomeCategory.SALARY)
                 .setDate(LocalDateTime.now());
@@ -69,12 +70,22 @@ public class MongoInitializr {
         IncomeEntity i2 = new IncomeEntity()
                 .setId(2L)
                 .setVersion(1)
+                .setUser(userRepository.findById(1L).orElseThrow())
                 .setAmount(BigDecimal.valueOf(970.90))
                 .setCategory(IncomeCategory.SAVINGS)
                 .setDate(LocalDateTime.now());
 
+        IncomeEntity i3 = new IncomeEntity()
+                .setId(3L)
+                .setVersion(1)
+                .setUser(userRepository.findById(2L).orElseThrow())
+                .setAmount(BigDecimal.valueOf(10000))
+                .setCategory(IncomeCategory.SALARY)
+                .setDate(LocalDateTime.now());
+
         incomeRepository.save(i1);
         incomeRepository.save(i2);
+        incomeRepository.save(i3);
     }
 
     private byte[] stringToByteArr(String s) {

@@ -16,6 +16,8 @@ public class IncomeEntity extends AbstractEntity<IncomeEntity> {
 
     private LocalDateTime date;
 
+    private UserEntity user;
+
     public BigDecimal getAmount() {
         return amount;
     }
@@ -40,6 +42,15 @@ public class IncomeEntity extends AbstractEntity<IncomeEntity> {
 
     public IncomeEntity setDate(LocalDateTime date) {
         this.date = date;
+        return this;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public IncomeEntity setUser(UserEntity user) {
+        this.user = user;
         return this;
     }
 }
