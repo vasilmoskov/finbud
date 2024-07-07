@@ -1,0 +1,19 @@
+logging:
+    level:
+        org:
+            atmosphere: warn
+server:
+    port: ${PORT:8080}
+spring:
+    jpa:
+        defer-datasource-initialization: true
+    main:
+        allow-bean-definition-overriding: true
+    mustache:
+        check-template-location: false
+    sql:
+        init:
+            mode: always
+vaadin:
+    allowed-packages: com.vaadin,org.vaadin,com.example.application
+    launch-browser: true

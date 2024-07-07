@@ -1,15 +1,13 @@
 package com.example.application.data;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "incomes")
+//@Entity
+//@Table(name = "incomes")
 public class Income extends AbstractEntity {
     private BigDecimal amount;
 
@@ -18,27 +16,30 @@ public class Income extends AbstractEntity {
 
     private LocalDateTime date;
 
-    public IncomeCategory getCategory() {
-        return category;
-    }
-
-    public void setCategory(IncomeCategory category) {
-        this.category = category;
-    }
-
     public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) {
+    public Income setAmount(BigDecimal amount) {
         this.amount = amount;
+        return this;
+    }
+
+    public IncomeCategory getCategory() {
+        return category;
+    }
+
+    public Income setCategory(IncomeCategory category) {
+        this.category = category;
+        return this;
     }
 
     public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public Income setDate(LocalDateTime date) {
         this.date = date;
+        return this;
     }
 }

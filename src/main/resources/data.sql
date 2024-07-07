@@ -4,5 +4,5 @@ insert into application_user (version, id, username,name,hashed_password,profile
 insert into user_roles (user_id, roles) values ('2', 'USER')
 insert into user_roles (user_id, roles) values ('2', 'ADMIN')
 
-insert into incomes(version, id, amount, category, date) values (1, '1', 2300.90, 'SALARY', CURRENT_TIMESTAMP(9))
-insert into incomes(version, id, amount, category, date) values (1, '2', 580.90, 'SAVINGS', CURRENT_TIMESTAMP(9))
+-- insert into incomes(version, id, amount, category, date) values (1, '1', 2300.90, 'SALARY', CURRENT_TIMESTAMP(9))
+-- insert into incomes(version, id, amount, category, date) values (1, '2', 580.90, 'SAVINGS', CURRENT_TIMESTAMP(9))
