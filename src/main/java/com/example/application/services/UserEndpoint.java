@@ -1,6 +1,6 @@
 package com.example.application.services;
 
-import com.example.application.data.User;
+import com.example.application.data.UserEntity;
 import com.example.application.security.AuthenticatedUser;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.hilla.Endpoint;
@@ -14,7 +14,7 @@ public class UserEndpoint {
     @Autowired
     private AuthenticatedUser authenticatedUser;
 
-    public Optional<User> getAuthenticatedUser() {
+    public Optional<UserEntity> getAuthenticatedUser() {
         return authenticatedUser.get();
     }
 }

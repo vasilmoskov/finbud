@@ -1,6 +1,6 @@
 package com.example.application.security;
 
-import com.example.application.data.User;
+import com.example.application.data.UserEntity;
 import com.example.application.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UsernameNotFoundException("No user present with username: " + username);
         } else {
@@ -33,7 +33,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
     }
 
-    private static List<GrantedAuthority> getAuthorities(User user) {
+    private static List<GrantedAuthority> getAuthorities(UserEntity user) {
         return user.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
 

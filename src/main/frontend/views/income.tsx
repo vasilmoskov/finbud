@@ -1,11 +1,11 @@
 import {Grid, GridColumn, GridSelectionColumn, HorizontalLayout, Icon, VerticalLayout} from "@vaadin/react-components";
 import {Avatar} from "@vaadin/react-components/Avatar.js";
 import React, {useEffect, useState} from "react";
-import Income from "Frontend/generated/com/example/application/data/Income";
-import {getAll} from "Frontend/generated/IncomeService";
+import IncomeEntity from "Frontend/generated/com/example/application/data/IncomeEntity";
+import {getAll} from "Frontend/generated/IncomeServiceImpl";
 import {ViewConfig} from "@vaadin/hilla-file-router/types.js";
 
-const amountRenderer = (income: Income) => (
+const amountRenderer = (income: IncomeEntity) => (
         <span
             {...({
                 theme: `badge ${income.amount >= 1000 ? 'success' : 'error'}`,
@@ -23,7 +23,7 @@ export const config: ViewConfig = {
 
 export default function IncomeView() {
     const gridRef = React.useRef<any>(null);
-    const [incomes, setIncomes] = useState<Income[]>([]);
+    const [incomes, setIncomes] = useState<IncomeEntity[]>([]);
     useEffect(() => {
         getAll().then((incomes) => {
             setIncomes(incomes)

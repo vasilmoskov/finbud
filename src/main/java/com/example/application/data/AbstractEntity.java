@@ -8,11 +8,10 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Version;
 
 @MappedSuperclass
-public abstract class AbstractEntity {
+public abstract class AbstractEntity<T> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgenerator")
-    // The initial value is to account for data.sql demo data ids
     @SequenceGenerator(name = "idgenerator", initialValue = 1000)
     private Long id;
 
@@ -23,12 +22,18 @@ public abstract class AbstractEntity {
         return id;
     }
 
-    public void setId(Long id) {
+    public T setId(Long id) {
         this.id = id;
+        return (T) this;
     }
 
     public int getVersion() {
         return version;
+    }
+
+    public T setVersion(int version) {
+        this.version = version;
+        return (T) this;
     }
 
     @Override

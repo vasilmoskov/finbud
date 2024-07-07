@@ -1,10 +1,10 @@
 package com.example.application.repository;
 
-import com.example.application.data.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import com.example.application.data.UserEntity;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
+// TODO: extend JpaSpecificationExecutor<UserEntity>?
+public interface UserRepository extends MongoRepository<UserEntity, Long> {
 
-    User findByUsername(String username);
+    UserEntity findByUsername(String username);
 }

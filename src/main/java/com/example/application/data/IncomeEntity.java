@@ -2,13 +2,13 @@ package com.example.application.data;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-//@Entity
-//@Table(name = "incomes")
-public class Income extends AbstractEntity {
+@Document("income")
+public class IncomeEntity extends AbstractEntity<IncomeEntity> {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
@@ -20,7 +20,7 @@ public class Income extends AbstractEntity {
         return amount;
     }
 
-    public Income setAmount(BigDecimal amount) {
+    public IncomeEntity setAmount(BigDecimal amount) {
         this.amount = amount;
         return this;
     }
@@ -29,7 +29,7 @@ public class Income extends AbstractEntity {
         return category;
     }
 
-    public Income setCategory(IncomeCategory category) {
+    public IncomeEntity setCategory(IncomeCategory category) {
         this.category = category;
         return this;
     }
@@ -38,7 +38,7 @@ public class Income extends AbstractEntity {
         return date;
     }
 
-    public Income setDate(LocalDateTime date) {
+    public IncomeEntity setDate(LocalDateTime date) {
         this.date = date;
         return this;
     }

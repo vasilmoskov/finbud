@@ -1,60 +1,72 @@
 package com.example.application.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Table;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Set;
 
-@Entity
-@Table(name = "application_user")
-public class User extends AbstractEntity {
+@Document("user")
+public class UserEntity extends AbstractEntity<UserEntity> {
 
     private String username;
     private String name;
     @JsonIgnore
     private String hashedPassword;
+    //TODO: check if annotations are needed when using Mongo
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
-    @Lob
-    @Column(length = 1000000)
+    //TODO: check if annotations are needed when using Mongo
+//    @Lob
+//    @Column(length = 1000000)
     private byte[] profilePicture;
 
     public String getUsername() {
         return username;
     }
-    public void setUsername(String username) {
+
+    public UserEntity setUsername(String username) {
         this.username = username;
+        return this;
     }
+
     public String getName() {
         return name;
     }
-    public void setName(String name) {
+
+    public UserEntity setName(String name) {
         this.name = name;
+        return this;
     }
+
     public String getHashedPassword() {
         return hashedPassword;
     }
-    public void setHashedPassword(String hashedPassword) {
+
+    public UserEntity setHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
+        return this;
     }
+
     public Set<Role> getRoles() {
         return roles;
     }
-    public void setRoles(Set<Role> roles) {
+
+    public UserEntity setRoles(Set<Role> roles) {
         this.roles = roles;
+        return this;
     }
+
     public byte[] getProfilePicture() {
         return profilePicture;
     }
-    public void setProfilePicture(byte[] profilePicture) {
-        this.profilePicture = profilePicture;
-    }
 
+    public UserEntity setProfilePicture(byte[] profilePicture) {
+        this.profilePicture = profilePicture;
+        return this;
+    }
 }

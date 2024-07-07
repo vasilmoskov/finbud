@@ -1,6 +1,6 @@
 package com.example.application.security;
 
-import com.example.application.data.User;
+import com.example.application.data.UserEntity;
 import com.example.application.repository.UserRepository;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import java.util.Optional;
@@ -20,7 +20,7 @@ public class AuthenticatedUser {
     }
 
     @Transactional
-    public Optional<User> get() {
+    public Optional<UserEntity> get() {
         return authenticationContext.getAuthenticatedUser(UserDetails.class)
                 .map(userDetails -> userRepository.findByUsername(userDetails.getUsername()));
     }
