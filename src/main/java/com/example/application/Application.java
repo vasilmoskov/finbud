@@ -1,6 +1,6 @@
 package com.example.application;
 
-import com.example.application.data.UserRepository;
+import com.example.application.repository.UserRepository;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.theme.Theme;
 import javax.sql.DataSource;
