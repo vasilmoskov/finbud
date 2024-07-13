@@ -26,4 +26,9 @@ public class IncomeServiceImpl implements IncomeService {
     public List<IncomeEntity> getAll() {
         return repository.findAllByUser(authenticatedUser.get().orElseThrow());
     }
+
+    @Override
+    public void deleteIncome(Long incomeId) {
+        repository.deleteById(incomeId);
+    }
 }

@@ -7,4 +7,6 @@ import java.util.List;
 public interface IncomeService {
     // TODO: map to DTO
     List<IncomeEntity> getAll();
+
+    void deleteIncome(Long id);
 }
