@@ -1,5 +1,6 @@
 package com.example.application.services;
 
+import com.example.application.data.IncomeCategory;
 import com.example.application.data.IncomeEntity;
 import com.example.application.repository.IncomeRepository;
 import com.example.application.security.AuthenticatedUser;
@@ -7,6 +8,8 @@ import com.vaadin.hilla.BrowserCallable;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @BrowserCallable
@@ -28,7 +31,18 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public void deleteIncome(Long incomeId) {
+    public void deleteIncome(String incomeId) {
         repository.deleteById(incomeId);
+    }
+
+    @Override
+    public IncomeEntity create(String amount, String category) {
+        IncomeEntity incomeEntity = new IncomeEntity()
+                .setAmount(new BigDecimal(amount))
+                .setUser(authenticatedUser.get().orElseThrow())
+                .setDate(LocalDateTime.now())
+                .setCategory(IncomeCategory.valueOf(category));
+
+        return repository.save(incomeEntity);
     }
 }

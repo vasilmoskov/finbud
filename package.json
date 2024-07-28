@@ -35,6 +35,7 @@
     "@babel/preset-react": "7.24.7",
     "@rollup/plugin-replace": "5.0.7",
     "@rollup/pluginutils": "5.1.0",
+    "@types/css-modules": "^1.0.5",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "@vaadin/hilla-generator-cli": "24.4.0",
@@ -119,7 +120,7 @@
       "workbox-core": "7.1.0",
       "workbox-precaching": "7.1.0"
     },
-    "hash": "00086ecf51ad52d043355465dceef19db8c8b3c8b2c101c4135cfb07026de9f6"
+    "hash": "b37786bab2c79c4aad45fa1385a35b98e891f13a42e1091ff21ddb633c0edbac"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",

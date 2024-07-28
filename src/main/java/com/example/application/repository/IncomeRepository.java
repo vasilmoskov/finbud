@@ -6,6 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface IncomeRepository extends MongoRepository<IncomeEntity, Long> {
+public interface IncomeRepository extends MongoRepository<IncomeEntity, String> {
     List<IncomeEntity> findAllByUser(UserEntity user);
 }

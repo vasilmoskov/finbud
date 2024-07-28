@@ -6,23 +6,25 @@ import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Version;
+import org.springframework.data.mongodb.core.index.Indexed;
 
 @MappedSuperclass
 public abstract class AbstractEntity<T> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgenerator")
-    @SequenceGenerator(name = "idgenerator", initialValue = 1000)
-    private Long id;
+    @Indexed(unique = true)
+    private String id;
+//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgenerator")
+//    @SequenceGenerator(name = "idgenerator", initialValue = 1000)
 
     @Version
     private int version;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public T setId(Long id) {
+    public T setId(String id) {
         this.id = id;
         return (T) this;
     }
