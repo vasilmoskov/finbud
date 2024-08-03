@@ -10,7 +10,7 @@ import {
 } from "@vaadin/react-components";
 import React, {useEffect, useState} from "react";
 import IncomeEntity from "Frontend/generated/com/example/application/data/IncomeEntity";
-import {deleteIncome, getAll, create} from "Frontend/generated/IncomeServiceImpl";
+import {deleteIncome, getAll, addIncome} from "Frontend/generated/IncomeServiceImpl";
 import {ViewConfig} from "@vaadin/hilla-file-router/types.js";
 import {Button} from "@vaadin/react-components/Button.js";
 import {TextField} from "@vaadin/react-components/TextField.js";
@@ -33,10 +33,15 @@ const amountRenderer = (income: IncomeDto) => (
          </span>
 );
 
-const buttonRenderer = (income: IncomeDto, onDelete: (income: IncomeDto) => void) => (
-    <Button theme="icon" onClick={() => onDelete(income)}>
-        <Icon icon="vaadin:trash"/>
-    </Button>
+const buttonRenderer = (income: IncomeDto, onEdit: (income: IncomeDto) => void, onDelete: (income: IncomeDto) => void) => (
+    <div>
+        <Button theme="icon" onClick={() => onEdit(income)}>
+            <Icon icon="vaadin:edit"/>
+        </Button>
+        <Button theme="icon" onClick={() => onDelete(income)}>
+            <Icon icon="vaadin:trash"/>
+        </Button>
+    </div>
 );
 
 interface IncomeDto {
@@ -81,7 +86,24 @@ export default function IncomeView() {
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
     const [addDialogOpened, setAddDialogOpened] = useState(false);
     const [selectedIncome, setSelectedIncome] = useState<IncomeDto | null>(null);
-    const [newIncome, setNewIncome] = useState<IncomeDto>({amount: '', category: 'Other'});
+    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: '', category: 'Other', date: ''});
+
+    const handleEdit = (income: IncomeDto) => {
+        // TODO: setNewIncome should be enough.. something with the state and the dialog is not working good and it's not synced
+        newIncome.id = income.id;
+        newIncome.amount = income.amount;
+        newIncome.category = income.category;
+        newIncome.date = income.date;
+
+        setNewIncome({
+            id: income.id,
+            amount: income.amount,
+            category: income.category,
+            date: income.date
+        });
+
+        setAddDialogOpened(true);
+    };
 
     const handleDelete = (income: IncomeDto) => {
         setSelectedIncome(income);
@@ -100,13 +122,9 @@ export default function IncomeView() {
         }
     };
 
-    const openAddDialog = () => {
-        setAddDialogOpened(true);
-    };
-
-    const addIncome = () => {
+    const addNewIncome = () => {
         const income: IncomeDto = {
-            amount: newIncome.amount, // parseFloat(newIncome.amount),
+            amount: newIncome.amount,
             category: newIncome.category,
             date: format(new Date(), "dd MMM yyyy HH:mm:ss")
         };
@@ -114,10 +132,10 @@ export default function IncomeView() {
         const previousIncomes = [...incomes];
 
         setIncomes([...incomes, income]);
-        setNewIncome({amount: '', category: 'Other'});
+        setNewIncome({id: '', amount: '', category: 'Other', date: ''});
         setAddDialogOpened(false);
 
-        create(newIncome.amount, newIncome.category.toUpperCase())
+        addIncome(newIncome.amount, newIncome.category.toUpperCase())
             .then((savedIncome) => {
                     income.id = savedIncome.id
                     setIncomes([...incomes, income]);
@@ -136,7 +154,6 @@ export default function IncomeView() {
             setIncomes(mappedIncomes)
         });
 
-        // Workaround for https://github.com/vaadin/react-components/issues/129
         setTimeout(() => {
             gridRef.current?.recalculateColumnWidths();
         }, 100);
@@ -144,16 +161,23 @@ export default function IncomeView() {
 
     const handleDialogOpenedChanged = (detailValue: boolean) => {
         if (!detailValue) {
-            setNewIncome({amount: '', category: 'Other'});
+            console.log("Reset")
+
+            // TODO: setNewIncome should be enough.. something with the state and the dialog is not working good and it's not synced
+            newIncome.id = '';
+            newIncome.amount = '';
+            newIncome.category = 'Other';
+            newIncome.date = '';
+
+            setNewIncome({...newIncome, id: '', amount: '', category: 'Other', date: ''});
         }
+
         setAddDialogOpened(detailValue);
     };
 
     return (
         <>
             <Grid items={incomes} ref={gridRef}>
-                {/*<GridSelectionColumn/>*/}
-
                 <GridColumn header="Amount" autoWidth>
                     {({item}) => amountRenderer(item)}
                 </GridColumn>
@@ -167,7 +191,7 @@ export default function IncomeView() {
                 </GridColumn>
 
                 <GridColumn autoWidth>
-                    {({item}) => buttonRenderer(item, handleDelete)}
+                    {({item}) => buttonRenderer(item, handleEdit, handleDelete)}
                 </GridColumn>
             </Grid>
 
@@ -175,7 +199,7 @@ export default function IncomeView() {
                 <Button
                     theme="primary"
                     className={styles.addButton}
-                    onClick={openAddDialog}
+                    onClick={() => setAddDialogOpened(true)}
                 >
                     <Icon icon="vaadin:plus" className={styles.addButtonIcon}/>
                 </Button>
@@ -199,7 +223,7 @@ export default function IncomeView() {
                 footerRenderer={() => (
                     <>
                         <Button onClick={() => setAddDialogOpened(false)}>Cancel</Button>
-                        <Button theme="primary" onClick={addIncome}>
+                        <Button theme="primary" onClick={addNewIncome}>
                             Add
                         </Button>
                     </>
@@ -207,6 +231,7 @@ export default function IncomeView() {
             >
                 <VerticalLayout style={{alignItems: 'stretch', width: '18rem', maxWidth: '100%'}}>
                     <TextField
+                        key={newIncome.id}  // Force re-render based on key
                         label="Amount"
                         value={newIncome.amount}
                         onChange={e => setNewIncome({...newIncome, amount: e.target.value})}

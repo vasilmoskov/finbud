@@ -36,7 +36,7 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public IncomeEntity create(String amount, String category) {
+    public IncomeEntity addIncome(String amount, String category) {
         IncomeEntity incomeEntity = new IncomeEntity()
                 .setAmount(new BigDecimal(amount))
                 .setUser(authenticatedUser.get().orElseThrow())

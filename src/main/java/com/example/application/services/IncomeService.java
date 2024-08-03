@@ -1,9 +1,7 @@
 package com.example.application.services;
 
-import com.example.application.data.IncomeCategory;
 import com.example.application.data.IncomeEntity;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public interface IncomeService {
@@ -12,5 +10,5 @@ public interface IncomeService {
 
     void deleteIncome(String id);
 
-    IncomeEntity create(String amount, String category);
+    IncomeEntity addIncome(String amount, String category);
 }
