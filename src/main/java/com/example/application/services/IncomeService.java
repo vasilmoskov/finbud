@@ -8,7 +8,10 @@ public interface IncomeService {
     // TODO: map to DTO
     List<IncomeEntity> getAll();
 
+    IncomeEntity addIncome(String amount, String category);
+
+    IncomeEntity editIncome(String id, String amount, String category);
+
     void deleteIncome(String id);
 
-    IncomeEntity addIncome(String amount, String category);
 }

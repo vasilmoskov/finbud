@@ -10,7 +10,7 @@ import {
 } from "@vaadin/react-components";
 import React, {useEffect, useState} from "react";
 import IncomeEntity from "Frontend/generated/com/example/application/data/IncomeEntity";
-import {deleteIncome, getAll, addIncome} from "Frontend/generated/IncomeServiceImpl";
+import {deleteIncome, getAll, addIncome, editIncome} from "Frontend/generated/IncomeServiceImpl";
 import {ViewConfig} from "@vaadin/hilla-file-router/types.js";
 import {Button} from "@vaadin/react-components/Button.js";
 import {TextField} from "@vaadin/react-components/TextField.js";
@@ -83,12 +83,15 @@ const categoryOptions: SelectItem[] = Object.values(categoriesMap).map(value => 
 export default function IncomeView() {
     const gridRef = React.useRef<any>(null);
     const [incomes, setIncomes] = useState<IncomeDto[]>([]);
+    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: '', category: 'Other', date: ''});
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
     const [addDialogOpened, setAddDialogOpened] = useState(false);
     const [selectedIncome, setSelectedIncome] = useState<IncomeDto | null>(null);
-    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: '', category: 'Other', date: ''});
+    const [isEditing, setIsEditing] = useState(false);
 
     const handleEdit = (income: IncomeDto) => {
+        setIsEditing(true);
+
         // TODO: setNewIncome should be enough.. something with the state and the dialog is not working good and it's not synced
         newIncome.id = income.id;
         newIncome.amount = income.amount;
@@ -126,26 +129,44 @@ export default function IncomeView() {
         const income: IncomeDto = {
             amount: newIncome.amount,
             category: newIncome.category,
-            date: format(new Date(), "dd MMM yyyy HH:mm:ss")
         };
 
         const previousIncomes = [...incomes];
 
-        setIncomes([...incomes, income]);
+        if (isEditing) {
+            income.id = newIncome.id;
+            income.date = newIncome.date;
+            setIncomes(incomes.map(i => i.id === income.id ? income : i));
+        } else {
+            income.date = format(new Date(), "dd MMM yyyy HH:mm:ss");
+            setIncomes([...incomes, income]);
+        }
+
         setNewIncome({id: '', amount: '', category: 'Other', date: ''});
         setAddDialogOpened(false);
 
-        addIncome(newIncome.amount, newIncome.category.toUpperCase())
-            .then((savedIncome) => {
-                    income.id = savedIncome.id
-                    setIncomes([...incomes, income]);
-                }
-            )
-            .catch(() => {
-                setIncomes(previousIncomes);
-                setNewIncome(income);
-                setAddDialogOpened(true);
-            })
+        if (isEditing) {
+            editIncome(income.id!, income.amount, income.category.toUpperCase())
+                .catch(() => {
+                    setIncomes(previousIncomes);
+                    setNewIncome(income);
+                    setAddDialogOpened(true);
+                })
+
+            setIsEditing(false);
+        } else {
+            addIncome(income.amount, income.category.toUpperCase())
+                .then((savedIncome) => {
+                        income.id = savedIncome.id
+                        setIncomes([...incomes, income]);
+                    }
+                )
+                .catch(() => {
+                    setIncomes(previousIncomes);
+                    setNewIncome(income);
+                    setAddDialogOpened(true);
+                })
+        }
     };
 
     useEffect(() => {
@@ -160,9 +181,15 @@ export default function IncomeView() {
     }, []);
 
     const handleDialogOpenedChanged = (detailValue: boolean) => {
-        if (!detailValue) {
-            console.log("Reset")
+        if(isEditing) { // && incomeWasChanged
+            // todo: show confirmation dialog "Are you sure you want to cancel editing"
+            // return;
+            setIsEditing(false);
+        }
 
+        setAddDialogOpened(detailValue);
+
+        if (!detailValue) {
             // TODO: setNewIncome should be enough.. something with the state and the dialog is not working good and it's not synced
             newIncome.id = '';
             newIncome.amount = '';
@@ -171,8 +198,6 @@ export default function IncomeView() {
 
             setNewIncome({...newIncome, id: '', amount: '', category: 'Other', date: ''});
         }
-
-        setAddDialogOpened(detailValue);
     };
 
     return (
@@ -217,21 +242,21 @@ export default function IncomeView() {
             </ConfirmDialog>
 
             <Dialog
-                headerTitle="New Income"
+                headerTitle={isEditing ? "Edit Income" : "Add Income"}
                 opened={addDialogOpened}
                 onOpenedChanged={({detail}) => handleDialogOpenedChanged(detail.value)}
                 footerRenderer={() => (
                     <>
-                        <Button onClick={() => setAddDialogOpened(false)}>Cancel</Button>
+                        <Button onClick={() => handleDialogOpenedChanged(false)}>Cancel</Button>
                         <Button theme="primary" onClick={addNewIncome}>
-                            Add
+                            {isEditing ? "Edit" : "Add"}
                         </Button>
                     </>
                 )}
             >
                 <VerticalLayout style={{alignItems: 'stretch', width: '18rem', maxWidth: '100%'}}>
                     <TextField
-                        key={newIncome.id}  // Force re-render based on key
+                        // key={newIncome.id} // todo: was not making any difference - delete?
                         label="Amount"
                         value={newIncome.amount}
                         onChange={e => setNewIncome({...newIncome, amount: e.target.value})}

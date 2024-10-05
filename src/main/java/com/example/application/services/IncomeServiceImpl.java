@@ -2,6 +2,7 @@ package com.example.application.services;
 
 import com.example.application.data.IncomeCategory;
 import com.example.application.data.IncomeEntity;
+import com.example.application.exception.ResourceNotFoundException;
 import com.example.application.repository.IncomeRepository;
 import com.example.application.security.AuthenticatedUser;
 import com.vaadin.hilla.BrowserCallable;
@@ -31,11 +32,6 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public void deleteIncome(String incomeId) {
-        repository.deleteById(incomeId);
-    }
-
-    @Override
     public IncomeEntity addIncome(String amount, String category) {
         IncomeEntity incomeEntity = new IncomeEntity()
                 .setAmount(new BigDecimal(amount))
@@ -44,5 +40,23 @@ public class IncomeServiceImpl implements IncomeService {
                 .setCategory(IncomeCategory.valueOf(category));
 
         return repository.save(incomeEntity);
+    }
+
+    @Override
+    public IncomeEntity editIncome(String id, String amount, String category) {
+        IncomeEntity incomeEntity = repository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Income with id %s not found.", id)));
+
+        incomeEntity
+                .setAmount(new BigDecimal(amount))
+                .setCategory(IncomeCategory.valueOf(category));
+
+        return repository.save(incomeEntity);
+    }
+
+    @Override
+    public void deleteIncome(String incomeId) {
+        repository.deleteById(incomeId);
     }
 }
