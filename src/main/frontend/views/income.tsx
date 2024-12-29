@@ -84,28 +84,29 @@ export default function IncomeView() {
     const gridRef = React.useRef<any>(null);
     const [incomes, setIncomes] = useState<IncomeDto[]>([]);
     const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: '', category: 'Other', date: ''});
+    const [editedIncome, setEditedIncome] = useState<IncomeDto>({id: '', amount: '', category: 'Other', date: ''});
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
     const [addDialogOpened, setAddDialogOpened] = useState(false);
+    const [editDialogOpened, setEditDialogOpened] = useState(false);
     const [selectedIncome, setSelectedIncome] = useState<IncomeDto | null>(null);
     const [isEditing, setIsEditing] = useState(false);
 
     const handleEdit = (income: IncomeDto) => {
-        setIsEditing(true);
 
         // TODO: setNewIncome should be enough.. something with the state and the dialog is not working good and it's not synced
-        newIncome.id = income.id;
-        newIncome.amount = income.amount;
-        newIncome.category = income.category;
-        newIncome.date = income.date;
+        editedIncome.id = income.id;
+        editedIncome.amount = income.amount;
+        editedIncome.category = income.category;
+        editedIncome.date = income.date;
 
-        setNewIncome({
+        setEditedIncome({
             id: income.id,
             amount: income.amount,
             category: income.category,
             date: income.date
         });
 
-        setAddDialogOpened(true);
+        setEditDialogOpened(true);
     };
 
     const handleDelete = (income: IncomeDto) => {
@@ -133,40 +134,47 @@ export default function IncomeView() {
 
         const previousIncomes = [...incomes];
 
-        if (isEditing) {
-            income.id = newIncome.id;
-            income.date = newIncome.date;
-            setIncomes(incomes.map(i => i.id === income.id ? income : i));
-        } else {
-            income.date = format(new Date(), "dd MMM yyyy HH:mm:ss");
-            setIncomes([...incomes, income]);
-        }
+        income.date = format(new Date(), "dd MMM yyyy HH:mm:ss");
+        setIncomes([...incomes, income]);
 
         setNewIncome({id: '', amount: '', category: 'Other', date: ''});
         setAddDialogOpened(false);
 
-        if (isEditing) {
-            editIncome(income.id!, income.amount, income.category.toUpperCase())
-                .catch(() => {
-                    setIncomes(previousIncomes);
-                    setNewIncome(income);
-                    setAddDialogOpened(true);
-                })
+        addIncome(income.amount, income.category.toUpperCase())
+            .then((savedIncome) => {
+                    income.id = savedIncome.id
+                    setIncomes([...incomes, income]);
+                }
+            )
+            .catch(() => {
+                setIncomes(previousIncomes);
+                setNewIncome(income);
+                setAddDialogOpened(true);
+            })
+        
+    };
 
-            setIsEditing(false);
-        } else {
-            addIncome(income.amount, income.category.toUpperCase())
-                .then((savedIncome) => {
-                        income.id = savedIncome.id
-                        setIncomes([...incomes, income]);
-                    }
-                )
-                .catch(() => {
-                    setIncomes(previousIncomes);
-                    setNewIncome(income);
-                    setAddDialogOpened(true);
-                })
-        }
+    const editCustomIncome = () => {
+        const income: IncomeDto = {
+            amount: editedIncome.amount,
+            category: editedIncome.category,
+        };
+
+        const previousIncomes = [...incomes];
+
+        income.id = editedIncome.id;
+        income.date = editedIncome.date;
+        setIncomes(incomes.map(i => i.id === income.id ? income : i));
+
+        // setEditedIncome({id: '', amount: '', category: 'Other', date: ''});
+        setEditDialogOpened(false);
+
+        editIncome(income.id!, income.amount, income.category.toUpperCase())
+            .catch(() => {
+                setIncomes(previousIncomes);
+                setEditedIncome(income);
+                setEditDialogOpened(true);
+            })
     };
 
     useEffect(() => {
@@ -180,13 +188,7 @@ export default function IncomeView() {
         }, 100);
     }, []);
 
-    const handleDialogOpenedChanged = (detailValue: boolean) => {
-        if(isEditing) { // && incomeWasChanged
-            // todo: show confirmation dialog "Are you sure you want to cancel editing"
-            // return;
-            setIsEditing(false);
-        }
-
+    const handleAddDialogOpenedChanged = (detailValue: boolean) => {
         setAddDialogOpened(detailValue);
 
         if (!detailValue) {
@@ -198,6 +200,10 @@ export default function IncomeView() {
 
             setNewIncome({...newIncome, id: '', amount: '', category: 'Other', date: ''});
         }
+    };
+
+    const handleEditDialogOpenedChanged = (detailValue: boolean) => {
+        setEditDialogOpened(detailValue);
     };
 
     return (
@@ -242,14 +248,14 @@ export default function IncomeView() {
             </ConfirmDialog>
 
             <Dialog
-                headerTitle={isEditing ? "Edit Income" : "Add Income"}
+                headerTitle="Add Income"
                 opened={addDialogOpened}
-                onOpenedChanged={({detail}) => handleDialogOpenedChanged(detail.value)}
+                onOpenedChanged={({detail}) => handleAddDialogOpenedChanged(detail.value)}
                 footerRenderer={() => (
                     <>
-                        <Button onClick={() => handleDialogOpenedChanged(false)}>Cancel</Button>
+                        <Button onClick={() => handleAddDialogOpenedChanged(false)}>Cancel</Button>
                         <Button theme="primary" onClick={addNewIncome}>
-                            {isEditing ? "Edit" : "Add"}
+                            Add
                         </Button>
                     </>
                 )}
@@ -269,6 +275,37 @@ export default function IncomeView() {
                     />
                 </VerticalLayout>
             </Dialog>
+
+
+            <Dialog
+                headerTitle="Edit Income"
+                opened={editDialogOpened}
+                onOpenedChanged={({detail}) => handleEditDialogOpenedChanged(detail.value)}
+                footerRenderer={() => (
+                    <>
+                        <Button onClick={() => handleEditDialogOpenedChanged(false)}>Cancel</Button>
+                        <Button theme="primary" onClick={editCustomIncome}>
+                            Edit
+                        </Button>
+                    </>
+                )}
+            >
+                <VerticalLayout style={{alignItems: 'stretch', width: '18rem', maxWidth: '100%'}}>
+                    <TextField
+                        // key={newIncome.id} // todo: was not making any difference - delete?
+                        label="Amount"
+                        value={editedIncome.amount}
+                        onChange={e => setEditedIncome({...editedIncome, amount: e.target.value})}
+                    />
+                    <Select
+                        label="Category"
+                        value={editedIncome.category}
+                        items={categoryOptions}
+                        onValueChanged={e => setEditedIncome({...editedIncome, category: e.detail.value})}
+                    />
+                </VerticalLayout>
+            </Dialog>
+
         </>
     );
 }
