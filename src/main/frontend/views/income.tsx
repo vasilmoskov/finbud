@@ -36,7 +36,7 @@ const buttonRenderer = (income: IncomeDto, onEdit: (income: IncomeDto) => void, 
 
 interface IncomeDto {
     id?: string,
-    amount: string;
+    amount: number;
     currency: string;
     category: string;
     date?: string;
@@ -80,7 +80,7 @@ const formatDate = (dateString: string): string => {
 const mapIncomeEntityToDto = (income: IncomeEntity): IncomeDto => {
     return {
         id: income.id,
-        amount: income.amount + "",
+        amount: income.amount,
         currency: formtatCurrency(income.currency),
         category: formatCategory(income.category),
         date: income.date ? formatDate(income.date) : ''
@@ -100,8 +100,8 @@ const categoryOptions: SelectItem[] = Object.values(categoriesMap).map(value => 
 export default function IncomeView() {
     const gridRef = React.useRef<any>(null);
     const [incomes, setIncomes] = useState<IncomeDto[]>([]);
-    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: '', currency: 'Other', category: 'Other', date: ''});
-    const [editedIncome, setEditedIncome] = useState<IncomeDto>({id: '', amount: '', currency: 'Other', category: 'Other', date: ''});
+    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: ''});
+    const [editedIncome, setEditedIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: ''});
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
     const [addDialogOpened, setAddDialogOpened] = useState(false);
     const [editDialogOpened, setEditDialogOpened] = useState(false);
@@ -156,7 +156,7 @@ export default function IncomeView() {
         income.date = format(new Date(), "dd MMM yyyy HH:mm:ss");
         setIncomes([...incomes, income]);
 
-        setNewIncome({id: '', amount: '', currency: 'Other', category: 'Other', date: ''});
+        setNewIncome({id: '', amount: 0, currency: 'Other', category: 'Other', date: ''});
         setAddDialogOpened(false);
 
         addIncome(income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase())
@@ -214,12 +214,12 @@ export default function IncomeView() {
         if (!detailValue) {
             // TODO: setNewIncome should be enough.. something with the state and the dialog is not working good and it's not synced
             newIncome.id = '';
-            newIncome.amount = '';
+            newIncome.amount = 0;
             newIncome.currency = 'Other';
             newIncome.category = 'Other';
             newIncome.date = '';
 
-            setNewIncome({...newIncome, id: '', amount: '', currency: 'Other', category: 'Other', date: ''});
+            setNewIncome({...newIncome, id: '', amount: 0, currency: 'Other', category: 'Other', date: ''});
         }
     };
 
@@ -289,8 +289,8 @@ export default function IncomeView() {
                     <TextField
                         // key={newIncome.id} // todo: was not making any difference - delete?
                         label="Amount"
-                        value={newIncome.amount}
-                        onChange={e => setNewIncome({...newIncome, amount: e.target.value})}
+                        value={newIncome.amount.toFixed(2).toString()}
+                        onChange={e => setNewIncome({...newIncome, amount: Number(e.target.value)})}
                     />
                     <Select
                         label="Currency"
@@ -325,8 +325,8 @@ export default function IncomeView() {
                     <TextField
                         // key={newIncome.id} // todo: was not making any difference - delete?
                         label="Amount"
-                        value={editedIncome.amount}
-                        onChange={e => setEditedIncome({...editedIncome, amount: e.target.value})}
+                        value={editedIncome.amount.toFixed(2).toString()}
+                        onChange={e => setEditedIncome({...editedIncome, amount: Number(e.target.value)})}
                     />
                     <Select
                         label="Currency"

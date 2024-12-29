@@ -33,9 +33,9 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public IncomeEntity addIncome(String amount, String currencyCode, String category) {
+    public IncomeEntity addIncome(BigDecimal amount, String currencyCode, String category) {
         IncomeEntity incomeEntity = new IncomeEntity()
-                .setAmount(new BigDecimal(amount))
+                .setAmount(amount)
                 .setCurrency(CurrencyCode.valueOf(currencyCode))
                 .setUser(authenticatedUser.get().orElseThrow())
                 .setDate(LocalDateTime.now())
@@ -45,13 +45,13 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public IncomeEntity editIncome(String id, String amount, String currencyCode, String category) {
+    public IncomeEntity editIncome(String id, BigDecimal amount, String currencyCode, String category) {
         IncomeEntity incomeEntity = repository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Income with id %s not found.", id)));
 
         incomeEntity
-                .setAmount(new BigDecimal(amount))
+                .setAmount(amount)
                 .setCurrency(CurrencyCode.valueOf(currencyCode))
                 .setCategory(IncomeCategory.valueOf(category));
 
