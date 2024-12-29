@@ -49,6 +49,16 @@ const categoriesMap: Record<string, string> = {
     'OTHER': 'Other'
 };
 
+const categoryOptions: SelectItem[] = Object.values(categoriesMap).map(value => ({
+    label: value,
+    value: value
+}));
+
+const categoryFilteringOptions : SelectItem[] = [
+    { label: 'All', value: 'All' },
+    ...Object.values(categoriesMap).map(v => ({ label: v, value: v }))
+];
+
 const currencyCodesToSigns: Record<string, string> = {
     'BGN': 'лв.',
     'USD': '$',
@@ -92,11 +102,6 @@ const currencyOptions: SelectItem[] = Object.values(currencyCodesToSigns).map(va
     value: value
 }));
 
-const categoryOptions: SelectItem[] = Object.values(categoriesMap).map(value => ({
-    label: value,
-    value: value
-}));
-
 export default function IncomeView() {
     const gridRef = React.useRef<any>(null);
     const [incomes, setIncomes] = useState<IncomeDto[]>([]);
@@ -106,6 +111,8 @@ export default function IncomeView() {
     const [addDialogOpened, setAddDialogOpened] = useState(false);
     const [editDialogOpened, setEditDialogOpened] = useState(false);
     const [selectedIncome, setSelectedIncome] = useState<IncomeDto | null>(null);
+
+    const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
     const handleEdit = (income: IncomeDto) => {
 
@@ -229,7 +236,14 @@ export default function IncomeView() {
 
     return (
         <>
-            <Grid items={incomes} ref={gridRef}>
+            <Select
+                label="Filter by category"
+                items={categoryFilteringOptions}
+                value={selectedCategory}
+                onValueChanged={e => setSelectedCategory(e.detail.value)}
+                style={{margin: '1rem'}}
+            />
+            <Grid items={incomes.filter(i => selectedCategory === 'All' || i.category === selectedCategory)} ref={gridRef}>
                 <GridColumn header="Amount" autoWidth>
                 {({ item }) => (
                     <span
