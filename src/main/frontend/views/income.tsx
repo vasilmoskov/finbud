@@ -1,5 +1,8 @@
 import {
     ConfirmDialog,
+    DatePicker,
+    DatePickerDate,
+    DatePickerElement,
     Dialog,
     Grid,
     GridColumn,
@@ -8,14 +11,15 @@ import {
     SelectItem,
     VerticalLayout
 } from "@vaadin/react-components";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import IncomeEntity from "Frontend/generated/com/example/application/data/IncomeEntity";
 import {deleteIncome, getAll, addIncome, editIncome} from "Frontend/generated/IncomeServiceImpl";
 import {ViewConfig} from "@vaadin/hilla-file-router/types.js";
 import {Button} from "@vaadin/react-components/Button.js";
 import {TextField} from "@vaadin/react-components/TextField.js";
 import styles from "./income.module.css";
-import {format} from 'date-fns';
+import {format, parse} from 'date-fns';
+import { useSignal } from "@vaadin/hilla-react-signals";
 
 export const config: ViewConfig = {
     menu: {order: 2, icon: 'line-awesome/svg/file.svg'},
@@ -98,6 +102,24 @@ const formatDate = (dateString: string): string => {
     return format(new Date(dateString), "dd MMM yyyy HH:mm:ss");
 };
 
+
+const formatDateForDatePicker = (dateParts: DatePickerDate) => {
+    const { year, month, day } = dateParts;
+    const date = new Date(year, month, day);
+  
+    return format(date, 'dd/MM/yyyy');
+  }
+
+const parseDateForDatePicker = (inputValue: string) => {
+    const date = parse(inputValue, 'dd/MM/yyyy', new Date());
+  
+    return { year: date.getFullYear(), month: date.getMonth(), day: date.getDate() };
+  }
+
+const getDateWithoutTime = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
 const mapIncomeEntityToDto = (income: IncomeEntity): IncomeDto => {
     return {
         id: income.id,
@@ -128,6 +150,35 @@ export default function IncomeView() {
 
     const [amountFilterType, setAmountFilterType] = useState<string>('>');
     const [amountFilterValue, setAmountFilterValue] = useState<number>(0);
+
+    const startDate = useSignal(format(new Date(), 'dd/MM/yyyy'));
+    const endDate = useSignal(format(new Date(), 'dd/MM/yyyy'));
+
+    const startDatePickerRef = useRef<DatePickerElement>(null);
+    useEffect(() => {
+        const datePicker = startDatePickerRef.current;
+
+        if(datePicker) {
+            datePicker.i18n = {
+                ...datePicker.i18n,
+                formatDate: formatDateForDatePicker,
+                parseDate: parseDateForDatePicker
+            }
+        }
+    }, [startDatePickerRef.current])
+
+    const endDatePickerRef = useRef<DatePickerElement>(null);
+    useEffect(() => {
+        const datePicker = endDatePickerRef.current;
+
+        if(datePicker) {
+            datePicker.i18n = {
+                ...datePicker.i18n,
+                formatDate: formatDateForDatePicker,
+                parseDate: parseDateForDatePicker
+            }
+        }
+    }, [endDatePickerRef.current])
 
     const handleEdit = (income: IncomeDto) => {
 
@@ -251,37 +302,63 @@ export default function IncomeView() {
 
     return (
         <>
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'start', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1rem' }}>
+            <label style={{ marginRight: '0.5rem' }}>Filter by amount:</label>
                 <Select 
-                    label="Filter by amount"
                         items={amountFilterOptions}
                         value={amountFilterType}
                         onValueChanged={(e => setAmountFilterType(e.detail.value))}
-                        style={{
-                            marginLeft: '1rem',
-                        }}
+                        style={{maxWidth: '200px'}}
                         />
 
                 <TextField 
-                        label="Amount"
                         value={amountFilterValue !== null ? amountFilterValue.toString() : ''}
                         onChange={(e) => setAmountFilterValue(e.target.value ? Number(e.target.value) : 0)}
+                        style={{maxWidth: '200px'}}
                         />
+                </div>
 
-                <Select
-                    label="Filter by currency"
-                    items={currencyFilteringOptions}
-                    value={selectedCurrency}
-                    onValueChanged={e => setSelectedCurrency(e.detail.value)}
-                    style={{marginLeft: '1rem'}}
-                />
-                <Select
-                    label="Filter by category"
-                    items={categoryFilteringOptions}
-                    value={selectedCategory}
-                    onValueChanged={e => setSelectedCategory(e.detail.value)}
-                    style={{marginLeft: '1rem'}}
-                />
+                <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1rem' }}>
+
+                    <label style={{ marginRight: '0.5rem' }}>Filter by currency:</label>
+
+                    <Select
+                        items={currencyFilteringOptions}
+                        value={selectedCurrency}
+                        onValueChanged={e => setSelectedCurrency(e.detail.value)}
+                        style={{maxWidth: '200px'}}
+
+                    />
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1rem' }}>
+                    <label style={{ marginRight: '0.5rem' }}>Filter by catergory:</label>
+                    <Select
+                        items={categoryFilteringOptions}
+                        value={selectedCategory}
+                        onValueChanged={e => setSelectedCategory(e.detail.value)}
+                        style={{maxWidth: '200px'}}
+
+                    />
+                </div>
+                 <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1rem' }}>
+                    <label style={{ marginRight: '0.5rem' }}>Filter by date:</label>
+                    <DatePicker
+                        ref={startDatePickerRef}
+                        placeholder="From"
+                        value={startDate.value}
+                        onValueChanged={(e) => startDate.value = e.detail.value}
+                        style={{maxWidth: '200px'}}
+                    />
+                    <DatePicker
+                        ref={endDatePickerRef}
+                        placeholder="To"
+                        value={endDate.value}
+                        onValueChanged={(e) => endDate.value = e.detail.value}
+                        style={{maxWidth: '200px'}}
+                    />
+                </div>
             </div>
 
             <Grid items={incomes.filter(i => {
@@ -289,6 +366,7 @@ export default function IncomeView() {
                 const currencyFilter = selectedCurrency === 'All' || i.currency === selectedCurrency
 
                 let amountFilter = true;
+                let dateFilter = true;
 
                 if(amountFilterValue !== null) {
                     switch(amountFilterType) {
@@ -304,7 +382,19 @@ export default function IncomeView() {
                     }
                 }
 
-                return categoryFilter && currencyFilter && amountFilter
+                if(startDate.value || endDate.value) {
+                    const incomeDate = getDateWithoutTime(new Date(i.date!));
+
+                    if(startDate && incomeDate < getDateWithoutTime(new Date(startDate.value))) {
+                        dateFilter = false;
+                    }
+
+                    if(endDate && incomeDate > getDateWithoutTime(new Date(endDate.value))) {
+                        dateFilter = false;
+                    }
+                }
+
+                return categoryFilter && currencyFilter && amountFilter && dateFilter
 
             })} ref={gridRef}>
                 <GridColumn header="Amount" autoWidth>
