@@ -361,7 +361,7 @@ export default function IncomeView() {
                 </div>
             </div>
 
-            <Grid items={incomes.filter(i => {
+            <Grid style={{maxHeight: '300px'}} items={incomes.filter(i => {
                 const categoryFilter = selectedCategory === 'All' || i.category === selectedCategory
                 const currencyFilter = selectedCurrency === 'All' || i.currency === selectedCurrency
 
