@@ -75,6 +75,11 @@ const currencySignsToCodes: Record<string, string> = {
     'Other': 'OTHER'
 };
 
+const currencyFilteringOptions : SelectItem[] = [
+    { label: 'All', value: 'All' },
+    ...Object.keys(currencySignsToCodes).map(k => ({ label: k, value: k }))
+];
+
 const formtatCurrency = (currency: string): string => {
     return currencyCodesToSigns[currency] || currency;
 }
@@ -113,6 +118,7 @@ export default function IncomeView() {
     const [selectedIncome, setSelectedIncome] = useState<IncomeDto | null>(null);
 
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
+    const [selectedCurrency, setSelectedCurrency] = useState<string>('All');
 
     const handleEdit = (income: IncomeDto) => {
 
@@ -237,13 +243,26 @@ export default function IncomeView() {
     return (
         <>
             <Select
+                label="Filter by currency"
+                items={currencyFilteringOptions}
+                value={selectedCurrency}
+                onValueChanged={e => setSelectedCurrency(e.detail.value)}
+                style={{margin: '1rem'}}
+            />
+            <Select
                 label="Filter by category"
                 items={categoryFilteringOptions}
                 value={selectedCategory}
                 onValueChanged={e => setSelectedCategory(e.detail.value)}
                 style={{margin: '1rem'}}
             />
-            <Grid items={incomes.filter(i => selectedCategory === 'All' || i.category === selectedCategory)} ref={gridRef}>
+            <Grid items={incomes.filter(i => {
+                const categoryFilter = selectedCategory === 'All' || i.category === selectedCategory
+                const currencyFilter = selectedCurrency === 'All' || i.currency === selectedCurrency
+
+                return categoryFilter && currencyFilter
+
+            })} ref={gridRef}>
                 <GridColumn header="Amount" autoWidth>
                 {({ item }) => (
                     <span
