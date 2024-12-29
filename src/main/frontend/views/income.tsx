@@ -42,6 +42,12 @@ interface IncomeDto {
     date?: string;
 }
 
+const amountFilterOptions = [
+    { label: 'Greater than', value: '>' },
+    { label: 'Less than', value: '<' },
+    { label: 'Equals', value: '=' }
+]
+
 const categoriesMap: Record<string, string> = {
     'SALARY': 'Salary',
     'SAVINGS': 'Savings',
@@ -119,6 +125,9 @@ export default function IncomeView() {
 
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
     const [selectedCurrency, setSelectedCurrency] = useState<string>('All');
+
+    const [amountFilterType, setAmountFilterType] = useState<string>('>');
+    const [amountFilterValue, setAmountFilterValue] = useState<number>(0);
 
     const handleEdit = (income: IncomeDto) => {
 
@@ -242,25 +251,60 @@ export default function IncomeView() {
 
     return (
         <>
-            <Select
-                label="Filter by currency"
-                items={currencyFilteringOptions}
-                value={selectedCurrency}
-                onValueChanged={e => setSelectedCurrency(e.detail.value)}
-                style={{margin: '1rem'}}
-            />
-            <Select
-                label="Filter by category"
-                items={categoryFilteringOptions}
-                value={selectedCategory}
-                onValueChanged={e => setSelectedCategory(e.detail.value)}
-                style={{margin: '1rem'}}
-            />
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                <Select 
+                    label="Filter by amount"
+                        items={amountFilterOptions}
+                        value={amountFilterType}
+                        onValueChanged={(e => setAmountFilterType(e.detail.value))}
+                        style={{
+                            marginLeft: '1rem',
+                        }}
+                        />
+
+                <TextField 
+                        label="Amount"
+                        value={amountFilterValue !== null ? amountFilterValue.toString() : ''}
+                        onChange={(e) => setAmountFilterValue(e.target.value ? Number(e.target.value) : 0)}
+                        />
+
+                <Select
+                    label="Filter by currency"
+                    items={currencyFilteringOptions}
+                    value={selectedCurrency}
+                    onValueChanged={e => setSelectedCurrency(e.detail.value)}
+                    style={{marginLeft: '1rem'}}
+                />
+                <Select
+                    label="Filter by category"
+                    items={categoryFilteringOptions}
+                    value={selectedCategory}
+                    onValueChanged={e => setSelectedCategory(e.detail.value)}
+                    style={{marginLeft: '1rem'}}
+                />
+            </div>
+
             <Grid items={incomes.filter(i => {
                 const categoryFilter = selectedCategory === 'All' || i.category === selectedCategory
                 const currencyFilter = selectedCurrency === 'All' || i.currency === selectedCurrency
 
-                return categoryFilter && currencyFilter
+                let amountFilter = true;
+
+                if(amountFilterValue !== null) {
+                    switch(amountFilterType) {
+                        case ">": 
+                            amountFilter = i.amount > amountFilterValue;
+                            break;
+                        case "<": 
+                            amountFilter = i.amount < amountFilterValue;
+                            break;
+                        case "=":
+                            amountFilter = i.amount === amountFilterValue;
+                            break;
+                    }
+                }
+
+                return categoryFilter && currencyFilter && amountFilter
 
             })} ref={gridRef}>
                 <GridColumn header="Amount" autoWidth>
