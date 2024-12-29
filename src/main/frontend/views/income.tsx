@@ -231,7 +231,15 @@ export default function IncomeView() {
         <>
             <Grid items={incomes} ref={gridRef}>
                 <GridColumn header="Amount" autoWidth>
-                    {({item}) => Number(item.amount).toFixed(2)}
+                {({ item }) => (
+                    <span
+                        {...({
+                            theme: 'badge success',
+                        } satisfies object)}
+                    >
+                        {Number(item.amount).toFixed(2)}
+                    </span>
+                )}
                 </GridColumn>
 
                 <GridColumn header="Currency" autoWidth>
