@@ -106,13 +106,13 @@ export default function IncomeView() {
     const [addDialogOpened, setAddDialogOpened] = useState(false);
     const [editDialogOpened, setEditDialogOpened] = useState(false);
     const [selectedIncome, setSelectedIncome] = useState<IncomeDto | null>(null);
-    const [isEditing, setIsEditing] = useState(false);
 
     const handleEdit = (income: IncomeDto) => {
 
         // TODO: setNewIncome should be enough.. something with the state and the dialog is not working good and it's not synced
         editedIncome.id = income.id;
         editedIncome.amount = income.amount;
+        editedIncome.currency = income.currency;
         editedIncome.category = income.category;
         editedIncome.date = income.date;
 
