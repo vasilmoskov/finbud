@@ -23,16 +23,6 @@ export const config: ViewConfig = {
     loginRequired: true,
 };
 
-const amountRenderer = (income: IncomeDto) => (
-    <span
-        {...({
-            theme: `badge ${+income.amount >= 1000 ? 'success' : 'error'}`,
-        } satisfies object)}
-    >
-        {Number(income.amount).toFixed(2)} $
-         </span>
-);
-
 const buttonRenderer = (income: IncomeDto, onEdit: (income: IncomeDto) => void, onDelete: (income: IncomeDto) => void) => (
     <div>
         <Button theme="icon" onClick={() => onEdit(income)}>
@@ -241,7 +231,7 @@ export default function IncomeView() {
         <>
             <Grid items={incomes} ref={gridRef}>
                 <GridColumn header="Amount" autoWidth>
-                    {({item}) => amountRenderer(item)}
+                    {({item}) => Number(item.amount).toFixed(2)}
                 </GridColumn>
 
                 <GridColumn header="Currency" autoWidth>
