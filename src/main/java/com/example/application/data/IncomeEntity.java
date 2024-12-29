@@ -12,6 +12,9 @@ public class IncomeEntity extends AbstractEntity<IncomeEntity> {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
+    private CurrencyCode currency;
+
+    @Enumerated(EnumType.STRING)
     private IncomeCategory category;
 
     private LocalDateTime date;
@@ -24,6 +27,15 @@ public class IncomeEntity extends AbstractEntity<IncomeEntity> {
 
     public IncomeEntity setAmount(BigDecimal amount) {
         this.amount = amount;
+        return this;
+    }
+
+    public CurrencyCode getCurrency() {
+        return currency;
+    }
+
+    public IncomeEntity setCurrency(CurrencyCode currency) {
+        this.currency = currency;
         return this;
     }
 

@@ -47,6 +47,7 @@ const buttonRenderer = (income: IncomeDto, onEdit: (income: IncomeDto) => void, 
 interface IncomeDto {
     id?: string,
     amount: string;
+    currency: string;
     category: string;
     date?: string;
 }
@@ -57,6 +58,26 @@ const categoriesMap: Record<string, string> = {
     'DEPOSIT': 'Deposit',
     'OTHER': 'Other'
 };
+
+const currencyCodesToSigns: Record<string, string> = {
+    'BGN': 'лв.',
+    'USD': '$',
+    'EUR': '€',
+    'GBP': '£',
+    'OTHER': 'Other'
+};
+
+const currencySignsToCodes: Record<string, string> = {
+    'лв.': 'BGN',
+    '$': 'USD',
+    '€': 'EUR',
+    '£': 'GBP',
+    'Other': 'OTHER'
+};
+
+const formtatCurrency = (currency: string): string => {
+    return currencyCodesToSigns[currency] || currency;
+}
 
 const formatCategory = (category: string): string => {
     return categoriesMap[category] || category;
@@ -70,10 +91,16 @@ const mapIncomeEntityToDto = (income: IncomeEntity): IncomeDto => {
     return {
         id: income.id,
         amount: income.amount + "",
+        currency: formtatCurrency(income.currency),
         category: formatCategory(income.category),
         date: income.date ? formatDate(income.date) : ''
     };
 };
+
+const currencyOptions: SelectItem[] = Object.values(currencyCodesToSigns).map(value => ({
+    label: value,
+    value: value
+}));
 
 const categoryOptions: SelectItem[] = Object.values(categoriesMap).map(value => ({
     label: value,
@@ -83,8 +110,8 @@ const categoryOptions: SelectItem[] = Object.values(categoriesMap).map(value => 
 export default function IncomeView() {
     const gridRef = React.useRef<any>(null);
     const [incomes, setIncomes] = useState<IncomeDto[]>([]);
-    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: '', category: 'Other', date: ''});
-    const [editedIncome, setEditedIncome] = useState<IncomeDto>({id: '', amount: '', category: 'Other', date: ''});
+    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: '', currency: 'Other', category: 'Other', date: ''});
+    const [editedIncome, setEditedIncome] = useState<IncomeDto>({id: '', amount: '', currency: 'Other', category: 'Other', date: ''});
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
     const [addDialogOpened, setAddDialogOpened] = useState(false);
     const [editDialogOpened, setEditDialogOpened] = useState(false);
@@ -102,6 +129,7 @@ export default function IncomeView() {
         setEditedIncome({
             id: income.id,
             amount: income.amount,
+            currency: income.currency,
             category: income.category,
             date: income.date
         });
@@ -129,6 +157,7 @@ export default function IncomeView() {
     const addNewIncome = () => {
         const income: IncomeDto = {
             amount: newIncome.amount,
+            currency: newIncome.currency,
             category: newIncome.category,
         };
 
@@ -137,10 +166,10 @@ export default function IncomeView() {
         income.date = format(new Date(), "dd MMM yyyy HH:mm:ss");
         setIncomes([...incomes, income]);
 
-        setNewIncome({id: '', amount: '', category: 'Other', date: ''});
+        setNewIncome({id: '', amount: '', currency: 'Other', category: 'Other', date: ''});
         setAddDialogOpened(false);
 
-        addIncome(income.amount, income.category.toUpperCase())
+        addIncome(income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase())
             .then((savedIncome) => {
                     income.id = savedIncome.id
                     setIncomes([...incomes, income]);
@@ -157,6 +186,7 @@ export default function IncomeView() {
     const editCustomIncome = () => {
         const income: IncomeDto = {
             amount: editedIncome.amount,
+            currency: editedIncome.currency,
             category: editedIncome.category,
         };
 
@@ -169,7 +199,7 @@ export default function IncomeView() {
         // setEditedIncome({id: '', amount: '', category: 'Other', date: ''});
         setEditDialogOpened(false);
 
-        editIncome(income.id!, income.amount, income.category.toUpperCase())
+        editIncome(income.id!, income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase())
             .catch(() => {
                 setIncomes(previousIncomes);
                 setEditedIncome(income);
@@ -195,10 +225,11 @@ export default function IncomeView() {
             // TODO: setNewIncome should be enough.. something with the state and the dialog is not working good and it's not synced
             newIncome.id = '';
             newIncome.amount = '';
+            newIncome.currency = 'Other';
             newIncome.category = 'Other';
             newIncome.date = '';
 
-            setNewIncome({...newIncome, id: '', amount: '', category: 'Other', date: ''});
+            setNewIncome({...newIncome, id: '', amount: '', currency: 'Other', category: 'Other', date: ''});
         }
     };
 
@@ -211,6 +242,10 @@ export default function IncomeView() {
             <Grid items={incomes} ref={gridRef}>
                 <GridColumn header="Amount" autoWidth>
                     {({item}) => amountRenderer(item)}
+                </GridColumn>
+
+                <GridColumn header="Currency" autoWidth>
+                    {({item}) => item.currency}
                 </GridColumn>
 
                 <GridColumn header="Date" autoWidth>
@@ -268,6 +303,12 @@ export default function IncomeView() {
                         onChange={e => setNewIncome({...newIncome, amount: e.target.value})}
                     />
                     <Select
+                        label="Currency"
+                        value={newIncome.currency}
+                        items={currencyOptions}
+                        onValueChanged={e => setNewIncome({...newIncome, currency: e.detail.value})}
+                    />
+                    <Select
                         label="Category"
                         value={newIncome.category}
                         items={categoryOptions}
@@ -296,6 +337,12 @@ export default function IncomeView() {
                         label="Amount"
                         value={editedIncome.amount}
                         onChange={e => setEditedIncome({...editedIncome, amount: e.target.value})}
+                    />
+                    <Select
+                        label="Currency"
+                        value={editedIncome.currency}
+                        items={currencyOptions}
+                        onValueChanged={e => setEditedIncome({...editedIncome, currency: e.detail.value})}
                     />
                     <Select
                         label="Category"

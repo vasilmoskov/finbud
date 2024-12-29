@@ -1,5 +1,6 @@
 package com.example.application.services;
 
+import com.example.application.data.CurrencyCode;
 import com.example.application.data.IncomeCategory;
 import com.example.application.data.IncomeEntity;
 import com.example.application.exception.ResourceNotFoundException;
@@ -32,9 +33,10 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public IncomeEntity addIncome(String amount, String category) {
+    public IncomeEntity addIncome(String amount, String currencyCode, String category) {
         IncomeEntity incomeEntity = new IncomeEntity()
                 .setAmount(new BigDecimal(amount))
+                .setCurrency(CurrencyCode.valueOf(currencyCode))
                 .setUser(authenticatedUser.get().orElseThrow())
                 .setDate(LocalDateTime.now())
                 .setCategory(IncomeCategory.valueOf(category));
@@ -43,13 +45,14 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public IncomeEntity editIncome(String id, String amount, String category) {
+    public IncomeEntity editIncome(String id, String amount, String currencyCode, String category) {
         IncomeEntity incomeEntity = repository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Income with id %s not found.", id)));
 
         incomeEntity
                 .setAmount(new BigDecimal(amount))
+                .setCurrency(CurrencyCode.valueOf(currencyCode))
                 .setCategory(IncomeCategory.valueOf(category));
 
         return repository.save(incomeEntity);
