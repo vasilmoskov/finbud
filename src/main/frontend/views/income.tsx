@@ -238,12 +238,12 @@ export default function IncomeView() {
                     {({item}) => item.currency}
                 </GridColumn>
 
-                <GridColumn header="Date" autoWidth>
-                    {({item}) => item.date}
-                </GridColumn>
-
                 <GridColumn header="Category" autoWidth>
                     {({item}) => item.category}
+                </GridColumn>
+
+                <GridColumn header="Date" autoWidth>
+                    {({item}) => item.date}
                 </GridColumn>
 
                 <GridColumn autoWidth>
