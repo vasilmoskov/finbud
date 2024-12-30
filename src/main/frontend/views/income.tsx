@@ -353,7 +353,7 @@ export default function IncomeView() {
                 style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
             >
                 Clear Filters
-                <Icon icon="vaadin:trash"/>
+                <i className="fa-solid fa-broom" style={{ marginLeft: '0.5rem' }}></i>
             </Button>
 
             {filtersVisible && (

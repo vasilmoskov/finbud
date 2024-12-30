@@ -1,4 +1,5 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 export const config: ViewConfig = {
   menu: { order: 0, icon: 'line-awesome/svg/globe-solid.svg' },
