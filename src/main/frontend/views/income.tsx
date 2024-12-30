@@ -191,7 +191,7 @@ export default function IncomeView() {
         selectedCurrency === 'All' &&
         selectedCategory === 'All' &&
         !isStartDateSelected && 
-        !isStartDateSelected
+        !isEndDateSelected
       );
     }
 
