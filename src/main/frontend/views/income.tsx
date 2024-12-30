@@ -17,7 +17,6 @@ import {deleteIncome, getAll, addIncome, editIncome} from "Frontend/generated/In
 import {ViewConfig} from "@vaadin/hilla-file-router/types.js";
 import {Button} from "@vaadin/react-components/Button.js";
 import {TextField} from "@vaadin/react-components/TextField.js";
-import styles from "./income.module.css";
 import {format, parse} from 'date-fns';
 import { useSignal } from "@vaadin/hilla-react-signals";
 
@@ -304,80 +303,80 @@ export default function IncomeView() {
 
     return (
         <>
-        <Button
-            theme="success"
-            onClick={() => setAddDialogOpened(true)}
-            style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
-        >
-            Add Income 
-            <Icon icon="vaadin:plus"/>
-        </Button>
+            <Button
+                theme="success"
+                onClick={() => setAddDialogOpened(true)}
+                style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
+            >
+                Add Income
+                <Icon icon="vaadin:plus"/>
+            </Button>
 
-        <Button theme="success" onClick={() => setFiltersVisible(!filtersVisible)} style={{margin: '1rem'}}>
-            {filtersVisible ? 'Hide Filters' : 'Show Filters'}
-            <Icon icon={`vaadin:${filtersVisible ? 'angle-down' : 'angle-right'}`}/>
-        </Button>
-        {filtersVisible && (
+            <Button theme="success" onClick={() => setFiltersVisible(!filtersVisible)} style={{margin: '1rem'}}>
+                {filtersVisible ? 'Hide Filters' : 'Show Filters'}
+                <Icon icon={`vaadin:${filtersVisible ? 'angle-down' : 'angle-right'}`}/>
+            </Button>
+            {filtersVisible && (
 
-        <div style={{ display: 'flex', alignItems: 'start', marginBottom: '1rem' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1rem' }}>
-            <label style={{ marginRight: '0.5rem' }}>Filter by amount:</label>
-                <Select 
-                        items={amountFilterOptions}
-                        value={amountFilterType}
-                        onValueChanged={(e => setAmountFilterType(e.detail.value))}
-                        style={{maxWidth: '200px'}}
+                <div style={{display: 'flex', alignItems: 'start', marginBottom: '1rem'}}>
+                    <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
+                        <label style={{marginRight: '0.5rem'}}>Filter by amount:</label>
+                        <Select
+                            items={amountFilterOptions}
+                            value={amountFilterType}
+                            onValueChanged={(e => setAmountFilterType(e.detail.value))}
+                            style={{maxWidth: '200px'}}
                         />
 
-                <TextField 
-                        value={amountFilterValue !== null ? amountFilterValue.toString() : ''}
-                        onChange={(e) => setAmountFilterValue(e.target.value ? Number(e.target.value) : 0)}
-                        style={{maxWidth: '200px'}}
+                        <TextField
+                            value={amountFilterValue !== null ? amountFilterValue.toString() : ''}
+                            onChange={(e) => setAmountFilterValue(e.target.value ? Number(e.target.value) : 0)}
+                            style={{maxWidth: '200px'}}
                         />
+                    </div>
+
+                    <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
+
+                        <label style={{marginRight: '0.5rem'}}>Filter by currency:</label>
+
+                        <Select
+                            items={currencyFilteringOptions}
+                            value={selectedCurrency}
+                            onValueChanged={e => setSelectedCurrency(e.detail.value)}
+                            style={{maxWidth: '200px'}}
+
+                        />
+                    </div>
+
+                    <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
+                        <label style={{marginRight: '0.5rem'}}>Filter by catergory:</label>
+                        <Select
+                            items={categoryFilteringOptions}
+                            value={selectedCategory}
+                            onValueChanged={e => setSelectedCategory(e.detail.value)}
+                            style={{maxWidth: '200px'}}
+
+                        />
+                    </div>
+                    <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
+                        <label style={{marginRight: '0.5rem'}}>Filter by date:</label>
+                        <DatePicker
+                            ref={startDatePickerRef}
+                            placeholder="From"
+                            value={startDate.value}
+                            onValueChanged={(e) => startDate.value = e.detail.value}
+                            style={{maxWidth: '200px'}}
+                        />
+                        <DatePicker
+                            ref={endDatePickerRef}
+                            placeholder="To"
+                            value={endDate.value}
+                            onValueChanged={(e) => endDate.value = e.detail.value}
+                            style={{maxWidth: '200px'}}
+                        />
+                    </div>
                 </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1rem' }}>
-
-                    <label style={{ marginRight: '0.5rem' }}>Filter by currency:</label>
-
-                    <Select
-                        items={currencyFilteringOptions}
-                        value={selectedCurrency}
-                        onValueChanged={e => setSelectedCurrency(e.detail.value)}
-                        style={{maxWidth: '200px'}}
-
-                    />
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1rem' }}>
-                    <label style={{ marginRight: '0.5rem' }}>Filter by catergory:</label>
-                    <Select
-                        items={categoryFilteringOptions}
-                        value={selectedCategory}
-                        onValueChanged={e => setSelectedCategory(e.detail.value)}
-                        style={{maxWidth: '200px'}}
-
-                    />
-                </div>
-                 <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1rem' }}>
-                    <label style={{ marginRight: '0.5rem' }}>Filter by date:</label>
-                    <DatePicker
-                        ref={startDatePickerRef}
-                        placeholder="From"
-                        value={startDate.value}
-                        onValueChanged={(e) => startDate.value = e.detail.value}
-                        style={{maxWidth: '200px'}}
-                    />
-                    <DatePicker
-                        ref={endDatePickerRef}
-                        placeholder="To"
-                        value={endDate.value}
-                        onValueChanged={(e) => endDate.value = e.detail.value}
-                        style={{maxWidth: '200px'}}
-                    />
-                </div>
-            </div>
-        )}
+            )}
             <Grid items={incomes.filter(i => {
                 const categoryFilter = selectedCategory === 'All' || i.category === selectedCategory
                 const currencyFilter = selectedCurrency === 'All' || i.currency === selectedCurrency
@@ -385,12 +384,12 @@ export default function IncomeView() {
                 let amountFilter = true;
                 let dateFilter = true;
 
-                if(amountFilterValue !== null) {
-                    switch(amountFilterType) {
-                        case ">": 
+                if (amountFilterValue !== null) {
+                    switch (amountFilterType) {
+                        case ">":
                             amountFilter = i.amount > amountFilterValue;
                             break;
-                        case "<": 
+                        case "<":
                             amountFilter = i.amount < amountFilterValue;
                             break;
                         case "=":
@@ -399,14 +398,14 @@ export default function IncomeView() {
                     }
                 }
 
-                if(startDate.value || endDate.value) {
+                if (startDate.value || endDate.value) {
                     const incomeDate = getDateWithoutTime(new Date(i.date!));
 
-                    if(startDate && incomeDate < getDateWithoutTime(new Date(startDate.value))) {
+                    if (startDate && incomeDate < getDateWithoutTime(new Date(startDate.value))) {
                         dateFilter = false;
                     }
 
-                    if(endDate && incomeDate > getDateWithoutTime(new Date(endDate.value))) {
+                    if (endDate && incomeDate > getDateWithoutTime(new Date(endDate.value))) {
                         dateFilter = false;
                     }
                 }
@@ -415,15 +414,15 @@ export default function IncomeView() {
 
             })} ref={gridRef}>
                 <GridColumn header="Amount" autoWidth>
-                {({ item }) => (
-                    <span
-                        {...({
-                            theme: 'badge success',
-                        } satisfies object)}
-                    >
+                    {({item}) => (
+                        <span
+                            {...({
+                                theme: 'badge success',
+                            } satisfies object)}
+                        >
                         {Number(item.amount).toFixed(2)}
                     </span>
-                )}
+                    )}
                 </GridColumn>
 
                 <GridColumn header="Currency" autoWidth>
