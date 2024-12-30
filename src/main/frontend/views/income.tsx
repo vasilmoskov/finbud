@@ -155,6 +155,9 @@ export default function IncomeView() {
     const startDate = useSignal(format(new Date(), 'dd/MM/yyyy'));
     const endDate = useSignal(format(new Date(), 'dd/MM/yyyy'));
 
+    const [isStartDateSelected, setIsStartDateSelected] = useState(false);
+    const [isEndDateSelected, setIsEndDateSelected] = useState(false);
+
     const startDatePickerRef = useRef<DatePickerElement>(null);
     useEffect(() => {
         const datePicker = startDatePickerRef.current;
@@ -187,8 +190,8 @@ export default function IncomeView() {
         amountFilterValue === 0 &&
         selectedCurrency === 'All' &&
         selectedCategory === 'All' &&
-        startDate.value === '' && 
-        endDate.value === ''
+        !isStartDateSelected && 
+        !isStartDateSelected
       );
     }
 
@@ -197,6 +200,8 @@ export default function IncomeView() {
       setAmountFilterValue(0);
       setSelectedCurrency('All');
       setSelectedCategory('All');
+      setIsStartDateSelected(false);
+      setIsEndDateSelected(false);
       startDate.value = '';
       endDate.value = '';
     }
@@ -399,14 +404,20 @@ export default function IncomeView() {
                             ref={startDatePickerRef}
                             placeholder="From"
                             value={startDate.value}
-                            onValueChanged={(e) => startDate.value = e.detail.value}
+                            onValueChanged={(e) => {
+                                startDate.value = e.detail.value;
+                                setIsStartDateSelected(!!e.detail.value);
+                            }}
                             style={{maxWidth: '200px'}}
                         />
                         <DatePicker
                             ref={endDatePickerRef}
                             placeholder="To"
                             value={endDate.value}
-                            onValueChanged={(e) => endDate.value = e.detail.value}
+                            onValueChanged={(e) => {
+                                endDate.value = e.detail.value;
+                                setIsEndDateSelected(!!e.detail.value);
+                            }}
                             style={{maxWidth: '200px'}}
                         />
                     </div>
