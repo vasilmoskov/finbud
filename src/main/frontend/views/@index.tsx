@@ -1,37 +1,16 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
-import { useSignal } from '@vaadin/hilla-react-signals';
-import { Button } from '@vaadin/react-components/Button.js';
-import { Notification } from '@vaadin/react-components/Notification.js';
-import { TextField } from '@vaadin/react-components/TextField.js';
-import { HelloWorldService } from 'Frontend/generated/endpoints.js';
 
 export const config: ViewConfig = {
   menu: { order: 0, icon: 'line-awesome/svg/globe-solid.svg' },
-  title: 'Hello World',
+  title: 'Dashboards',
   loginRequired: true,
 };
 
-export default function HelloWorldView() {
-  const name = useSignal('');
-
+export default function DashboardsView() {
   return (
-    <>
-      <section className="flex p-m gap-m items-end">
-        <TextField
-          label="Your name"
-          onValueChanged={(e) => {
-            name.value = e.detail.value;
-          }}
-        />
-        <Button
-          onClick={async () => {
-            const serverResponse = await HelloWorldService.sayHello(name.value);
-            Notification.show(serverResponse);
-          }}
-        >
-          Say hello
-        </Button>
-      </section>
-    </>
+    <div className="flex flex-col h-full items-center justify-center p-l text-center box-border">
+      <img style={{ width: '200px' }} src="images/empty-plant.png" />
+      <h2>Vizualize Dashboards with Incomes and Expenses</h2>
+    </div>
   );
 }
