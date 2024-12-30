@@ -304,6 +304,15 @@ export default function IncomeView() {
 
     return (
         <>
+        <Button
+            theme="success"
+            onClick={() => setAddDialogOpened(true)}
+            style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
+        >
+            Add Income 
+            <Icon icon="vaadin:plus"/>
+        </Button>
+
         <Button theme="success" onClick={() => setFiltersVisible(!filtersVisible)} style={{margin: '1rem'}}>
             {filtersVisible ? 'Hide Filters' : 'Show Filters'}
             <Icon icon={`vaadin:${filtersVisible ? 'angle-down' : 'angle-right'}`}/>
@@ -433,16 +442,6 @@ export default function IncomeView() {
                     {({item}) => buttonRenderer(item, handleEdit, handleDelete)}
                 </GridColumn>
             </Grid>
-
-            <div style={{display: 'flex', justifyContent: 'center', marginTop: '1rem'}}>
-                <Button
-                    theme="primary"
-                    className={styles.addButton}
-                    onClick={() => setAddDialogOpened(true)}
-                >
-                    <Icon icon="vaadin:plus" className={styles.addButtonIcon}/>
-                </Button>
-            </div>
 
             <ConfirmDialog
                 header="Confirm Delete"
