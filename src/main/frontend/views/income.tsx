@@ -21,7 +21,7 @@ import {format, parse} from 'date-fns';
 import { useSignal } from "@vaadin/hilla-react-signals";
 
 export const config: ViewConfig = {
-    menu: {order: 2, icon: 'line-awesome/svg/file.svg'},
+    menu: {order: 1, icon: 'line-awesome/svg/file.svg'},
     title: 'Incomes',
     loginRequired: true,
 };

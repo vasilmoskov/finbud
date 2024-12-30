@@ -1,7 +1,7 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 
 export const config: ViewConfig = {
-  menu: { order: 1, icon: 'line-awesome/svg/file.svg' },
+  menu: { order: 2, icon: 'line-awesome/svg/file.svg' },
   title: 'Expenses',
   loginRequired: true,
 };
