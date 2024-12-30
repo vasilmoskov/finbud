@@ -145,6 +145,8 @@ export default function IncomeView() {
     const [editDialogOpened, setEditDialogOpened] = useState(false);
     const [selectedIncome, setSelectedIncome] = useState<IncomeDto | null>(null);
 
+    const [filtersVisible, setFiltersVisible] = useState(false);
+
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
     const [selectedCurrency, setSelectedCurrency] = useState<string>('All');
 
@@ -302,6 +304,12 @@ export default function IncomeView() {
 
     return (
         <>
+        <Button theme="success" onClick={() => setFiltersVisible(!filtersVisible)} style={{margin: '1rem'}}>
+            {filtersVisible ? 'Hide Filters' : 'Show Filters'}
+            <Icon icon={`vaadin:${filtersVisible ? 'angle-down' : 'angle-right'}`}/>
+        </Button>
+        {filtersVisible && (
+
         <div style={{ display: 'flex', alignItems: 'start', marginBottom: '1rem' }}>
         <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '1rem' }}>
             <label style={{ marginRight: '0.5rem' }}>Filter by amount:</label>
@@ -360,8 +368,8 @@ export default function IncomeView() {
                     />
                 </div>
             </div>
-
-            <Grid style={{maxHeight: '300px'}} items={incomes.filter(i => {
+        )}
+            <Grid items={incomes.filter(i => {
                 const categoryFilter = selectedCategory === 'All' || i.category === selectedCategory
                 const currencyFilter = selectedCurrency === 'All' || i.currency === selectedCurrency
 
