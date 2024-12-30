@@ -181,6 +181,26 @@ export default function IncomeView() {
         }
     }, [endDatePickerRef.current])
 
+    const areFiltersDefault = () => {
+      return (
+        amountFilterType === '>' &&
+        amountFilterValue === 0 &&
+        selectedCurrency === 'All' &&
+        selectedCategory === 'All' &&
+        startDate.value === '' && 
+        endDate.value === ''
+      );
+    }
+
+    const clearFilters = () => {
+      setAmountFilterType('>');
+      setAmountFilterValue(0);
+      setSelectedCurrency('All');
+      setSelectedCategory('All');
+      startDate.value = '';
+      endDate.value = '';
+    }
+
     const handleEdit = (income: IncomeDto) => {
 
         // TODO: setNewIncome should be enough.. something with the state and the dialog is not working good and it's not synced
@@ -312,10 +332,25 @@ export default function IncomeView() {
                 <Icon icon="vaadin:plus"/>
             </Button>
 
-            <Button theme="success" onClick={() => setFiltersVisible(!filtersVisible)} style={{margin: '1rem'}}>
+            <Button 
+                theme="success" 
+                onClick={() => setFiltersVisible(!filtersVisible)} 
+                style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
+            >
                 {filtersVisible ? 'Hide Filters' : 'Show Filters'}
                 <Icon icon={`vaadin:${filtersVisible ? 'angle-down' : 'angle-right'}`}/>
             </Button>
+
+            <Button 
+                theme="success" 
+                disabled={areFiltersDefault()} 
+                onClick={() => clearFilters()} 
+                style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
+            >
+                Clear Filters
+                <Icon icon="vaadin:trash"/>
+            </Button>
+
             {filtersVisible && (
 
                 <div style={{display: 'flex', alignItems: 'start', marginBottom: '1rem'}}>
