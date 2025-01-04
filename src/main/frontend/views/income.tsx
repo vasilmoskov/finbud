@@ -91,6 +91,12 @@ const currencyFilteringOptions : SelectItem[] = [
     ...Object.keys(currencySignsToCodes).map(k => ({ label: k, value: k }))
 ];
 
+const usualityFilteringOptions : SelectItem[] = [
+    { label: 'All', value: 'All' },
+    { label: 'Usual', value: 'usual' },
+    { label: 'Unusual', value: 'unusual' }
+];
+
 const formtatCurrency = (currency: string): string => {
     return currencyCodesToSigns[currency] || currency;
 }
@@ -161,6 +167,8 @@ export default function IncomeView() {
     const [isStartDateSelected, setIsStartDateSelected] = useState(false);
     const [isEndDateSelected, setIsEndDateSelected] = useState(false);
 
+    const [selectedByUsuality, setSelectedByUsuality] = useState<string>('All');
+
     const [sortConfig, setSortConfig] = useState({key: '', direction: ''});
 
     const startDatePickerRef = useRef<DatePickerElement>(null);
@@ -195,6 +203,7 @@ export default function IncomeView() {
         amountFilterValue === 0 &&
         selectedCurrency === 'All' &&
         selectedCategory === 'All' &&
+        selectedByUsuality === 'All' &&
         !isStartDateSelected && 
         !isEndDateSelected
       );
@@ -205,6 +214,7 @@ export default function IncomeView() {
       setAmountFilterValue(0);
       setSelectedCurrency('All');
       setSelectedCategory('All');
+      setSelectedByUsuality('All');
       setIsStartDateSelected(false);
       setIsEndDateSelected(false);
       startDate.value = '';
@@ -420,7 +430,6 @@ export default function IncomeView() {
                             value={selectedCategory}
                             onValueChanged={e => setSelectedCategory(e.detail.value)}
                             style={{maxWidth: '200px'}}
-
                         />
                     </div>
                     <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
@@ -446,11 +455,23 @@ export default function IncomeView() {
                             style={{maxWidth: '200px'}}
                         />
                     </div>
+                    <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
+                        <label style={{marginRight: '0.5rem'}}>Filter by usuality:</label>
+                        <Select
+                            items={usualityFilteringOptions}
+                            value={selectedByUsuality}
+                            onValueChanged={e => setSelectedByUsuality(e.detail.value)}
+                            style={{maxWidth: '200px'}}
+                        />
+                    </div>
                 </div>
             )}
             <Grid items={incomes.filter(i => {
                 const categoryFilter = selectedCategory === 'All' || i.category === selectedCategory
                 const currencyFilter = selectedCurrency === 'All' || i.currency === selectedCurrency
+                const usualityFilter = selectedByUsuality === 'All' || 
+                     (selectedByUsuality === 'usual' && !i.unusual) || 
+                     (selectedByUsuality === 'unusual' && i.unusual);
 
                 let amountFilter = true;
                 let dateFilter = true;
@@ -481,7 +502,7 @@ export default function IncomeView() {
                     }
                 }
 
-                return categoryFilter && currencyFilter && amountFilter && dateFilter
+                return categoryFilter && currencyFilter && amountFilter && dateFilter && usualityFilter
 
             }).sort((a, b) => {
                 if(sortConfig.direction === '') {
