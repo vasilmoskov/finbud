@@ -121,7 +121,7 @@
       "workbox-core": "7.1.0",
       "workbox-precaching": "7.1.0"
     },
-    "hash": "b37786bab2c79c4aad45fa1385a35b98e891f13a42e1091ff21ddb633c0edbac"
+    "hash": "b942336a4837ebd9a974827dcc3deb2071c1b2a071f7ab26b8bf0476af9d49f4"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -161,6 +161,7 @@
     "@vaadin/react-components-pro": "$@vaadin/react-components-pro",
     "@vaadin/vaadin-themable-mixin": "$@vaadin/vaadin-themable-mixin",
     "@vaadin/vaadin-lumo-styles": "$@vaadin/vaadin-lumo-styles",
-    "@vaadin/vaadin-material-styles": "$@vaadin/vaadin-material-styles"
+    "@vaadin/vaadin-material-styles": "$@vaadin/vaadin-material-styles",
+    "@fortawesome/fontawesome-free": "$@fortawesome/fontawesome-free"
   }
 }

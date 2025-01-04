@@ -158,6 +158,8 @@ export default function IncomeView() {
     const [isStartDateSelected, setIsStartDateSelected] = useState(false);
     const [isEndDateSelected, setIsEndDateSelected] = useState(false);
 
+    const [sortConfig, setSortConfig] = useState({key: '', direction: ''});
+
     const startDatePickerRef = useRef<DatePickerElement>(null);
     useEffect(() => {
         const datePicker = startDatePickerRef.current;
@@ -204,6 +206,21 @@ export default function IncomeView() {
       setIsEndDateSelected(false);
       startDate.value = '';
       endDate.value = '';
+    }
+
+    const handleSort = (key: string) => {
+        // when we click on a column header for a first time, we sort in ascending order
+        let direction = 'ascending';
+
+        if(sortConfig.key === key && sortConfig.direction === 'ascending') {
+            // if the last sort was with the same key and it was in ascending order, we change the sort to descending order
+            direction = 'descending';
+        } else if(sortConfig.key  === key && sortConfig.direction === 'descending') {
+            // if the last sort was with the same key and it was in descending order, we change the sort to default order
+            direction = '';
+        }
+
+        setSortConfig({key, direction});   
     }
 
     const handleEdit = (income: IncomeDto) => {
@@ -447,20 +464,51 @@ export default function IncomeView() {
                 if (startDate.value || endDate.value) {
                     const incomeDate = getDateWithoutTime(new Date(i.date!));
 
-                    if (startDate && incomeDate < getDateWithoutTime(new Date(startDate.value))) {
+                    if (isStartDateSelected && startDate && incomeDate < getDateWithoutTime(new Date(startDate.value))) {
                         dateFilter = false;
                     }
 
-                    if (endDate && incomeDate > getDateWithoutTime(new Date(endDate.value))) {
+                    if (isEndDateSelected && endDate && incomeDate > getDateWithoutTime(new Date(endDate.value))) {
                         dateFilter = false;
                     }
                 }
 
                 return categoryFilter && currencyFilter && amountFilter && dateFilter
 
-            })} ref={gridRef}>
-                <GridColumn header="Amount" autoWidth>
-                    {({item}) => (
+            }).sort((a, b) => {
+                if(sortConfig.direction === '') {
+                    return 0;
+                }
+
+                if(sortConfig.key === 'amount') {
+                    return sortConfig.direction === 'ascending'
+                        ? a.amount - b.amount
+                        : b.amount - a.amount
+                }
+
+                if(sortConfig.key === 'currency') {
+                    return sortConfig.direction === 'ascending'
+                        ? a.currency.localeCompare(b.currency)
+                        : b.currency.localeCompare(a.currency);
+                }
+
+                if (sortConfig.key === 'category') {
+                    return sortConfig.direction === 'ascending'
+                    ? a.category.localeCompare(b.category)
+                    : b.category.localeCompare(a.category);
+                }
+
+                if(sortConfig.key === 'date') {
+                    return sortConfig.direction === 'ascending'
+                        ? new Date(a.date!).getTime() - new Date(b.date!).getTime()
+                        : new Date(b.date!).getTime() - new Date(a.date!).getTime()
+                }
+
+                return 0;
+            })
+            } ref={gridRef}>
+            <GridColumn header={<div onClick={() => handleSort('amount')}>Amount <Icon icon="vaadin:sort"/></div>} autoWidth>
+            {({item}) => (
                         <span
                             {...({
                                 theme: 'badge success',
@@ -471,15 +519,15 @@ export default function IncomeView() {
                     )}
                 </GridColumn>
 
-                <GridColumn header="Currency" autoWidth>
-                    {({item}) => item.currency}
+                <GridColumn header={<div onClick={() => handleSort('currency')}>Currency <Icon icon="vaadin:sort"/></div>} autoWidth>
+                {({item}) => item.currency}
                 </GridColumn>
 
-                <GridColumn header="Category" autoWidth>
+                <GridColumn header={<div onClick={() => handleSort('category')}>Category <Icon icon="vaadin:sort"/></div>} autoWidth>
                     {({item}) => item.category}
                 </GridColumn>
 
-                <GridColumn header="Date" autoWidth>
+                <GridColumn header={<div onClick={() => handleSort('date')}>Date <Icon icon="vaadin:sort"/></div>} autoWidth>
                     {({item}) => item.date}
                 </GridColumn>
 
