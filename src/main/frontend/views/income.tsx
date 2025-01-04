@@ -515,20 +515,29 @@ export default function IncomeView() {
                 return 0;
             })
             } ref={gridRef}>
-            <GridColumn header={<div onClick={() => handleSort('amount')}>Amount <Icon icon="vaadin:sort"/></div>} autoWidth>
-            {({item}) => (
-                        <span
-                            {...({
-                                theme: 'badge success',
-                            } satisfies object)}
-                        >
-                        {Number(item.amount).toFixed(2)}
-                    </span>
+                <GridColumn header={<div onClick={() => handleSort('amount')}>Amount <Icon icon="vaadin:sort"/></div>} autoWidth>
+                    {({item}) => (
+                        <div>
+                            <span
+                                {...({
+                                    theme: 'badge success',
+                                } satisfies object)}
+                            >
+                                {Number(item.amount).toFixed(2)}
+                            </span>
+                            {item.unusual && 
+                                <Icon 
+                                    icon="vaadin:star" 
+                                    style={{marginLeft: '0.5rem', fontSize: '0.8rem', color: 'gold'}}
+                                    title="This income is unusual"
+                                />
+                            }
+                        </div>
                     )}
                 </GridColumn>
 
                 <GridColumn header={<div onClick={() => handleSort('currency')}>Currency <Icon icon="vaadin:sort"/></div>} autoWidth>
-                {({item}) => item.currency}
+                    {({item}) => item.currency}
                 </GridColumn>
 
                 <GridColumn header={<div onClick={() => handleSort('category')}>Category <Icon icon="vaadin:sort"/></div>} autoWidth>
