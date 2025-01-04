@@ -33,19 +33,20 @@ public class IncomeServiceImpl implements IncomeService {
     }
 
     @Override
-    public IncomeEntity addIncome(BigDecimal amount, String currencyCode, String category) {
+    public IncomeEntity addIncome(BigDecimal amount, String currencyCode, String category, boolean unusual) {
         IncomeEntity incomeEntity = new IncomeEntity()
                 .setAmount(amount)
                 .setCurrency(CurrencyCode.valueOf(currencyCode))
-                .setUser(authenticatedUser.get().orElseThrow())
+                .setCategory(IncomeCategory.valueOf(category))
                 .setDate(LocalDateTime.now())
-                .setCategory(IncomeCategory.valueOf(category));
+                .setUnusual(unusual)
+                .setUser(authenticatedUser.get().orElseThrow());
 
         return repository.save(incomeEntity);
     }
 
     @Override
-    public IncomeEntity editIncome(String id, BigDecimal amount, String currencyCode, String category) {
+    public IncomeEntity editIncome(String id, BigDecimal amount, String currencyCode, String category, boolean unusual) {
         IncomeEntity incomeEntity = repository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Income with id %s not found.", id)));
@@ -53,7 +54,8 @@ public class IncomeServiceImpl implements IncomeService {
         incomeEntity
                 .setAmount(amount)
                 .setCurrency(CurrencyCode.valueOf(currencyCode))
-                .setCategory(IncomeCategory.valueOf(category));
+                .setCategory(IncomeCategory.valueOf(category))
+                .setUnusual(unusual);
 
         return repository.save(incomeEntity);
     }

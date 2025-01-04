@@ -19,6 +19,8 @@ public class IncomeEntity extends AbstractEntity<IncomeEntity> {
 
     private LocalDateTime date;
 
+    private boolean unusual;
+
     private UserEntity user;
 
     public BigDecimal getAmount() {
@@ -54,6 +56,15 @@ public class IncomeEntity extends AbstractEntity<IncomeEntity> {
 
     public IncomeEntity setDate(LocalDateTime date) {
         this.date = date;
+        return this;
+    }
+
+    public boolean isUnusual() {
+        return unusual;
+    }
+
+    public IncomeEntity setUnusual(boolean unusual) {
+        this.unusual = unusual;
         return this;
     }
 

@@ -1,4 +1,5 @@
 import {
+    Checkbox,
     ConfirmDialog,
     DatePicker,
     DatePickerDate,
@@ -43,6 +44,7 @@ interface IncomeDto {
     currency: string;
     category: string;
     date?: string;
+    unusual: boolean
 }
 
 const amountFilterOptions = [
@@ -125,7 +127,8 @@ const mapIncomeEntityToDto = (income: IncomeEntity): IncomeDto => {
         amount: income.amount,
         currency: formtatCurrency(income.currency),
         category: formatCategory(income.category),
-        date: income.date ? formatDate(income.date) : ''
+        date: income.date ? formatDate(income.date) : '',
+        unusual: income.unusual
     };
 };
 
@@ -137,8 +140,8 @@ const currencyOptions: SelectItem[] = Object.values(currencyCodesToSigns).map(va
 export default function IncomeView() {
     const gridRef = React.useRef<any>(null);
     const [incomes, setIncomes] = useState<IncomeDto[]>([]);
-    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: ''});
-    const [editedIncome, setEditedIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: ''});
+    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', unusual: false});
+    const [editedIncome, setEditedIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', unusual: false});
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
     const [addDialogOpened, setAddDialogOpened] = useState(false);
     const [editDialogOpened, setEditDialogOpened] = useState(false);
@@ -231,13 +234,15 @@ export default function IncomeView() {
         editedIncome.currency = income.currency;
         editedIncome.category = income.category;
         editedIncome.date = income.date;
+        editedIncome.unusual = income.unusual
 
         setEditedIncome({
             id: income.id,
             amount: income.amount,
             currency: income.currency,
             category: income.category,
-            date: income.date
+            date: income.date,
+            unusual: income.unusual
         });
 
         setEditDialogOpened(true);
@@ -265,17 +270,18 @@ export default function IncomeView() {
             amount: newIncome.amount,
             currency: newIncome.currency,
             category: newIncome.category,
+            date: format(new Date(), "dd MMM yyyy HH:mm:ss"),
+            unusual: newIncome.unusual
         };
 
         const previousIncomes = [...incomes];
 
-        income.date = format(new Date(), "dd MMM yyyy HH:mm:ss");
         setIncomes([...incomes, income]);
 
-        setNewIncome({id: '', amount: 0, currency: 'Other', category: 'Other', date: ''});
+        setNewIncome({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', unusual: false});
         setAddDialogOpened(false);
 
-        addIncome(income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase())
+        addIncome(income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase(), income.unusual)
             .then((savedIncome) => {
                     income.id = savedIncome.id
                     setIncomes([...incomes, income]);
@@ -291,21 +297,22 @@ export default function IncomeView() {
 
     const editCustomIncome = () => {
         const income: IncomeDto = {
+            id: editedIncome.id,
             amount: editedIncome.amount,
             currency: editedIncome.currency,
             category: editedIncome.category,
+            date: editedIncome.date,
+            unusual: editedIncome.unusual
         };
 
         const previousIncomes = [...incomes];
 
-        income.id = editedIncome.id;
-        income.date = editedIncome.date;
         setIncomes(incomes.map(i => i.id === income.id ? income : i));
 
         // setEditedIncome({id: '', amount: '', category: 'Other', date: ''});
         setEditDialogOpened(false);
 
-        editIncome(income.id!, income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase())
+        editIncome(income.id!, income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase(), income.unusual)
             .catch(() => {
                 setIncomes(previousIncomes);
                 setEditedIncome(income);
@@ -334,8 +341,9 @@ export default function IncomeView() {
             newIncome.currency = 'Other';
             newIncome.category = 'Other';
             newIncome.date = '';
+            newIncome.unusual = false;
 
-            setNewIncome({...newIncome, id: '', amount: 0, currency: 'Other', category: 'Other', date: ''});
+            setNewIncome({...newIncome, id: '', amount: 0, currency: 'Other', category: 'Other', date: '', unusual: false});
         }
     };
 
@@ -579,6 +587,10 @@ export default function IncomeView() {
                         items={categoryOptions}
                         onValueChanged={e => setNewIncome({...newIncome, category: e.detail.value})}
                     />
+                    <Checkbox 
+                        label="This income is unusual" 
+                        checked={newIncome.unusual}
+                        onChange={e => setNewIncome({...newIncome, unusual: e.target.checked})}/>
                 </VerticalLayout>
             </Dialog>
 
@@ -614,6 +626,11 @@ export default function IncomeView() {
                         value={editedIncome.category}
                         items={categoryOptions}
                         onValueChanged={e => setEditedIncome({...editedIncome, category: e.detail.value})}
+                    />
+                    <Checkbox 
+                        label="This income is unusual" 
+                        checked={editedIncome.unusual}
+                        onChange={e => setEditedIncome({...editedIncome, unusual: e.target.checked})}
                     />
                 </VerticalLayout>
             </Dialog>
