@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @BrowserCallable
 @PermitAll
@@ -29,11 +30,19 @@ public class IncomeServiceImpl implements IncomeService {
     // TODO: map to DTO
     @Override
     public List<IncomeEntity> getAll() {
-        return repository.findAllByUser(authenticatedUser.get().orElseThrow());
+        return repository.findAllByUser(authenticatedUser.get().orElseThrow())
+        .stream()
+        .map((i) -> {
+            if (i.getDocument() == null) {
+                i.setDocument("");
+            }
+
+            return i;
+        }).collect(Collectors.toList());
     }
 
     @Override
-    public IncomeEntity addIncome(BigDecimal amount, String currencyCode, String category, boolean unusual) {
+    public IncomeEntity addIncome(BigDecimal amount, String currencyCode, String category, String document, boolean unusual) {
         IncomeEntity incomeEntity = new IncomeEntity()
                 .setAmount(amount)
                 .setCurrency(CurrencyCode.valueOf(currencyCode))
@@ -41,6 +50,10 @@ public class IncomeServiceImpl implements IncomeService {
                 .setDate(LocalDateTime.now())
                 .setUnusual(unusual)
                 .setUser(authenticatedUser.get().orElseThrow());
+
+        if(document != null) {
+            incomeEntity.setDocument(document);
+        }
 
         return repository.save(incomeEntity);
     }

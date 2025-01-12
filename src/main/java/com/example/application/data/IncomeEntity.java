@@ -19,6 +19,8 @@ public class IncomeEntity extends AbstractEntity<IncomeEntity> {
 
     private LocalDateTime date;
 
+    private String document;
+
     private boolean unusual;
 
     private UserEntity user;
@@ -57,6 +59,14 @@ public class IncomeEntity extends AbstractEntity<IncomeEntity> {
     public IncomeEntity setDate(LocalDateTime date) {
         this.date = date;
         return this;
+    }
+
+    public String getDocument() {
+        return document;
+    }
+
+    public void setDocument(String document) {
+        this.document = document;
     }
 
     public boolean isUnusual() {

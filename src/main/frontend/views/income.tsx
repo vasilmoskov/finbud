@@ -10,6 +10,8 @@ import {
     Icon,
     Select,
     SelectItem,
+    Upload,
+    UploadFile,
     VerticalLayout
 } from "@vaadin/react-components";
 import React, {useEffect, useRef, useState} from "react";
@@ -29,6 +31,11 @@ export const config: ViewConfig = {
 
 const buttonRenderer = (income: IncomeDto, onEdit: (income: IncomeDto) => void, onDelete: (income: IncomeDto) => void) => (
     <div>
+        {income.document && (
+            <Button theme="icon" onClick={() => visualizeDocument(income.document!)}>
+                <Icon icon="vaadin:file-text-o" />
+            </Button>
+        )}
         <Button theme="icon" onClick={() => onEdit(income)}>
             <Icon icon="vaadin:edit"/>
         </Button>
@@ -38,13 +45,22 @@ const buttonRenderer = (income: IncomeDto, onEdit: (income: IncomeDto) => void, 
     </div>
 );
 
+const visualizeDocument = (document: string) => {
+    const win = window.open();
+    if (win) {
+        win.document.write(`<iframe src="${document}" frameborder="0" style="border:0; top:0; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>`);
+    }
+};
+
+
 interface IncomeDto {
     id?: string,
     amount: number;
     currency: string;
     category: string;
     date?: string;
-    unusual: boolean
+    document?: string;
+    unusual: boolean;
 }
 
 const amountFilterOptions = [
@@ -134,6 +150,7 @@ const mapIncomeEntityToDto = (income: IncomeEntity): IncomeDto => {
         currency: formtatCurrency(income.currency),
         category: formatCategory(income.category),
         date: income.date ? formatDate(income.date) : '',
+        document: income.document,
         unusual: income.unusual
     };
 };
@@ -146,7 +163,7 @@ const currencyOptions: SelectItem[] = Object.values(currencyCodesToSigns).map(va
 export default function IncomeView() {
     const gridRef = React.useRef<any>(null);
     const [incomes, setIncomes] = useState<IncomeDto[]>([]);
-    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', unusual: false});
+    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: '', unusual: false});
     const [editedIncome, setEditedIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', unusual: false});
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
     const [addDialogOpened, setAddDialogOpened] = useState(false);
@@ -170,6 +187,8 @@ export default function IncomeView() {
     const [selectedByUsuality, setSelectedByUsuality] = useState<string>('All');
 
     const [sortConfig, setSortConfig] = useState({key: '', direction: ''});
+
+    const [documentFile, setDocumentFile] = useState<UploadFile[]>([]);
 
     const startDatePickerRef = useRef<DatePickerElement>(null);
     useEffect(() => {
@@ -281,6 +300,7 @@ export default function IncomeView() {
             currency: newIncome.currency,
             category: newIncome.category,
             date: format(new Date(), "dd MMM yyyy HH:mm:ss"),
+            document: newIncome.document,
             unusual: newIncome.unusual
         };
 
@@ -288,10 +308,11 @@ export default function IncomeView() {
 
         setIncomes([...incomes, income]);
 
-        setNewIncome({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', unusual: false});
+        setDocumentFile([]);
+        setNewIncome({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: '', unusual: false});
         setAddDialogOpened(false);
 
-        addIncome(income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase(), income.unusual)
+        addIncome(income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase(), income.document!, income.unusual)
             .then((savedIncome) => {
                     income.id = savedIncome.id
                     setIncomes([...incomes, income]);
@@ -351,14 +372,27 @@ export default function IncomeView() {
             newIncome.currency = 'Other';
             newIncome.category = 'Other';
             newIncome.date = '';
+            newIncome.document = '';
             newIncome.unusual = false;
 
-            setNewIncome({...newIncome, id: '', amount: 0, currency: 'Other', category: 'Other', date: '', unusual: false});
+            setNewIncome({...newIncome, id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: '', unusual: false});
+            setDocumentFile([]);
         }
     };
 
     const handleEditDialogOpenedChanged = (detailValue: boolean) => {
         setEditDialogOpened(detailValue);
+    };
+
+    const handleUploadBefore = async (e: CustomEvent) => {
+        const file = e.detail.file as UploadFile;
+        e.preventDefault();
+        const reader = new FileReader();
+        reader.onload = () => {
+            setDocumentFile(Array.of(file))
+            setNewIncome({...newIncome, document: reader.result as string});
+        };
+        reader.readAsDataURL(file);
     };
 
     return (
@@ -616,6 +650,12 @@ export default function IncomeView() {
                         value={newIncome.category}
                         items={categoryOptions}
                         onValueChanged={e => setNewIncome({...newIncome, category: e.detail.value})}
+                    />
+                    <Upload
+                        files={documentFile}
+                        accept=".pdf"
+                        maxFiles={1}
+                        onUploadBefore={handleUploadBefore}
                     />
                     <Checkbox 
                         label="This income is unusual" 
