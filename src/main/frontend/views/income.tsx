@@ -22,6 +22,8 @@ import {Button} from "@vaadin/react-components/Button.js";
 import {TextField} from "@vaadin/react-components/TextField.js";
 import {format, parse} from 'date-fns';
 import { useSignal } from "@vaadin/hilla-react-signals";
+import { IncomeDto } from "Frontend/types/IncomeDto";
+import IncomeButtonRenderer from "Frontend/components/IncomeButtonRenderer";
 
 export const config: ViewConfig = {
     menu: {order: 1, icon: 'line-awesome/svg/file.svg'},
@@ -29,39 +31,12 @@ export const config: ViewConfig = {
     loginRequired: true,
 };
 
-const buttonRenderer = (income: IncomeDto, onEdit: (income: IncomeDto) => void, onDelete: (income: IncomeDto) => void) => (
-    <div>
-        {income.document && (
-            <Button theme="icon" onClick={() => visualizeDocument(income.document!)}>
-                <Icon icon="vaadin:file-text-o" />
-            </Button>
-        )}
-        <Button theme="icon" onClick={() => onEdit(income)}>
-            <Icon icon="vaadin:edit"/>
-        </Button>
-        <Button theme="icon" onClick={() => onDelete(income)}>
-            <Icon icon="vaadin:trash"/>
-        </Button>
-    </div>
-);
-
 const visualizeDocument = (document: string) => {
     const win = window.open();
     if (win) {
         win.document.write(`<iframe src="${document}" frameborder="0" style="border:0; top:0; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>`);
     }
 };
-
-
-interface IncomeDto {
-    id?: string,
-    amount: number;
-    currency: string;
-    category: string;
-    date?: string;
-    document?: string;
-    unusual: boolean;
-}
 
 const amountFilterOptions = [
     { label: 'Greater than', value: '>' },
@@ -604,7 +579,14 @@ export default function IncomeView() {
                 </GridColumn>
 
                 <GridColumn autoWidth>
-                    {({item}) => buttonRenderer(item, handleEdit, handleDelete)}
+                  {({ item }) => (
+                    <IncomeButtonRenderer
+                      income={item}
+                      onEdit={handleEdit}
+                      onDelete={handleDelete}
+                      visualizeDocument={visualizeDocument}
+                    />
+                  )}
                 </GridColumn>
             </Grid>
 
