@@ -2,132 +2,34 @@ import {
     Checkbox,
     ConfirmDialog,
     DatePicker,
-    DatePickerDate,
     DatePickerElement,
     Dialog,
     Grid,
     GridColumn,
     Icon,
     Select,
-    SelectItem,
     Upload,
     UploadFile,
     VerticalLayout
 } from "@vaadin/react-components";
 import React, {useEffect, useRef, useState} from "react";
-import IncomeEntity from "Frontend/generated/com/example/application/data/IncomeEntity";
 import {deleteIncome, getAll, addIncome, editIncome} from "Frontend/generated/IncomeServiceImpl";
 import {ViewConfig} from "@vaadin/hilla-file-router/types.js";
 import {Button} from "@vaadin/react-components/Button.js";
 import {TextField} from "@vaadin/react-components/TextField.js";
-import {format, parse} from 'date-fns';
+import {format} from 'date-fns';
 import { useSignal } from "@vaadin/hilla-react-signals";
 import { IncomeDto } from "Frontend/types/IncomeDto";
 import IncomeButtonRenderer from "Frontend/components/IncomeButtonRenderer";
 import { visualizeDocument } from "Frontend/util/documentUtils";
+import { formatDateForDatePicker, getDateWithoutTime, mapIncomeEntityToDto, parseDateForDatePicker } from "Frontend/util/incomeUtils";
+import { amountFilterOptions, categoryFilteringOptions, categoryOptions, currencyFilteringOptions, currencyOptions, currencySignsToCodes, usualityFilteringOptions } from "Frontend/constants/incomeConstants";
 
 export const config: ViewConfig = {
     menu: {order: 1, icon: 'line-awesome/svg/file.svg'},
     title: 'Incomes',
     loginRequired: true,
 };
-
-const amountFilterOptions = [
-    { label: 'Greater than', value: '>' },
-    { label: 'Less than', value: '<' },
-    { label: 'Equals', value: '=' }
-]
-
-const categoriesMap: Record<string, string> = {
-    'SALARY': 'Salary',
-    'SAVINGS': 'Savings',
-    'DEPOSIT': 'Deposit',
-    'OTHER': 'Other'
-};
-
-const categoryOptions: SelectItem[] = Object.values(categoriesMap).map(value => ({
-    label: value,
-    value: value
-}));
-
-const categoryFilteringOptions : SelectItem[] = [
-    { label: 'All', value: 'All' },
-    ...Object.values(categoriesMap).map(v => ({ label: v, value: v }))
-];
-
-const currencyCodesToSigns: Record<string, string> = {
-    'BGN': 'лв.',
-    'USD': '$',
-    'EUR': '€',
-    'GBP': '£',
-    'OTHER': 'Other'
-};
-
-const currencySignsToCodes: Record<string, string> = {
-    'лв.': 'BGN',
-    '$': 'USD',
-    '€': 'EUR',
-    '£': 'GBP',
-    'Other': 'OTHER'
-};
-
-const currencyFilteringOptions : SelectItem[] = [
-    { label: 'All', value: 'All' },
-    ...Object.keys(currencySignsToCodes).map(k => ({ label: k, value: k }))
-];
-
-const usualityFilteringOptions : SelectItem[] = [
-    { label: 'All', value: 'All' },
-    { label: 'Usual', value: 'usual' },
-    { label: 'Unusual', value: 'unusual' }
-];
-
-const formtatCurrency = (currency: string): string => {
-    return currencyCodesToSigns[currency] || currency;
-}
-
-const formatCategory = (category: string): string => {
-    return categoriesMap[category] || category;
-};
-
-const formatDate = (dateString: string): string => {
-    return format(new Date(dateString), "dd MMM yyyy HH:mm:ss");
-};
-
-
-const formatDateForDatePicker = (dateParts: DatePickerDate) => {
-    const { year, month, day } = dateParts;
-    const date = new Date(year, month, day);
-  
-    return format(date, 'dd/MM/yyyy');
-  }
-
-const parseDateForDatePicker = (inputValue: string) => {
-    const date = parse(inputValue, 'dd/MM/yyyy', new Date());
-  
-    return { year: date.getFullYear(), month: date.getMonth(), day: date.getDate() };
-  }
-
-const getDateWithoutTime = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-};
-
-const mapIncomeEntityToDto = (income: IncomeEntity): IncomeDto => {
-    return {
-        id: income.id,
-        amount: income.amount,
-        currency: formtatCurrency(income.currency),
-        category: formatCategory(income.category),
-        date: income.date ? formatDate(income.date) : '',
-        document: income.document,
-        unusual: income.unusual
-    };
-};
-
-const currencyOptions: SelectItem[] = Object.values(currencyCodesToSigns).map(value => ({
-    label: value,
-    value: value
-}));
 
 export default function IncomeView() {
     const gridRef = React.useRef<any>(null);
