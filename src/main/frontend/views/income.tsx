@@ -24,6 +24,7 @@ import IncomeButtonRenderer from "Frontend/components/IncomeButtonRenderer";
 import { visualizeDocument } from "Frontend/util/documentUtils";
 import { formatDateForDatePicker, getDateWithoutTime, mapIncomeEntityToDto, parseDateForDatePicker } from "Frontend/util/incomeUtils";
 import { amountFilterOptions, categoryFilteringOptions, categoryOptions, currencyFilteringOptions, currencyOptions, currencySignsToCodes, usualityFilteringOptions } from "Frontend/constants/incomeConstants";
+import ConfirmDeleteDialog from "Frontend/components/ConfirmDeleteDialog";
 
 export const config: ViewConfig = {
     menu: {order: 1, icon: 'line-awesome/svg/file.svg'},
@@ -486,16 +487,9 @@ export default function IncomeView() {
                 </GridColumn>
             </Grid>
 
-            <ConfirmDialog
-                header="Confirm Delete"
-                cancelButtonVisible
-                confirmText="Delete"
-                opened={confirmDialogOpened}
-                onConfirm={confirmDelete}
-                onCancel={() => setConfirmDialogOpened(false)}
-            >
-                Are you sure you want to delete this income?
-            </ConfirmDialog>
+            <ConfirmDeleteDialog
+              opened={confirmDialogOpened} onConfirm={confirmDelete} onCancel={() => setConfirmDialogOpened(false)}>
+            </ConfirmDeleteDialog>
 
             <Dialog
                 headerTitle="Add Income"
