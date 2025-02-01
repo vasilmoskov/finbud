@@ -1,7 +1,9 @@
 package com.example.application.data;
 
+import com.mongodb.lang.Nullable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
@@ -19,7 +21,8 @@ public class IncomeEntity extends AbstractEntity<IncomeEntity> {
 
     private LocalDateTime date;
 
-    private String document;
+    @Nullable
+    private DocumentEntity document;
 
     private boolean unusual;
 
@@ -61,11 +64,11 @@ public class IncomeEntity extends AbstractEntity<IncomeEntity> {
         return this;
     }
 
-    public String getDocument() {
+    public DocumentEntity getDocument() {
         return document;
     }
 
-    public void setDocument(String document) {
+    public void setDocument(DocumentEntity document) {
         this.document = document;
     }
 

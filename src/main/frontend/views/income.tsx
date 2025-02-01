@@ -1,6 +1,5 @@
 import {
     Checkbox,
-    ConfirmDialog,
     DatePicker,
     DatePickerElement,
     Dialog,
@@ -13,7 +12,7 @@ import {
     VerticalLayout
 } from "@vaadin/react-components";
 import React, {useEffect, useRef, useState} from "react";
-import {deleteIncome, getAll, addIncome, editIncome} from "Frontend/generated/IncomeServiceImpl";
+import {deleteIncome, getAll, addIncome, editIncome, deleteIncomeDocument} from "Frontend/generated/IncomeServiceImpl";
 import {ViewConfig} from "@vaadin/hilla-file-router/types.js";
 import {Button} from "@vaadin/react-components/Button.js";
 import {TextField} from "@vaadin/react-components/TextField.js";
@@ -35,9 +34,10 @@ export const config: ViewConfig = {
 export default function IncomeView() {
     const gridRef = React.useRef<any>(null);
     const [incomes, setIncomes] = useState<IncomeDto[]>([]);
-    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: '', unusual: false});
-    const [editedIncome, setEditedIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', unusual: false});
+    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
+    const [editedIncome, setEditedIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
+    const [confirmDocumentDialogOpened, setConfirmDocumentDialogOpened] = useState(false);
     const [addDialogOpened, setAddDialogOpened] = useState(false);
     const [editDialogOpened, setEditDialogOpened] = useState(false);
     const [selectedIncome, setSelectedIncome] = useState<IncomeDto | null>(null);
@@ -62,7 +62,10 @@ export default function IncomeView() {
 
     const [documentFile, setDocumentFile] = useState<UploadFile[]>([]);
 
+    const [incomeWithDocumentToRemove, setIncomeWithDocumentToRemove] = useState<IncomeDto | null>(null);
+
     const startDatePickerRef = useRef<DatePickerElement>(null);
+
     useEffect(() => {
         const datePicker = startDatePickerRef.current;
 
@@ -135,6 +138,7 @@ export default function IncomeView() {
         editedIncome.currency = income.currency;
         editedIncome.category = income.category;
         editedIncome.date = income.date;
+        editedIncome.document = income.document;
         editedIncome.unusual = income.unusual
 
         setEditedIncome({
@@ -143,6 +147,7 @@ export default function IncomeView() {
             currency: income.currency,
             category: income.category,
             date: income.date,
+            document: income.document,
             unusual: income.unusual
         });
 
@@ -181,12 +186,17 @@ export default function IncomeView() {
         setIncomes([...incomes, income]);
 
         setDocumentFile([]);
-        setNewIncome({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: '', unusual: false});
+        setNewIncome({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
         setAddDialogOpened(false);
 
-        addIncome(income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase(), income.document!, income.unusual)
+        addIncome(income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase(), income.document?.content!, income.unusual)
             .then((savedIncome) => {
                     income.id = savedIncome.id
+
+                    if(income.document != null) {
+                        income.document.id = savedIncome.document.id;
+                    }
+
                     setIncomes([...incomes, income]);
                 }
             )
@@ -205,17 +215,21 @@ export default function IncomeView() {
             currency: editedIncome.currency,
             category: editedIncome.category,
             date: editedIncome.date,
+            document: editedIncome.document,
             unusual: editedIncome.unusual
         };
+
 
         const previousIncomes = [...incomes];
 
         setIncomes(incomes.map(i => i.id === income.id ? income : i));
 
-        // setEditedIncome({id: '', amount: '', category: 'Other', date: ''});
         setEditDialogOpened(false);
 
-        editIncome(income.id!, income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase(), income.unusual)
+        editIncome(income.id!, income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase(), income.document?.content!, income.unusual)
+            .then(() => {
+                setDocumentFile([]);
+            })
             .catch(() => {
                 setIncomes(previousIncomes);
                 setEditedIncome(income);
@@ -244,27 +258,62 @@ export default function IncomeView() {
             newIncome.currency = 'Other';
             newIncome.category = 'Other';
             newIncome.date = '';
-            newIncome.document = '';
+            newIncome.document = null;
             newIncome.unusual = false;
 
-            setNewIncome({...newIncome, id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: '', unusual: false});
+            setNewIncome({...newIncome, id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
             setDocumentFile([]);
         }
     };
 
     const handleEditDialogOpenedChanged = (detailValue: boolean) => {
         setEditDialogOpened(detailValue);
+
+        if (!detailValue) {
+            setDocumentFile([]);
+        }
     };
 
-    const handleUploadBefore = async (e: CustomEvent) => {
+    const handleUploadBefore = async (e: CustomEvent, context: 'add' | 'edit') => {
         const file = e.detail.file as UploadFile;
         e.preventDefault();
         const reader = new FileReader();
         reader.onload = () => {
             setDocumentFile(Array.of(file))
-            setNewIncome({...newIncome, document: reader.result as string});
+
+            if(context === 'add') {
+                setNewIncome({...newIncome, document: {content: reader.result as string}});
+            } else if (context === 'edit') {
+                setEditedIncome({...editedIncome, document: {content: reader.result as string}});
+            }
+
         };
         reader.readAsDataURL(file);
+    };
+
+    const handleRemoveDocument = (income: IncomeDto) => {
+        setIncomeWithDocumentToRemove(income);
+        setConfirmDocumentDialogOpened(true);
+      };
+    
+    const confirmRemoveDocument = () => {
+        if(incomeWithDocumentToRemove == null) {
+            return;
+        }
+
+        incomeWithDocumentToRemove.document = null;
+
+        const previousIncomes = [...incomes];
+
+        setIncomes(incomes.map(i => i.id === incomeWithDocumentToRemove.id ? incomeWithDocumentToRemove : i));
+
+        setConfirmDocumentDialogOpened(false);
+
+        deleteIncomeDocument(incomeWithDocumentToRemove.id!)
+            .catch(() => {
+                setIncomes(previousIncomes);
+                setConfirmDocumentDialogOpened(true);
+            })
     };
 
     return (
@@ -482,13 +531,20 @@ export default function IncomeView() {
                       onEdit={handleEdit}
                       onDelete={handleDelete}
                       visualizeDocument={visualizeDocument}
+                      onRemoveDocument={handleRemoveDocument}
                     />
                   )}
                 </GridColumn>
             </Grid>
 
             <ConfirmDeleteDialog
+                message="Are you sure you want to delete this income?"
               opened={confirmDialogOpened} onConfirm={confirmDelete} onCancel={() => setConfirmDialogOpened(false)}>
+            </ConfirmDeleteDialog>
+
+            <ConfirmDeleteDialog
+                message="Are you sure you want to delete the document attached to this income?"
+              opened={confirmDocumentDialogOpened} onConfirm={confirmRemoveDocument} onCancel={() => setConfirmDocumentDialogOpened(false)}>
             </ConfirmDeleteDialog>
 
             <Dialog
@@ -527,7 +583,7 @@ export default function IncomeView() {
                         files={documentFile}
                         accept=".pdf"
                         maxFiles={1}
-                        onUploadBefore={handleUploadBefore}
+                        onUploadBefore={(e) => handleUploadBefore(e, 'add')}
                     />
                     <Checkbox 
                         label="This income is unusual" 
@@ -568,6 +624,12 @@ export default function IncomeView() {
                         value={editedIncome.category}
                         items={categoryOptions}
                         onValueChanged={e => setEditedIncome({...editedIncome, category: e.detail.value})}
+                    />
+                    <Upload
+                        files={documentFile}
+                        accept=".pdf"
+                        maxFiles={1}
+                        onUploadBefore={(e) => handleUploadBefore(e, 'edit')}
                     />
                     <Checkbox 
                         label="This income is unusual" 

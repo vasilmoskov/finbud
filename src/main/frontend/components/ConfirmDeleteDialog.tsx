@@ -1,12 +1,13 @@
 import { ConfirmDialog } from "@vaadin/react-components";
 
 interface Props {
+    message: string
     opened: boolean;
     onConfirm: () => void;
     onCancel: () => void;
 }
 
-export default function ConfirmDeleteDialog({opened, onConfirm, onCancel}: Props) {
+export default function ConfirmDeleteDialog({message, opened, onConfirm, onCancel}: Props) {
     return (
         <ConfirmDialog
             header="Confirm Delete"
@@ -16,7 +17,7 @@ export default function ConfirmDeleteDialog({opened, onConfirm, onCancel}: Props
             onConfirm={onConfirm}
             onCancel={onCancel}
         >
-            Are you sure you want to delete this income?
+            {message}
         </ConfirmDialog>
     );
 }

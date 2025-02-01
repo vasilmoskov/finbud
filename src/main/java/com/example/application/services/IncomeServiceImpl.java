@@ -1,9 +1,11 @@
 package com.example.application.services;
 
 import com.example.application.data.CurrencyCode;
+import com.example.application.data.DocumentEntity;
 import com.example.application.data.IncomeCategory;
 import com.example.application.data.IncomeEntity;
 import com.example.application.exception.ResourceNotFoundException;
+import com.example.application.repository.DocumentRepository;
 import com.example.application.repository.IncomeRepository;
 import com.example.application.security.AuthenticatedUser;
 import com.vaadin.hilla.BrowserCallable;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,26 +22,19 @@ import java.util.stream.Collectors;
 @PermitAll
 @Service
 public class IncomeServiceImpl implements IncomeService {
-    private final IncomeRepository repository;
     private final AuthenticatedUser authenticatedUser;
+    private final IncomeRepository incomeRepository;
+    private final DocumentRepository documentRepository;
 
-    public IncomeServiceImpl(IncomeRepository repository, AuthenticatedUser authenticatedUser) {
-        this.repository = repository;
+    public IncomeServiceImpl(IncomeRepository incomeRepository, AuthenticatedUser authenticatedUser, DocumentRepository documentRepository) {
+        this.incomeRepository = incomeRepository;
         this.authenticatedUser = authenticatedUser;
+        this.documentRepository = documentRepository;
     }
 
-    // TODO: map to DTO
     @Override
     public List<IncomeEntity> getAll() {
-        return repository.findAllByUser(authenticatedUser.get().orElseThrow())
-        .stream()
-        .map((i) -> {
-            if (i.getDocument() == null) {
-                i.setDocument("");
-            }
-
-            return i;
-        }).collect(Collectors.toList());
+        return new ArrayList<>(incomeRepository.findAllByUser(authenticatedUser.get().orElseThrow()));
     }
 
     @Override
@@ -51,16 +47,18 @@ public class IncomeServiceImpl implements IncomeService {
                 .setUnusual(unusual)
                 .setUser(authenticatedUser.get().orElseThrow());
 
-        if(document != null) {
-            incomeEntity.setDocument(document);
+        if(document != null && !document.isEmpty()) {
+            DocumentEntity documentEntity = new DocumentEntity(document);
+            incomeEntity.setDocument(documentEntity);
+            documentRepository.save(documentEntity);
         }
 
-        return repository.save(incomeEntity);
+        return incomeRepository.save(incomeEntity);
     }
 
     @Override
-    public IncomeEntity editIncome(String id, BigDecimal amount, String currencyCode, String category, boolean unusual) {
-        IncomeEntity incomeEntity = repository
+    public IncomeEntity editIncome(String id, BigDecimal amount, String currencyCode, String category, String document, boolean unusual) {
+        IncomeEntity incomeEntity = incomeRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Income with id %s not found.", id)));
 
@@ -70,11 +68,40 @@ public class IncomeServiceImpl implements IncomeService {
                 .setCategory(IncomeCategory.valueOf(category))
                 .setUnusual(unusual);
 
-        return repository.save(incomeEntity);
+        if(document != null && !document.isEmpty()) {
+
+            DocumentEntity previousDocument = incomeEntity.getDocument();
+
+            if (previousDocument != null) {
+                documentRepository.delete(previousDocument);
+            }
+
+            DocumentEntity documentEntity = new DocumentEntity(document);
+            incomeEntity.setDocument(documentEntity);
+            documentRepository.save(documentEntity);
+        }
+
+        return incomeRepository.save(incomeEntity);
     }
 
     @Override
     public void deleteIncome(String incomeId) {
-        repository.deleteById(incomeId);
+        incomeRepository.deleteById(incomeId);
+    }
+
+    @Override
+    public void deleteIncomeDocument(String id) {
+        IncomeEntity incomeEntity = incomeRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Income with id %s not found.", id)));
+
+        DocumentEntity document = incomeEntity.getDocument();
+
+        if (document != null) {
+            documentRepository.deleteById(document.getId());
+
+            incomeEntity.setDocument(null);
+            incomeRepository.save(incomeEntity);
+        }
     }
 }
