@@ -249,15 +249,6 @@ export default function IncomeView() {
         setAddDialogOpened(detailValue);
 
         if (!detailValue) {
-            // TODO: setNewIncome should be enough.. something with the state and the dialog is not working good and it's not synced
-            newIncome.id = '';
-            newIncome.amount = 0;
-            newIncome.currency = 'Other';
-            newIncome.category = 'Other';
-            newIncome.date = '';
-            newIncome.document = null;
-            newIncome.unusual = false;
-
             setNewIncome({...newIncome, id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
             setDocumentFile([]);
         }
