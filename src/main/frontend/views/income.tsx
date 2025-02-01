@@ -1,26 +1,23 @@
 import {
-    DatePicker,
-    DatePickerElement,
     Grid,
     GridColumn,
     Icon,
-    Select,
     UploadFile,
 } from "@vaadin/react-components";
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {deleteIncome, getAll, addIncome, editIncome, deleteIncomeDocument} from "Frontend/generated/IncomeServiceImpl";
 import {ViewConfig} from "@vaadin/hilla-file-router/types.js";
 import {Button} from "@vaadin/react-components/Button.js";
-import {TextField} from "@vaadin/react-components/TextField.js";
 import {format} from 'date-fns';
 import { useSignal } from "@vaadin/hilla-react-signals";
 import { IncomeDto } from "Frontend/types/IncomeDto";
 import IncomeButtonRenderer from "Frontend/components/IncomeButtonRenderer";
 import { visualizeDocument } from "Frontend/util/documentUtils";
-import { formatDateForDatePicker, getDateWithoutTime, mapIncomeEntityToDto, parseDateForDatePicker } from "Frontend/util/incomeUtils";
-import { amountFilterOptions, categoryFilteringOptions, currencyFilteringOptions, currencySignsToCodes, usualityFilteringOptions } from "Frontend/constants/incomeConstants";
+import { getDateWithoutTime, mapIncomeEntityToDto} from "Frontend/util/incomeUtils";
+import { currencySignsToCodes } from "Frontend/constants/incomeConstants";
 import ConfirmDeleteDialog from "Frontend/components/ConfirmDeleteDialog";
 import AddEditDialog from "Frontend/components/AddEditDialog";
+import IncomeFilters from "Frontend/components/IncomeFilters";
 
 export const config: ViewConfig = {
     menu: {order: 1, icon: 'line-awesome/svg/file.svg'},
@@ -38,8 +35,6 @@ export default function IncomeView() {
     const [addDialogOpened, setAddDialogOpened] = useState(false);
     const [editDialogOpened, setEditDialogOpened] = useState(false);
     const [selectedIncome, setSelectedIncome] = useState<IncomeDto | null>(null);
-
-    const [filtersVisible, setFiltersVisible] = useState(false);
 
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
     const [selectedCurrency, setSelectedCurrency] = useState<string>('All');
@@ -60,33 +55,6 @@ export default function IncomeView() {
     const [documentFile, setDocumentFile] = useState<UploadFile[]>([]);
 
     const [incomeWithDocumentToRemove, setIncomeWithDocumentToRemove] = useState<IncomeDto | null>(null);
-
-    const startDatePickerRef = useRef<DatePickerElement>(null);
-
-    useEffect(() => {
-        const datePicker = startDatePickerRef.current;
-
-        if(datePicker) {
-            datePicker.i18n = {
-                ...datePicker.i18n,
-                formatDate: formatDateForDatePicker,
-                parseDate: parseDateForDatePicker
-            }
-        }
-    }, [startDatePickerRef.current])
-
-    const endDatePickerRef = useRef<DatePickerElement>(null);
-    useEffect(() => {
-        const datePicker = endDatePickerRef.current;
-
-        if(datePicker) {
-            datePicker.i18n = {
-                ...datePicker.i18n,
-                formatDate: formatDateForDatePicker,
-                parseDate: parseDateForDatePicker
-            }
-        }
-    }, [endDatePickerRef.current])
 
     const areFiltersDefault = () => {
       return (
@@ -315,100 +283,25 @@ export default function IncomeView() {
                 <Icon icon="vaadin:plus"/>
             </Button>
 
-            <Button 
-                theme="success" 
-                onClick={() => setFiltersVisible(!filtersVisible)} 
-                style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
-            >
-                {filtersVisible ? 'Hide Filters' : 'Show Filters'}
-                <Icon icon={`vaadin:${filtersVisible ? 'angle-down' : 'angle-right'}`}/>
-            </Button>
+            <IncomeFilters
+                areFiltersDefault={areFiltersDefault}
+                clearFilters={clearFilters}
+                amountFilterType={amountFilterType}
+                setAmountFilterType={setAmountFilterType}
+                amountFilterValue={amountFilterValue}
+                setAmountFilterValue={setAmountFilterValue}
+                selectedCurrency={selectedCurrency}
+                setSelectedCurrency={setSelectedCurrency}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+                startDate={startDate}
+                setIsStartDateSelected={setIsStartDateSelected}
+                endDate={endDate}
+                setIsEndDateSelected={setIsEndDateSelected}
+                selectedByUsuality={selectedByUsuality}
+                setSelectedByUsuality={setSelectedByUsuality}
+            ></IncomeFilters>
 
-            <Button 
-                theme="success" 
-                disabled={areFiltersDefault()} 
-                onClick={() => clearFilters()} 
-                style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
-            >
-                Clear Filters
-                <i className="fa-solid fa-broom" style={{ marginLeft: '0.5rem' }}></i>
-            </Button>
-
-            {filtersVisible && (
-
-                <div style={{display: 'flex', alignItems: 'start', marginBottom: '1rem'}}>
-                    <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
-                        <label style={{marginRight: '0.5rem'}}>Filter by amount:</label>
-                        <Select
-                            items={amountFilterOptions}
-                            value={amountFilterType}
-                            onValueChanged={(e => setAmountFilterType(e.detail.value))}
-                            style={{maxWidth: '200px'}}
-                        />
-
-                        <TextField
-                            value={amountFilterValue !== null ? amountFilterValue.toString() : ''}
-                            onChange={(e) => setAmountFilterValue(e.target.value ? Number(e.target.value) : 0)}
-                            style={{maxWidth: '200px'}}
-                        />
-                    </div>
-
-                    <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
-
-                        <label style={{marginRight: '0.5rem'}}>Filter by currency:</label>
-
-                        <Select
-                            items={currencyFilteringOptions}
-                            value={selectedCurrency}
-                            onValueChanged={e => setSelectedCurrency(e.detail.value)}
-                            style={{maxWidth: '200px'}}
-
-                        />
-                    </div>
-
-                    <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
-                        <label style={{marginRight: '0.5rem'}}>Filter by catergory:</label>
-                        <Select
-                            items={categoryFilteringOptions}
-                            value={selectedCategory}
-                            onValueChanged={e => setSelectedCategory(e.detail.value)}
-                            style={{maxWidth: '200px'}}
-                        />
-                    </div>
-                    <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
-                        <label style={{marginRight: '0.5rem'}}>Filter by date:</label>
-                        <DatePicker
-                            ref={startDatePickerRef}
-                            placeholder="From"
-                            value={startDate.value}
-                            onValueChanged={(e) => {
-                                startDate.value = e.detail.value;
-                                setIsStartDateSelected(!!e.detail.value);
-                            }}
-                            style={{maxWidth: '200px'}}
-                        />
-                        <DatePicker
-                            ref={endDatePickerRef}
-                            placeholder="To"
-                            value={endDate.value}
-                            onValueChanged={(e) => {
-                                endDate.value = e.detail.value;
-                                setIsEndDateSelected(!!e.detail.value);
-                            }}
-                            style={{maxWidth: '200px'}}
-                        />
-                    </div>
-                    <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
-                        <label style={{marginRight: '0.5rem'}}>Filter by usuality:</label>
-                        <Select
-                            items={usualityFilteringOptions}
-                            value={selectedByUsuality}
-                            onValueChanged={e => setSelectedByUsuality(e.detail.value)}
-                            style={{maxWidth: '200px'}}
-                        />
-                    </div>
-                </div>
-            )}
             <Grid items={incomes.filter(i => {
                 const categoryFilter = selectedCategory === 'All' || i.category === selectedCategory
                 const currencyFilter = selectedCurrency === 'All' || i.currency === selectedCurrency
