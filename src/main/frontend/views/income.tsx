@@ -1,15 +1,11 @@
 import {
-    Checkbox,
     DatePicker,
     DatePickerElement,
-    Dialog,
     Grid,
     GridColumn,
     Icon,
     Select,
-    Upload,
     UploadFile,
-    VerticalLayout
 } from "@vaadin/react-components";
 import React, {useEffect, useRef, useState} from "react";
 import {deleteIncome, getAll, addIncome, editIncome, deleteIncomeDocument} from "Frontend/generated/IncomeServiceImpl";
@@ -22,8 +18,9 @@ import { IncomeDto } from "Frontend/types/IncomeDto";
 import IncomeButtonRenderer from "Frontend/components/IncomeButtonRenderer";
 import { visualizeDocument } from "Frontend/util/documentUtils";
 import { formatDateForDatePicker, getDateWithoutTime, mapIncomeEntityToDto, parseDateForDatePicker } from "Frontend/util/incomeUtils";
-import { amountFilterOptions, categoryFilteringOptions, categoryOptions, currencyFilteringOptions, currencyOptions, currencySignsToCodes, usualityFilteringOptions } from "Frontend/constants/incomeConstants";
+import { amountFilterOptions, categoryFilteringOptions, currencyFilteringOptions, currencySignsToCodes, usualityFilteringOptions } from "Frontend/constants/incomeConstants";
 import ConfirmDeleteDialog from "Frontend/components/ConfirmDeleteDialog";
+import AddEditDialog from "Frontend/components/AddEditDialog";
 
 export const config: ViewConfig = {
     menu: {order: 1, icon: 'line-awesome/svg/file.svg'},
@@ -547,98 +544,27 @@ export default function IncomeView() {
               opened={confirmDocumentDialogOpened} onConfirm={confirmRemoveDocument} onCancel={() => setConfirmDocumentDialogOpened(false)}>
             </ConfirmDeleteDialog>
 
-            <Dialog
-                headerTitle="Add Income"
+            <AddEditDialog
                 opened={addDialogOpened}
-                onOpenedChanged={({detail}) => handleAddDialogOpenedChanged(detail.value)}
-                footerRenderer={() => (
-                    <>
-                        <Button onClick={() => handleAddDialogOpenedChanged(false)}>Cancel</Button>
-                        <Button theme="primary" onClick={addNewIncome}>
-                            Add
-                        </Button>
-                    </>
-                )}
-            >
-                <VerticalLayout style={{alignItems: 'stretch', width: '18rem', maxWidth: '100%'}}>
-                    <TextField
-                        // key={newIncome.id} // todo: was not making any difference - delete?
-                        label="Amount"
-                        value={newIncome.amount.toFixed(2).toString()}
-                        onChange={e => setNewIncome({...newIncome, amount: Number(e.target.value)})}
-                    />
-                    <Select
-                        label="Currency"
-                        value={newIncome.currency}
-                        items={currencyOptions}
-                        onValueChanged={e => setNewIncome({...newIncome, currency: e.detail.value})}
-                    />
-                    <Select
-                        label="Category"
-                        value={newIncome.category}
-                        items={categoryOptions}
-                        onValueChanged={e => setNewIncome({...newIncome, category: e.detail.value})}
-                    />
-                    <Upload
-                        files={documentFile}
-                        accept=".pdf"
-                        maxFiles={1}
-                        onUploadBefore={(e) => handleUploadBefore(e, 'add')}
-                    />
-                    <Checkbox 
-                        label="This income is unusual" 
-                        checked={newIncome.unusual}
-                        onChange={e => setNewIncome({...newIncome, unusual: e.target.checked})}/>
-                </VerticalLayout>
-            </Dialog>
+                income={newIncome}
+                onIncomeChange={setNewIncome}
+                onSave={addNewIncome}
+                handleOpenChanged={(value) => handleAddDialogOpenedChanged(value)}
+                isEdit={false}
+                documentFile={documentFile}
+                handleUploadBefore={(e) => handleUploadBefore(e, 'add')}
+            ></AddEditDialog>
 
-
-            <Dialog
-                headerTitle="Edit Income"
+            <AddEditDialog
                 opened={editDialogOpened}
-                onOpenedChanged={({detail}) => handleEditDialogOpenedChanged(detail.value)}
-                footerRenderer={() => (
-                    <>
-                        <Button onClick={() => handleEditDialogOpenedChanged(false)}>Cancel</Button>
-                        <Button theme="primary" onClick={editCustomIncome}>
-                            Edit
-                        </Button>
-                    </>
-                )}
-            >
-                <VerticalLayout style={{alignItems: 'stretch', width: '18rem', maxWidth: '100%'}}>
-                    <TextField
-                        // key={newIncome.id} // todo: was not making any difference - delete?
-                        label="Amount"
-                        value={editedIncome.amount.toFixed(2).toString()}
-                        onChange={e => setEditedIncome({...editedIncome, amount: Number(e.target.value)})}
-                    />
-                    <Select
-                        label="Currency"
-                        value={editedIncome.currency}
-                        items={currencyOptions}
-                        onValueChanged={e => setEditedIncome({...editedIncome, currency: e.detail.value})}
-                    />
-                    <Select
-                        label="Category"
-                        value={editedIncome.category}
-                        items={categoryOptions}
-                        onValueChanged={e => setEditedIncome({...editedIncome, category: e.detail.value})}
-                    />
-                    <Upload
-                        files={documentFile}
-                        accept=".pdf"
-                        maxFiles={1}
-                        onUploadBefore={(e) => handleUploadBefore(e, 'edit')}
-                    />
-                    <Checkbox 
-                        label="This income is unusual" 
-                        checked={editedIncome.unusual}
-                        onChange={e => setEditedIncome({...editedIncome, unusual: e.target.checked})}
-                    />
-                </VerticalLayout>
-            </Dialog>
-
+                income={editedIncome}
+                onIncomeChange={setEditedIncome}
+                onSave={editCustomIncome}
+                handleOpenChanged={(value) => handleEditDialogOpenedChanged(value)}
+                isEdit={true}
+                documentFile={documentFile}
+                handleUploadBefore={(e) => handleUploadBefore(e, 'edit')}
+            ></AddEditDialog>
         </>
     );
 }
