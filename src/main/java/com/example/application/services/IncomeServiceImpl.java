@@ -32,6 +32,7 @@ public class IncomeServiceImpl implements IncomeService {
         this.documentRepository = documentRepository;
     }
 
+    // todo: return DTO where enum representations is used
     @Override
     public List<IncomeEntity> getAll() {
         return new ArrayList<>(incomeRepository.findAllByUser(authenticatedUser.get().orElseThrow()));

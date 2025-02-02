@@ -3,20 +3,20 @@ import React, {useEffect, useState} from "react";
 import {deleteIncome, getAll, addIncome, editIncome, deleteIncomeDocument} from "Frontend/generated/IncomeServiceImpl";
 import {format} from 'date-fns';
 import { useSignal } from "@vaadin/hilla-react-signals";
-import { IncomeDto } from "Frontend/types/IncomeDto";
+import { Transaction } from "Frontend/types/Transaction";
 import { mapIncomeEntityToDto} from "Frontend/util/incomeUtils";
-import { currencySignsToCodes } from "Frontend/constants/incomeConstants";
+import { currencySignsToCodes } from "Frontend/constants/constants";
 
 export const useIncomeViwState = () => {
     const gridRef = React.useRef<any>(null);
-    const [incomes, setIncomes] = useState<IncomeDto[]>([]);
-    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
-    const [editedIncome, setEditedIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
+    const [incomes, setIncomes] = useState<Transaction[]>([]);
+    const [newIncome, setNewIncome] = useState<Transaction>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
+    const [editedIncome, setEditedIncome] = useState<Transaction>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
     const [confirmDocumentDialogOpened, setConfirmDocumentDialogOpened] = useState(false);
     const [addDialogOpened, setAddDialogOpened] = useState(false);
     const [editDialogOpened, setEditDialogOpened] = useState(false);
-    const [selectedIncome, setSelectedIncome] = useState<IncomeDto | null>(null);
+    const [selectedIncome, setSelectedIncome] = useState<Transaction | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
     const [selectedCurrency, setSelectedCurrency] = useState<string>('All');
     const [amountFilterType, setAmountFilterType] = useState<string>('>');
@@ -27,7 +27,7 @@ export const useIncomeViwState = () => {
     const [isEndDateSelected, setIsEndDateSelected] = useState(false);
     const [selectedByUsuality, setSelectedByUsuality] = useState<string>('All');
     const [documentFile, setDocumentFile] = useState<UploadFile[]>([]);
-    const [incomeWithDocumentToRemove, setIncomeWithDocumentToRemove] = useState<IncomeDto | null>(null);
+    const [incomeWithDocumentToRemove, setIncomeWithDocumentToRemove] = useState<Transaction | null>(null);
 
     useEffect(() => {
         getAll().then(incomes => {
@@ -64,7 +64,7 @@ export const useIncomeViwState = () => {
       endDate.value = '';
     }
 
-    const handleEdit = (income: IncomeDto) => {
+    const handleEdit = (income: Transaction) => {
         editedIncome.id = income.id;
         editedIncome.amount = income.amount;
         editedIncome.currency = income.currency;
@@ -86,7 +86,7 @@ export const useIncomeViwState = () => {
         setEditDialogOpened(true);
     };
 
-    const handleDelete = (income: IncomeDto) => {
+    const handleDelete = (income: Transaction) => {
         setSelectedIncome(income);
         setConfirmDialogOpened(true);
     };
@@ -104,7 +104,7 @@ export const useIncomeViwState = () => {
     };
 
     const addNewIncome = () => {
-        const income: IncomeDto = {
+        const income: Transaction = {
             amount: newIncome.amount,
             currency: newIncome.currency,
             category: newIncome.category,
@@ -141,7 +141,7 @@ export const useIncomeViwState = () => {
     };
 
     const editExistingIncome = () => {
-        const income: IncomeDto = {
+        const income: Transaction = {
             id: editedIncome.id,
             amount: editedIncome.amount,
             currency: editedIncome.currency,
@@ -205,7 +205,7 @@ export const useIncomeViwState = () => {
         reader.readAsDataURL(file);
     };
 
-    const handleRemoveDocument = (income: IncomeDto) => {
+    const handleRemoveDocument = (income: Transaction) => {
         setIncomeWithDocumentToRemove(income);
         setConfirmDocumentDialogOpened(true);
       };

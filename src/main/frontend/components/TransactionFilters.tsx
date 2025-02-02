@@ -1,10 +1,11 @@
 import { Button, DatePicker, DatePickerElement, Icon, Select, TextField } from "@vaadin/react-components";
 import { formatDateForDatePicker, parseDateForDatePicker } from "Frontend/util/incomeUtils";
 import { useEffect, useRef, useState } from "react";
-import { amountFilterOptions, categoryFilteringOptions, currencyFilteringOptions, currencySignsToCodes, usualityFilteringOptions } from "Frontend/constants/incomeConstants";
+import { amountFilterOptions, incomeCategoryFilteringOptions, currencyFilteringOptions, currencySignsToCodes, usualityFilteringOptions, expenseCategoryFilteringOptions } from "Frontend/constants/constants";
 import { Signal } from "@vaadin/hilla-react-signals";
 
 interface Proprs {
+    transactionType: "income" | "expense",
     areFiltersDefault: () => boolean;
     clearFilters: () => void;
     amountFilterType: string,
@@ -23,7 +24,8 @@ interface Proprs {
     setSelectedByUsuality: (currency: string) => void;
 }
 
-export default function IncomeFilters({
+export default function TransactionFilters({
+    transactionType,
     areFiltersDefault, 
     clearFilters,
     amountFilterType,
@@ -41,6 +43,17 @@ export default function IncomeFilters({
     selectedByUsuality,
     setSelectedByUsuality
 } : Proprs) {
+
+    let buttonTheme;
+    let categoryFilteringOptions;
+
+    if(transactionType === 'income') {
+        buttonTheme = 'success';
+        categoryFilteringOptions = incomeCategoryFilteringOptions;
+    } else {
+        buttonTheme = 'error';
+        categoryFilteringOptions = expenseCategoryFilteringOptions;
+    }
 
     const [filtersVisible, setFiltersVisible] = useState(false);
     
@@ -75,7 +88,7 @@ export default function IncomeFilters({
     return (
         <>
         <Button 
-                theme="success" 
+                theme={buttonTheme}
                 onClick={() => setFiltersVisible(!filtersVisible)} 
                 style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
             >
@@ -84,7 +97,7 @@ export default function IncomeFilters({
             </Button>
 
             <Button 
-                theme="success" 
+                theme={buttonTheme}
                 disabled={areFiltersDefault()} 
                 onClick={() => clearFilters()} 
                 style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}

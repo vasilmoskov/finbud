@@ -3,8 +3,8 @@ import {ViewConfig} from "@vaadin/hilla-file-router/types.js";
 import {Button} from "@vaadin/react-components/Button.js";
 import ConfirmDeleteDialog from "Frontend/components/ConfirmDeleteDialog";
 import AddEditDialog from "Frontend/components/AddEditDialog";
-import IncomeFilters from "Frontend/components/IncomeFilters";
-import IncomeGrid from "Frontend/components/IncomeGrid";
+import TransactionFilters from "Frontend/components/TransactionFilters";
+import TransactionGrid from "Frontend/components/TransactionGrid";
 import { useIncomeViwState } from "Frontend/hooks/useIncomeViewState";
 
 export const config: ViewConfig = {
@@ -58,19 +58,21 @@ export default function IncomeView() {
         confirmRemoveDocument
     } = useIncomeViwState();
 
+    const buttonTheme = 'success'
 
     return (
         <>
             <Button
-                theme="success"
+                theme={buttonTheme}
                 onClick={() => handleAddDialogOpenedChanged(true)}
                 style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
             >
                 Add Income
-                <Icon icon="vaadin:plus"/>
+                <Icon icon="vaadin:plus-circle-o"/>
             </Button>
 
-            <IncomeFilters
+            <TransactionFilters
+                transactionType='income'
                 areFiltersDefault={areFiltersDefault}
                 clearFilters={clearFilters}
                 amountFilterType={amountFilterType}
@@ -87,10 +89,11 @@ export default function IncomeView() {
                 setIsEndDateSelected={setIsEndDateSelected}
                 selectedByUsuality={selectedByUsuality}
                 setSelectedByUsuality={setSelectedByUsuality}
-            ></IncomeFilters>
+            ></TransactionFilters>
 
-            <IncomeGrid
-                incomes={incomes}
+            <TransactionGrid
+                buttonTheme={buttonTheme}
+                transactions={incomes}
                 selectedCategory={selectedCategory}
                 selectedCurrency={selectedCurrency}
                 selectedByUsuality={selectedByUsuality}
@@ -104,7 +107,7 @@ export default function IncomeView() {
                 handleDelete={handleDelete}
                 handleRemoveDocument={handleRemoveDocument}
                 gridRef={gridRef}
-            ></IncomeGrid>
+            ></TransactionGrid>
 
             <ConfirmDeleteDialog
                 message="Are you sure you want to delete this income?"
@@ -117,9 +120,10 @@ export default function IncomeView() {
             </ConfirmDeleteDialog>
 
             <AddEditDialog
+                transactionType='Income'
                 opened={addDialogOpened}
-                income={newIncome}
-                onIncomeChange={setNewIncome}
+                transaction={newIncome}
+                onTransactionChange={setNewIncome}
                 onSave={addNewIncome}
                 handleOpenChanged={(value) => handleAddDialogOpenedChanged(value)}
                 isEdit={false}
@@ -128,9 +132,10 @@ export default function IncomeView() {
             ></AddEditDialog>
 
             <AddEditDialog
+                transactionType='Income'
                 opened={editDialogOpened}
-                income={editedIncome}
-                onIncomeChange={setEditedIncome}
+                transaction={editedIncome}
+                onTransactionChange={setEditedIncome}
                 onSave={editExistingIncome}
                 handleOpenChanged={(value) => handleEditDialogOpenedChanged(value)}
                 isEdit={true}

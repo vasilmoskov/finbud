@@ -1,4 +1,4 @@
 export interface DocumentDto {
     id?: string,
-    content: string;
+    content?: string;
 }

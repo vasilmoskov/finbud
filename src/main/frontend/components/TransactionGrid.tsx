@@ -1,13 +1,14 @@
-import { DatePickerDate, Grid, GridColumn, Icon } from "@vaadin/react-components";
-import IncomeButtonRenderer from "./IncomeButtonRenderer";
-import { IncomeDto } from "Frontend/types/IncomeDto";
+import { Grid, GridColumn, Icon } from "@vaadin/react-components";
+import TransactionButtonRenderer from "./TransactionButtonRenderer";
+import { Transaction } from "Frontend/types/Transaction";
 import { useState } from "react";
 import { Signal } from "@vaadin/hilla-react-signals";
-import { getDateWithoutTime, mapIncomeEntityToDto} from "Frontend/util/incomeUtils";
+import { getDateWithoutTime} from "Frontend/util/incomeUtils";
 import { visualizeDocument } from "Frontend/util/documentUtils";
 
 interface Props {
-    incomes: IncomeDto[];
+    buttonTheme: string,
+    transactions: Transaction[];
     selectedCategory: string;
     selectedCurrency: string;
     selectedByUsuality: string;
@@ -17,14 +18,15 @@ interface Props {
     isStartDateSelected: boolean;
     endDate: Signal<string>;
     isEndDateSelected: boolean;
-    handleEdit: (income: IncomeDto) => void;
-    handleDelete: (income: IncomeDto) => void;
-    handleRemoveDocument: (income: IncomeDto) => void;
+    handleEdit: (transaction: Transaction) => void;
+    handleDelete: (transaction: Transaction) => void;
+    handleRemoveDocument: (transaction: Transaction) => void;
     gridRef: React.MutableRefObject<any>
   }
 
-export default function IncomeGrid({
-    incomes,
+export default function TransactionGrid({
+    buttonTheme,
+    transactions,
     selectedCategory,
     selectedCurrency,
     selectedByUsuality,
@@ -60,7 +62,7 @@ export default function IncomeGrid({
 
     return (
         <>
-        <Grid items={incomes.filter(i => {
+        <Grid items={transactions.filter(i => {
                 const categoryFilter = selectedCategory === 'All' || i.category === selectedCategory
                 const currencyFilter = selectedCurrency === 'All' || i.currency === selectedCurrency
                 const usualityFilter = selectedByUsuality === 'All' || 
@@ -85,13 +87,13 @@ export default function IncomeGrid({
                 }
 
                 if (startDate.value || endDate.value) {
-                    const incomeDate = getDateWithoutTime(new Date(i.date!));
+                    const transactionDate = getDateWithoutTime(new Date(i.date!));
 
-                    if (isStartDateSelected && startDate && incomeDate < getDateWithoutTime(new Date(startDate.value))) {
+                    if (isStartDateSelected && startDate && transactionDate < getDateWithoutTime(new Date(startDate.value))) {
                         dateFilter = false;
                     }
 
-                    if (isEndDateSelected && endDate && incomeDate > getDateWithoutTime(new Date(endDate.value))) {
+                    if (isEndDateSelected && endDate && transactionDate > getDateWithoutTime(new Date(endDate.value))) {
                         dateFilter = false;
                     }
                 }
@@ -135,7 +137,7 @@ export default function IncomeGrid({
                         <div>
                             <span
                                 {...({
-                                    theme: 'badge success',
+                                    theme: `badge ${buttonTheme}`,
                                 } satisfies object)}
                             >
                                 {Number(item.amount).toFixed(2)}
@@ -144,7 +146,7 @@ export default function IncomeGrid({
                                 <Icon 
                                     icon="vaadin:star" 
                                     style={{marginLeft: '0.5rem', fontSize: '0.8rem', color: 'gold'}}
-                                    title="This income is unusual"
+                                    title="This transaction is unusual"
                                 />
                             }
                         </div>
@@ -165,8 +167,8 @@ export default function IncomeGrid({
 
                 <GridColumn autoWidth>
                   {({ item }) => (
-                    <IncomeButtonRenderer
-                      income={item}
+                    <TransactionButtonRenderer
+                      transaction={item}
                       onEdit={handleEdit}
                       onDelete={handleDelete}
                       visualizeDocument={visualizeDocument}

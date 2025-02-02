@@ -1,6 +1,6 @@
 import { DocumentDto } from "./DocumentDto";
 
-export interface IncomeDto {
+export interface Transaction {
     id?: string,
     amount: number;
     currency: string;
