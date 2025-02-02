@@ -1,20 +1,11 @@
-import {
-    Icon,
-    UploadFile,
-} from "@vaadin/react-components";
-import React, {useEffect, useState} from "react";
-import {deleteIncome, getAll, addIncome, editIncome, deleteIncomeDocument} from "Frontend/generated/IncomeServiceImpl";
+import { Icon } from "@vaadin/react-components";
 import {ViewConfig} from "@vaadin/hilla-file-router/types.js";
 import {Button} from "@vaadin/react-components/Button.js";
-import {format} from 'date-fns';
-import { useSignal } from "@vaadin/hilla-react-signals";
-import { IncomeDto } from "Frontend/types/IncomeDto";
-import { mapIncomeEntityToDto} from "Frontend/util/incomeUtils";
-import { currencySignsToCodes } from "Frontend/constants/incomeConstants";
 import ConfirmDeleteDialog from "Frontend/components/ConfirmDeleteDialog";
 import AddEditDialog from "Frontend/components/AddEditDialog";
 import IncomeFilters from "Frontend/components/IncomeFilters";
 import IncomeGrid from "Frontend/components/IncomeGrid";
+import { useIncomeViwState } from "Frontend/hooks/useIncomeViewState";
 
 export const config: ViewConfig = {
     menu: {order: 1, icon: 'line-awesome/svg/file.svg'},
@@ -23,240 +14,56 @@ export const config: ViewConfig = {
 };
 
 export default function IncomeView() {
-    const gridRef = React.useRef<any>(null);
-    const [incomes, setIncomes] = useState<IncomeDto[]>([]);
-    const [newIncome, setNewIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
-    const [editedIncome, setEditedIncome] = useState<IncomeDto>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
-    const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
-    const [confirmDocumentDialogOpened, setConfirmDocumentDialogOpened] = useState(false);
-    const [addDialogOpened, setAddDialogOpened] = useState(false);
-    const [editDialogOpened, setEditDialogOpened] = useState(false);
-    const [selectedIncome, setSelectedIncome] = useState<IncomeDto | null>(null);
+    const {
+        gridRef,
+        incomes,
+        newIncome,
+        setNewIncome,
+        editedIncome,
+        setEditedIncome,
+        confirmDialogOpened,
+        setConfirmDialogOpened,
+        confirmDocumentDialogOpened,
+        setConfirmDocumentDialogOpened,
+        addDialogOpened,
+        editDialogOpened,
+        selectedCategory,
+        setSelectedCategory,
+        selectedCurrency,
+        setSelectedCurrency,
+        amountFilterType,
+        setAmountFilterType,
+        amountFilterValue,
+        setAmountFilterValue,
+        startDate,
+        endDate,
+        isStartDateSelected,
+        setIsStartDateSelected,
+        isEndDateSelected,
+        setIsEndDateSelected,
+        selectedByUsuality,
+        setSelectedByUsuality,
+        documentFile,
+        areFiltersDefault,
+        clearFilters,
+        handleEdit,
+        handleDelete,
+        confirmDelete,
+        addNewIncome,
+        editExistingIncome,
+        handleAddDialogOpenedChanged,
+        handleEditDialogOpenedChanged,
+        handleUploadBefore,
+        handleRemoveDocument,
+        confirmRemoveDocument
+    } = useIncomeViwState();
 
-    const [selectedCategory, setSelectedCategory] = useState<string>('All');
-    const [selectedCurrency, setSelectedCurrency] = useState<string>('All');
-
-    const [amountFilterType, setAmountFilterType] = useState<string>('>');
-    const [amountFilterValue, setAmountFilterValue] = useState<number>(0);
-
-    const startDate = useSignal(format(new Date(), 'dd/MM/yyyy'));
-    const endDate = useSignal(format(new Date(), 'dd/MM/yyyy'));
-
-    const [isStartDateSelected, setIsStartDateSelected] = useState(false);
-    const [isEndDateSelected, setIsEndDateSelected] = useState(false);
-
-    const [selectedByUsuality, setSelectedByUsuality] = useState<string>('All');
-
-    const [documentFile, setDocumentFile] = useState<UploadFile[]>([]);
-
-    const [incomeWithDocumentToRemove, setIncomeWithDocumentToRemove] = useState<IncomeDto | null>(null);
-
-    const areFiltersDefault = () => {
-      return (
-        amountFilterType === '>' &&
-        amountFilterValue === 0 &&
-        selectedCurrency === 'All' &&
-        selectedCategory === 'All' &&
-        selectedByUsuality === 'All' &&
-        !isStartDateSelected && 
-        !isEndDateSelected
-      );
-    }
-
-    const clearFilters = () => {
-      setAmountFilterType('>');
-      setAmountFilterValue(0);
-      setSelectedCurrency('All');
-      setSelectedCategory('All');
-      setSelectedByUsuality('All');
-      setIsStartDateSelected(false);
-      setIsEndDateSelected(false);
-      startDate.value = '';
-      endDate.value = '';
-    }
-
-    const handleEdit = (income: IncomeDto) => {
-
-        // TODO: setNewIncome should be enough.. something with the state and the dialog is not working good and it's not synced
-        editedIncome.id = income.id;
-        editedIncome.amount = income.amount;
-        editedIncome.currency = income.currency;
-        editedIncome.category = income.category;
-        editedIncome.date = income.date;
-        editedIncome.document = income.document;
-        editedIncome.unusual = income.unusual
-
-        setEditedIncome({
-            id: income.id,
-            amount: income.amount,
-            currency: income.currency,
-            category: income.category,
-            date: income.date,
-            document: income.document,
-            unusual: income.unusual
-        });
-
-        setEditDialogOpened(true);
-    };
-
-    const handleDelete = (income: IncomeDto) => {
-        setSelectedIncome(income);
-        setConfirmDialogOpened(true);
-    };
-
-    const confirmDelete = () => {
-        if (selectedIncome) {
-            const previousIncomes = [...incomes];
-            const updatedIncomes = incomes.filter(i => i.id !== selectedIncome.id);
-            setIncomes(updatedIncomes);
-            deleteIncome(selectedIncome.id!).catch(() => setIncomes(previousIncomes));
-
-            setSelectedIncome(null);
-            setConfirmDialogOpened(false);
-        }
-    };
-
-    const addNewIncome = () => {
-        const income: IncomeDto = {
-            amount: newIncome.amount,
-            currency: newIncome.currency,
-            category: newIncome.category,
-            date: format(new Date(), "dd MMM yyyy HH:mm:ss"),
-            document: newIncome.document,
-            unusual: newIncome.unusual
-        };
-
-        const previousIncomes = [...incomes];
-
-        setIncomes([...incomes, income]);
-
-        setDocumentFile([]);
-        setNewIncome({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
-        setAddDialogOpened(false);
-
-        addIncome(income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase(), income.document?.content!, income.unusual)
-            .then((savedIncome) => {
-                    income.id = savedIncome.id
-
-                    if(income.document != null) {
-                        income.document.id = savedIncome.document.id;
-                    }
-
-                    setIncomes([...incomes, income]);
-                }
-            )
-            .catch(() => {
-                setIncomes(previousIncomes);
-                setNewIncome(income);
-                setAddDialogOpened(true);
-            })
-        
-    };
-
-    const editCustomIncome = () => {
-        const income: IncomeDto = {
-            id: editedIncome.id,
-            amount: editedIncome.amount,
-            currency: editedIncome.currency,
-            category: editedIncome.category,
-            date: editedIncome.date,
-            document: editedIncome.document,
-            unusual: editedIncome.unusual
-        };
-
-
-        const previousIncomes = [...incomes];
-
-        setIncomes(incomes.map(i => i.id === income.id ? income : i));
-
-        setEditDialogOpened(false);
-
-        editIncome(income.id!, income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase(), income.document?.content!, income.unusual)
-            .then(() => {
-                setDocumentFile([]);
-            })
-            .catch(() => {
-                setIncomes(previousIncomes);
-                setEditedIncome(income);
-                setEditDialogOpened(true);
-            })
-    };
-
-    useEffect(() => {
-        getAll().then(incomes => {
-            const mappedIncomes = incomes.map(mapIncomeEntityToDto);
-            setIncomes(mappedIncomes)
-        });
-
-        setTimeout(() => {
-            gridRef.current?.recalculateColumnWidths();
-        }, 100);
-    }, []);
-
-    const handleAddDialogOpenedChanged = (detailValue: boolean) => {
-        setAddDialogOpened(detailValue);
-
-        if (!detailValue) {
-            setNewIncome({...newIncome, id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
-            setDocumentFile([]);
-        }
-    };
-
-    const handleEditDialogOpenedChanged = (detailValue: boolean) => {
-        setEditDialogOpened(detailValue);
-
-        if (!detailValue) {
-            setDocumentFile([]);
-        }
-    };
-
-    const handleUploadBefore = async (e: CustomEvent, context: 'add' | 'edit') => {
-        const file = e.detail.file as UploadFile;
-        e.preventDefault();
-        const reader = new FileReader();
-        reader.onload = () => {
-            setDocumentFile(Array.of(file))
-
-            if(context === 'add') {
-                setNewIncome({...newIncome, document: {content: reader.result as string}});
-            } else if (context === 'edit') {
-                setEditedIncome({...editedIncome, document: {content: reader.result as string}});
-            }
-
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const handleRemoveDocument = (income: IncomeDto) => {
-        setIncomeWithDocumentToRemove(income);
-        setConfirmDocumentDialogOpened(true);
-      };
-    
-    const confirmRemoveDocument = () => {
-        if(incomeWithDocumentToRemove == null) {
-            return;
-        }
-
-        incomeWithDocumentToRemove.document = null;
-
-        const previousIncomes = [...incomes];
-
-        setIncomes(incomes.map(i => i.id === incomeWithDocumentToRemove.id ? incomeWithDocumentToRemove : i));
-
-        setConfirmDocumentDialogOpened(false);
-
-        deleteIncomeDocument(incomeWithDocumentToRemove.id!)
-            .catch(() => {
-                setIncomes(previousIncomes);
-                setConfirmDocumentDialogOpened(true);
-            })
-    };
 
     return (
         <>
             <Button
                 theme="success"
-                onClick={() => setAddDialogOpened(true)}
+                onClick={() => handleAddDialogOpenedChanged(true)}
                 style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
             >
                 Add Income
@@ -324,7 +131,7 @@ export default function IncomeView() {
                 opened={editDialogOpened}
                 income={editedIncome}
                 onIncomeChange={setEditedIncome}
-                onSave={editCustomIncome}
+                onSave={editExistingIncome}
                 handleOpenChanged={(value) => handleEditDialogOpenedChanged(value)}
                 isEdit={true}
                 documentFile={documentFile}
