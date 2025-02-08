@@ -7,8 +7,7 @@ public enum CurrencyCode {
     BGN("лв."),
     EUR("€"),
     USD("$"),
-    GBP("£"),
-    OTHER("Other");
+    GBP("£");
 
     private static final Map<String, CurrencyCode> CURRENCIES_BY_REPRESENTATION = new HashMap<>();
 

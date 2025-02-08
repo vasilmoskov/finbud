@@ -58,8 +58,7 @@ export const currencyCodesToSigns: Record<string, string> = {
     'BGN': 'лв.',
     'USD': '$',
     'EUR': '€',
-    'GBP': '£',
-    'OTHER': 'Other'
+    'GBP': '£'
 };
 
 export const currencySignsToCodes: Record<string, string> = Object.fromEntries(

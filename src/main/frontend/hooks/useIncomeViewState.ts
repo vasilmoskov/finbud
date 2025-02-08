@@ -10,8 +10,8 @@ import { currencySignsToCodes } from "Frontend/constants/constants";
 export const useIncomeViwState = () => {
     const gridRef = React.useRef<any>(null);
     const [incomes, setIncomes] = useState<Transaction[]>([]);
-    const [newIncome, setNewIncome] = useState<Transaction>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
-    const [editedIncome, setEditedIncome] = useState<Transaction>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
+    const [newIncome, setNewIncome] = useState<Transaction>({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: null, unusual: false});
+    const [editedIncome, setEditedIncome] = useState<Transaction>({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: null, unusual: false});
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
     const [confirmDocumentDialogOpened, setConfirmDocumentDialogOpened] = useState(false);
     const [addDialogOpened, setAddDialogOpened] = useState(false);
@@ -118,7 +118,7 @@ export const useIncomeViwState = () => {
         setIncomes([...incomes, income]);
 
         setDocumentFile([]);
-        setNewIncome({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
+        setNewIncome({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: null, unusual: false});
         setAddDialogOpened(false);
 
         addIncome(income.amount, currencySignsToCodes[income.currency], income.category.toUpperCase(), income.document?.content!, income.unusual)
@@ -175,7 +175,7 @@ export const useIncomeViwState = () => {
         setAddDialogOpened(detailValue);
 
         if (!detailValue) {
-            setNewIncome({...newIncome, id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
+            setNewIncome({...newIncome, id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: null, unusual: false});
             setDocumentFile([]);
         }
     };

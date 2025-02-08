@@ -4,6 +4,8 @@ import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts';
 import { useExpenseViewState } from 'Frontend/hooks/useExpenseViewState';
 import { useEffect, useState } from 'react';
 import { Transaction } from 'Frontend/types/Transaction';
+import { Select } from '@vaadin/react-components';
+import { currencyOptions } from 'Frontend/constants/constants';
 
 export const config: ViewConfig = {
   menu: { order: 0, icon: 'line-awesome/svg/globe-solid.svg' },
@@ -44,31 +46,26 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, outerRadius, percent, index }
   );
 };
 
-const formatTooltipValue = (value: number) => {
-  return `${value.toFixed(2)} лв.`;
+const conversionRates: { [key: string]: { [key: string]: number } } = {
+  'лв.': { 'лв.': 1, '€': 0.51, '$': 0.53, '£': 0.43 },
+  '€': { '€': 1, 'лв.': 1.96, '$': 1.03, '£': 0.83 },
+  '$': { '$': 1, 'лв.': 1.89, '€': 0.97, '£': 0.81 },
+  '£': { '£': 1, 'лв.': 2.35, '€': 1.2, '$': 1.24 },
 };
 
-const conversionRates: {[key: string]: number} = {
-  'лв.': 1,
-  '€': 1.96,
-  '$': 1.89,
-  '£': 2.35,
-};
-
-const convertToBGN = (amount: number, currency: string) => {
-  const rate = conversionRates[currency];
+const convertToCurrency = (amount: number, fromCurrency: string, toCurrency: string) => {
+  const rate = conversionRates[fromCurrency]?.[toCurrency];
   return amount * rate;
 };
 
-const accumulateExpensesByCategory = (expenses: Transaction[]) => {
+const accumulateExpensesByCategory = (expenses: Transaction[], selectedCurrency: string) => {
   const categoryMap = expenses.reduce((acc: { [key: string]: number }, expense: Transaction) => {
-    
-    const amountInBGN = convertToBGN(expense.amount, expense.currency);
-    
+    const amountInSelectedCurrency = convertToCurrency(expense.amount, expense.currency, selectedCurrency);
+
     if (acc[expense.category]) {
-      acc[expense.category] += amountInBGN;
+      acc[expense.category] += amountInSelectedCurrency;
     } else {
-      acc[expense.category] = amountInBGN;
+      acc[expense.category] = amountInSelectedCurrency;
     }
 
     return acc;
@@ -81,19 +78,36 @@ const accumulateExpensesByCategory = (expenses: Transaction[]) => {
 };
 
 export default function DashboardsView() {
-  const {expenses} = useExpenseViewState(); 
+  const { expenses } = useExpenseViewState();
+
+  const [selectedCurrency, setSelectedCurrency] = useState('лв.');
   const [expensesData, setExpensesData] = useState<{ name: string; value: number }[]>([]);
 
+  const formatTooltipValue = (value: number) => {
+    return `${value.toFixed(2)} ${selectedCurrency}`;
+  };
+
   useEffect(() => {
-    const accumulatedExpenses = accumulateExpensesByCategory(expenses);
+    const accumulatedExpenses = accumulateExpensesByCategory(expenses, selectedCurrency);
     setExpensesData(accumulatedExpenses);
   }, [expenses]);
 
   return (
     <div className="flex flex-col h-full items-center justify-center p-l text-center box-border">
+      <Select
+        label="Currency"
+        value={selectedCurrency}
+        items={currencyOptions}
+        onValueChanged={e => {
+          setSelectedCurrency(e.detail.value);
+          const accumulatedExpenses = accumulateExpensesByCategory(expenses,  e.detail.value);
+          setExpensesData(accumulatedExpenses);
+        }}
+      />
+
       <div className="flex flex-row justify-around w-full">
 
-      <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center">
           <h2>Incomes</h2>
           <PieChart width={500} height={500}>
             <Pie data={incomesData}
@@ -136,7 +150,7 @@ export default function DashboardsView() {
             </Pie>
 
             <Tooltip formatter={formatTooltipValue} />
-            <Legend  />
+            <Legend />
           </PieChart>
         </div>
 

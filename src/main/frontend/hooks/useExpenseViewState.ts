@@ -12,8 +12,8 @@ import DocumentDto from "Frontend/generated/com/example/application/dto/Document
 export const useExpenseViewState = () => {
     const gridRef = React.useRef<any>(null);
     const [expenses, setExpenses] = useState<Transaction[]>([]);
-    const [newExpense, setNewExpense] = useState<Transaction>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
-    const [editedExpense, setEditedExpense] = useState<Transaction>({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
+    const [newExpense, setNewExpense] = useState<Transaction>({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: null, unusual: false});
+    const [editedExpense, setEditedExpense] = useState<Transaction>({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: null, unusual: false});
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
     const [confirmDocumentDialogOpened, setConfirmDocumentDialogOpened] = useState(false);
     const [addDialogOpened, setAddDialogOpened] = useState(false);
@@ -143,7 +143,7 @@ export const useExpenseViewState = () => {
         setExpenses([...expenses, expense]);
 
         setDocumentFile([]);
-        setNewExpense({id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
+        setNewExpense({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: null, unusual: false});
         setAddDialogOpened(false);
 
         addExpense(expense.amount, expense.currency, expense.category, expense.document?.content!, expense.unusual)
@@ -200,7 +200,7 @@ export const useExpenseViewState = () => {
         setAddDialogOpened(detailValue);
 
         if (!detailValue) {
-            setNewExpense({...newExpense, id: '', amount: 0, currency: 'Other', category: 'Other', date: '', document: null, unusual: false});
+            setNewExpense({...newExpense, id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: null, unusual: false});
             setDocumentFile([]);
         }
     };
