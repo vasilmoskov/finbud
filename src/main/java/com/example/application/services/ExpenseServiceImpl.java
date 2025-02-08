@@ -42,6 +42,29 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .collect(Collectors.toList());
     }
 
+
+    @Override
+    public List<TransactionDto> getAllByDatesBetween(String startDate, String endDate) {
+        String[] startDateTokens = startDate.split("-");
+        int startDateYear = Integer.parseInt(startDateTokens[0]);
+        int startDateMonth = Integer.parseInt(startDateTokens[1]);
+        int startDateDay = Integer.parseInt(startDateTokens[2]);
+
+        String[] endDateTokens = endDate.split("-");
+        int endDateYear = Integer.parseInt(endDateTokens[0]);
+        int endDateMonth = Integer.parseInt(endDateTokens[1]);
+        int endDateDay = Integer.parseInt(endDateTokens[2]);
+
+        return expenseRepository
+                .findAllByUserAndDateBetween(authenticatedUser.get().orElseThrow(),
+                        LocalDateTime.of(startDateYear, startDateMonth, startDateDay, 0, 0),
+                        LocalDateTime.of(endDateYear, endDateMonth, endDateDay, 23, 59)
+                )
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
     private TransactionDto toDto(ExpenseEntity e) {
         return new TransactionDto()
                 .setId(e.getId())

@@ -19,4 +19,5 @@ public interface ExpenseService {
 
     void deleteExpenseDocument(String id);
 
+    List<TransactionDto> getAllByDatesBetween(String startDate, String endDate);
 }

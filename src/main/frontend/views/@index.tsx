@@ -2,10 +2,14 @@ import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { Cell, Legend, Pie, PieChart, Tooltip } from 'recharts';
 import { useExpenseViewState } from 'Frontend/hooks/useExpenseViewState';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Transaction } from 'Frontend/types/Transaction';
-import { Select } from '@vaadin/react-components';
+import { Button, DatePicker, DatePickerElement, Select } from '@vaadin/react-components';
 import { currencyOptions } from 'Frontend/constants/constants';
+import { formatDateForDatePicker, parseDateForDatePicker } from 'Frontend/util/incomeUtils';
+import { getAll, getAllByDatesBetween } from 'Frontend/generated/ExpenseServiceImpl';
+import TransactionDto from 'Frontend/generated/com/example/application/dto/TransactionDto';
+import { DocumentDto } from 'Frontend/types/DocumentDto';
 
 export const config: ViewConfig = {
   menu: { order: 0, icon: 'line-awesome/svg/globe-solid.svg' },
@@ -78,32 +82,123 @@ const accumulateExpensesByCategory = (expenses: Transaction[], selectedCurrency:
 };
 
 export default function DashboardsView() {
-  const { expenses } = useExpenseViewState();
-
+  const startDatePickerRef = useRef<DatePickerElement>(null);
+  const endDatePickerRef = useRef<DatePickerElement>(null);
+  const { startDate } = useExpenseViewState();
+  const { endDate } = useExpenseViewState();
   const [selectedCurrency, setSelectedCurrency] = useState('лв.');
   const [expensesData, setExpensesData] = useState<{ name: string; value: number }[]>([]);
+  let [fetchedExpenses, setFetchedExpenses] = useState<Transaction[]>([]); // should be const
+  // let fetchedExpenses: Transaction[] = [];
+
+  useEffect(() => {
+    const datePicker = startDatePickerRef.current;
+
+    if (datePicker) {
+      datePicker.i18n = {
+        ...datePicker.i18n,
+        formatDate: formatDateForDatePicker,
+        parseDate: parseDateForDatePicker
+      }
+    }
+  }, [startDatePickerRef.current])
+
+  useEffect(() => {
+    const datePicker = endDatePickerRef.current;
+
+    if (datePicker) {
+      datePicker.i18n = {
+        ...datePicker.i18n,
+        formatDate: formatDateForDatePicker,
+        parseDate: parseDateForDatePicker
+      }
+    }
+  }, [endDatePickerRef.current])
 
   const formatTooltipValue = (value: number) => {
     return `${value.toFixed(2)} ${selectedCurrency}`;
   };
 
-  useEffect(() => {
-    const accumulatedExpenses = accumulateExpensesByCategory(expenses, selectedCurrency);
-    setExpensesData(accumulatedExpenses);
-  }, [expenses]);
+  const fetchExpensesByDates = () => {
+
+    getAllByDatesBetween(startDate.value, endDate.value).then((expenses) => {
+      console.log(expenses);
+
+      fetchedExpenses = expenses.map(toDto); // this shouldn't be done - setFetchedExpenses should be enough  
+      setFetchedExpenses(expenses.map(toDto));
+      const accumulatedExpenses = accumulateExpensesByCategory(fetchedExpenses, selectedCurrency);
+      setExpensesData(accumulatedExpenses);
+    });
+  }
+
+  // this code is duplicated!!! Put logic in  useExpenseViewState
+  const toDto = (dto: TransactionDto): Transaction => {
+    let doc: DocumentDto | null = null;
+
+    if (dto.document) {
+      doc = {
+        id: dto.document.id,
+        content: dto.document.content
+      }
+    }
+
+    return {
+      id: dto.id,
+      amount: dto.amount!,
+      currency: dto.currency!,
+      category: dto.category!,
+      date: dto.date,
+      document: doc,
+      unusual: dto.unusual
+    };
+  };
 
   return (
     <div className="flex flex-col h-full items-center justify-center p-l text-center box-border">
-      <Select
-        label="Currency"
-        value={selectedCurrency}
-        items={currencyOptions}
-        onValueChanged={e => {
-          setSelectedCurrency(e.detail.value);
-          const accumulatedExpenses = accumulateExpensesByCategory(expenses,  e.detail.value);
-          setExpensesData(accumulatedExpenses);
-        }}
-      />
+
+      <div className="flex flex-row items-center justify-center space-x-4">
+        <DatePicker
+          ref={startDatePickerRef}
+          placeholder="From"
+          value={startDate.value}
+          onValueChanged={(e) => {
+            startDate.value = e.detail.value;
+          }}
+          style={{ maxWidth: '200px', marginLeft: '1rem' }}
+        />
+
+        <DatePicker
+          ref={endDatePickerRef}
+          placeholder="To"
+          value={endDate.value}
+          onValueChanged={(e) => {
+            endDate.value = e.detail.value;
+          }}
+          style={{ maxWidth: '200px', marginLeft: '1rem' }}
+          
+        />
+
+        <Button
+          onClick={() => fetchExpensesByDates()}
+          disabled={startDate.value === '' || endDate.value === ''}
+          style={{ marginLeft: '1rem' }}
+        >
+          Show
+        </Button>
+
+        <Select
+          value={selectedCurrency}
+          items={currencyOptions}
+          disabled={fetchedExpenses.length === 0}
+          style={{ marginLeft: '1rem' }}
+
+          onValueChanged={e => {
+            setSelectedCurrency(e.detail.value);
+            const accumulatedExpenses = accumulateExpensesByCategory(fetchedExpenses, e.detail.value);
+            setExpensesData(accumulatedExpenses);
+          }}
+        />
+      </div>
 
       <div className="flex flex-row justify-around w-full">
 
