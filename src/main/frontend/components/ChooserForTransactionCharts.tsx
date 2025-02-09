@@ -32,20 +32,18 @@ export default function ChooserForTransactionCharts({
 
     const { startDate, endDate, fetchExpensesByDates, fetchIncomesByDates, accumulateExpensesByCategory } = useExpenseViewState();
 
-    const handleFetchExpenses = async () => {
-        const transactions = await fetchExpensesByDates(startDate.value, endDate.value);
-        setExpensesByDates(transactions);
+    const handleFetchTransactions = async () => {
+        const expenses = await fetchExpensesByDates(startDate.value, endDate.value);
+        setExpensesByDates(expenses);
 
-        const accumulatedExpenses = accumulateExpensesByCategory(transactions, selectedCurrency);
+        const accumulatedExpenses = accumulateExpensesByCategory(expenses, selectedCurrency);
         setTotalExpensesByCategory(accumulatedExpenses);
-    };
 
-    const handleFetchIncomes = async () => {
-        const transactions = await fetchIncomesByDates(startDate.value, endDate.value);
-        setIncomesByDates(transactions);
+        const incomes = await fetchIncomesByDates(startDate.value, endDate.value);
+        setIncomesByDates(incomes);
 
-        const accumulatedExpenses = accumulateExpensesByCategory(transactions, selectedCurrency);
-        setTotalIncomesByCategory(accumulatedExpenses);
+        const accumulatedIncomes = accumulateExpensesByCategory(incomes, selectedCurrency);
+        setTotalIncomesByCategory(accumulatedIncomes);
     };
 
     useEffect(() => {
@@ -97,10 +95,7 @@ export default function ChooserForTransactionCharts({
                 />
 
                 <Button
-                    onClick={() => {
-                        handleFetchExpenses();
-                        handleFetchIncomes();
-                    }}
+                    onClick={() => handleFetchTransactions()}
                     disabled={startDate.value === '' || endDate.value === ''}
                     style={{ marginLeft: '1rem' }}
                 >
