@@ -113,10 +113,10 @@ export default function DashboardsView() {
   const renderCustomizedLabel = ({ cx, cy, midAngle, outerRadius, index, value }: LabelProps) => {
     const RADIAN = Math.PI / 180;
     const radius = outerRadius + 30;
-  
+
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
-  
+
     return (
       <text x={x} y={y} fill={COLORS[index % COLORS.length]} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
         {`${value.toFixed(2)} ${selectedCurrency}`}
@@ -157,55 +157,62 @@ export default function DashboardsView() {
   };
 
   return (
-    <div className="flex flex-col h-full items-center justify-center p-l text-center box-border">
+    <>
+      <div className="flex flex-col items-center mb-4" style={{ height: '200px', marginTop: '1rem', marginBottom: '1rem' }}>
+        <p className="text-sm text-gray-600">Select a timeframe to view expenses/incomes</p>
 
-      <div className="flex flex-row items-center justify-center space-x-4">
-        <DatePicker
-          ref={startDatePickerRef}
-          placeholder="From"
-          value={startDate.value}
-          onValueChanged={(e) => {
-            startDate.value = e.detail.value;
-          }}
-          style={{ maxWidth: '200px', marginLeft: '1rem' }}
-        />
+        <div className="flex flex-row items-center justify-center space-x-4">
+          <DatePicker
+            ref={startDatePickerRef}
+            placeholder="From"
+            value={startDate.value}
+            onValueChanged={(e) => {
+              startDate.value = e.detail.value;
+            }}
+            style={{ maxWidth: '200px', marginLeft: '1rem' }}
+          />
 
-        <DatePicker
-          ref={endDatePickerRef}
-          placeholder="To"
-          value={endDate.value}
-          onValueChanged={(e) => {
-            endDate.value = e.detail.value;
-          }}
-          style={{ maxWidth: '200px', marginLeft: '1rem' }}
-          
-        />
+          <DatePicker
+            ref={endDatePickerRef}
+            placeholder="To"
+            value={endDate.value}
+            onValueChanged={(e) => {
+              endDate.value = e.detail.value;
+            }}
+            style={{ maxWidth: '200px', marginLeft: '1rem' }}
+          />
 
-        <Button
-          onClick={() => fetchExpensesByDates()}
-          disabled={startDate.value === '' || endDate.value === ''}
-          style={{ marginLeft: '1rem' }}
-        >
-          Show
-        </Button>
+          <Button
+            onClick={() => fetchExpensesByDates()}
+            disabled={startDate.value === '' || endDate.value === ''}
+            style={{ marginLeft: '1rem' }}
+          >
+            Show
+          </Button>
+        </div>
 
-        <Select
-          value={selectedCurrency}
-          items={currencyOptions}
-          disabled={fetchedExpenses.length === 0}
-          style={{ marginLeft: '1rem' }}
-
-          onValueChanged={e => {
-            setSelectedCurrency(e.detail.value);
-            const accumulatedExpenses = accumulateExpensesByCategory(fetchedExpenses, e.detail.value);
-            setExpensesData(accumulatedExpenses);
-          }}
-        />
+        <div className="flex flex-col items-center mb-4">
+          {fetchedExpenses.length > 0 && (
+            <>
+              <p className="text-sm text-gray-600">Select a currency to visualize the chart</p>
+              <Select
+                value={selectedCurrency}
+                items={currencyOptions}
+                disabled={fetchedExpenses.length === 0}
+                style={{ width: '70px' }}
+                onValueChanged={e => {
+                  setSelectedCurrency(e.detail.value);
+                  const accumulatedExpenses = accumulateExpensesByCategory(fetchedExpenses, e.detail.value);
+                  setExpensesData(accumulatedExpenses);
+                }}
+              />
+            </>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-row justify-around w-full">
-
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center" style={{ width: '50%' }}>
           <h2>Incomes</h2>
           <PieChart width={500} height={500}>
             <Pie data={incomesData}
@@ -229,30 +236,36 @@ export default function DashboardsView() {
           </PieChart>
         </div>
 
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center" style={{ width: '50%' }}>
           <h2>Expenses</h2>
-          <PieChart width={500} height={500}>
-            <Pie data={expensesData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={150}
-              fill="#8884d8"
-              label={renderCustomizedLabel}>
 
-              {expensesData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
+          {fetchedExpenses.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full">
+              <p className="text-lg text-gray-600 mt-4">No data to display</p>
+            </div>
+          ) : (
+            <PieChart width={500} height={500}>
+              <Pie data={expensesData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={150}
+                fill="#8884d8"
+                label={renderCustomizedLabel}>
 
-            </Pie>
+                {expensesData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
 
-            <Tooltip formatter={formatTooltipValue} />
-            <Legend />
-          </PieChart>
+              </Pie>
+
+              <Tooltip formatter={formatTooltipValue} />
+              <Legend />
+            </PieChart>
+          )}
         </div>
-
       </div>
-    </div>
+    </>
   );
 }
