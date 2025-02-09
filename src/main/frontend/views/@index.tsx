@@ -7,7 +7,7 @@ import { Transaction } from 'Frontend/types/Transaction';
 import { Button, DatePicker, DatePickerElement, Select } from '@vaadin/react-components';
 import { currencyOptions } from 'Frontend/constants/constants';
 import { formatDateForDatePicker, parseDateForDatePicker } from 'Frontend/util/incomeUtils';
-import { getAll, getAllByDatesBetween } from 'Frontend/generated/ExpenseServiceImpl';
+import { getAllByDatesBetween } from 'Frontend/generated/ExpenseServiceImpl';
 import TransactionDto from 'Frontend/generated/com/example/application/dto/TransactionDto';
 import { DocumentDto } from 'Frontend/types/DocumentDto';
 
@@ -32,23 +32,11 @@ type LabelProps = {
   midAngle: number;
   innerRadius: number;
   outerRadius: number;
-  percent: number;
   index: number;
+  value: number;
 };
 
-const renderCustomizedLabel = ({ cx, cy, midAngle, outerRadius, percent, index }: LabelProps) => {
-  const RADIAN = Math.PI / 180;
-  const radius = outerRadius + 30;
 
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-  return (
-    <text x={x} y={y} fill={COLORS[index % COLORS.length]} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
-      {`${(percent * 100).toFixed(2)}%`}
-    </text>
-  );
-};
 
 const conversionRates: { [key: string]: { [key: string]: number } } = {
   'лв.': { 'лв.': 1, '€': 0.51, '$': 0.53, '£': 0.43 },
@@ -116,13 +104,28 @@ export default function DashboardsView() {
   }, [endDatePickerRef.current])
 
   const formatTooltipValue = (value: number) => {
-    return `${value.toFixed(2)} ${selectedCurrency}`;
+    const total = expensesData.reduce((acc, expense) => acc + expense.value, 0);
+    const percent = (value / total) * 100;
+
+    return `${percent.toFixed(2)}%`;
+  };
+
+  const renderCustomizedLabel = ({ cx, cy, midAngle, outerRadius, index, value }: LabelProps) => {
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius + 30;
+  
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  
+    return (
+      <text x={x} y={y} fill={COLORS[index % COLORS.length]} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+        {`${value.toFixed(2)} ${selectedCurrency}`}
+      </text>
+    );
   };
 
   const fetchExpensesByDates = () => {
-
     getAllByDatesBetween(startDate.value, endDate.value).then((expenses) => {
-      console.log(expenses);
 
       fetchedExpenses = expenses.map(toDto); // this shouldn't be done - setFetchedExpenses should be enough  
       setFetchedExpenses(expenses.map(toDto));
