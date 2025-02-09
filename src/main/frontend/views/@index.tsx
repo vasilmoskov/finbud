@@ -12,8 +12,8 @@ import TransactionDto from 'Frontend/generated/com/example/application/dto/Trans
 import { DocumentDto } from 'Frontend/types/DocumentDto';
 
 export const config: ViewConfig = {
-  menu: { order: 0, icon: 'line-awesome/svg/globe-solid.svg' },
-  title: 'Dashboards',
+  menu: { order: 0, icon: 'vaadin:pie-chart' },
+  title: 'Charts',
   loginRequired: true,
 };
 

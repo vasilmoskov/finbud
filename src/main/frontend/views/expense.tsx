@@ -7,7 +7,7 @@ import TransactionGrid from 'Frontend/components/TransactionGrid';
 import { useExpenseViewState } from 'Frontend/hooks/useExpenseViewState';
 
 export const config: ViewConfig = {
-  menu: { order: 2, icon: 'line-awesome/svg/file.svg' },
+  menu: { order: 2, icon: 'vaadin:minus-circle-o' },
   title: 'Expenses',
   loginRequired: true,
 };

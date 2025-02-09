@@ -8,7 +8,7 @@ import TransactionGrid from "Frontend/components/TransactionGrid";
 import { useIncomeViwState } from "Frontend/hooks/useIncomeViewState";
 
 export const config: ViewConfig = {
-    menu: {order: 1, icon: 'line-awesome/svg/file.svg'},
+    menu: {order: 1, icon: 'vaadin:plus-circle-o'},
     title: 'Incomes',
     loginRequired: true,
 };
