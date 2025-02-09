@@ -1,6 +1,7 @@
 package com.example.application.services;
 
 import com.example.application.data.IncomeEntity;
+import com.example.application.dto.TransactionDto;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,5 +16,7 @@ public interface IncomeService {
     void deleteIncome(String id);
 
     void deleteIncomeDocument(String id);
+
+    List<TransactionDto> getAllIncomesByDatesBetween(String startDate, String endDate);
 
 }

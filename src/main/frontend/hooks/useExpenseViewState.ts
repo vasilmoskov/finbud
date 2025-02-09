@@ -8,6 +8,7 @@ import { currencySignsToCodes } from "Frontend/constants/constants";
 import { Transaction } from "Frontend/types/Transaction";
 import TransactionDto from "Frontend/generated/com/example/application/dto/TransactionDto";
 import DocumentDto from "Frontend/generated/com/example/application/dto/DocumentDto";
+import { getAllIncomesByDatesBetween } from "Frontend/generated/IncomeServiceImpl";
 
 export const useExpenseViewState = () => {
     const gridRef = React.useRef<any>(null);
@@ -260,6 +261,11 @@ export const useExpenseViewState = () => {
         return expenses.map(toDto);
     }
 
+    const fetchIncomesByDates = async (fromDate: string, toDate: string): Promise<Transaction[]> => {
+        const incomes = await getAllIncomesByDatesBetween(fromDate, toDate);
+        return incomes.map(toDto);
+    }
+
     const accumulateExpensesByCategory = (expenses: Transaction[], selectedCurrency: string) => {
         const categoryMap = expenses.reduce((acc: { [key: string]: number }, expense: Transaction) => {
             const amountInSelectedCurrency = convertToCurrency(expense.amount, expense.currency, selectedCurrency);
@@ -334,6 +340,7 @@ export const useExpenseViewState = () => {
         handleRemoveDocument,
         confirmRemoveDocument,
         fetchExpensesByDates,
-        accumulateExpensesByCategory
+        accumulateExpensesByCategory,
+        fetchIncomesByDates
     };
 }

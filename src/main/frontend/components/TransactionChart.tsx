@@ -46,31 +46,33 @@ export default function TransactionChart({ transactionType, transactionsByDates,
         <div className="flex flex-col items-center" style={{ width: '50%' }}>
             <h2>{transactionType}</h2>
 
-            {transactionsByDates.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full">
+            <div>
+                {transactionsByDates.length === 0 ? (
                     <p className="text-lg text-gray-600 mt-4">There are no {transactionType.toLowerCase()} in the selected date range</p>
-                </div>
-            ) : (
-                <PieChart width={500} height={500}>
-                    <Pie data={totalTransactionsByCategory}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={150}
-                        fill="#8884d8"
-                        label={renderCustomizedLabel}>
+                ) : (
+                    <PieChart width={500} height={500}>
+                        <Pie data={totalTransactionsByCategory}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={150}
+                            fill="#8884d8"
+                            label={renderCustomizedLabel}>
 
-                        {totalTransactionsByCategory.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
+                            {totalTransactionsByCategory.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
 
-                    </Pie>
+                        </Pie>
 
-                    <Tooltip formatter={formatTooltipValue} />
-                    <Legend />
-                </PieChart>
-            )}
+                        <Tooltip formatter={formatTooltipValue} />
+                        <Legend />
+                    </PieChart>
+
+                )}
+            </div>
+
         </div>
     )
 }

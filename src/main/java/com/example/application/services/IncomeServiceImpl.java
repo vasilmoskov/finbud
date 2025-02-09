@@ -1,9 +1,8 @@
 package com.example.application.services;
 
-import com.example.application.data.CurrencyCode;
-import com.example.application.data.DocumentEntity;
-import com.example.application.data.IncomeCategory;
-import com.example.application.data.IncomeEntity;
+import com.example.application.data.*;
+import com.example.application.dto.DocumentDto;
+import com.example.application.dto.TransactionDto;
 import com.example.application.exception.ResourceNotFoundException;
 import com.example.application.repository.DocumentRepository;
 import com.example.application.repository.IncomeRepository;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,7 +48,7 @@ public class IncomeServiceImpl implements IncomeService {
                 .setUnusual(unusual)
                 .setUser(authenticatedUser.get().orElseThrow());
 
-        if(document != null && !document.isEmpty()) {
+        if (document != null && !document.isEmpty()) {
             DocumentEntity documentEntity = new DocumentEntity(document);
             incomeEntity.setDocument(documentEntity);
             documentRepository.save(documentEntity);
@@ -69,7 +69,7 @@ public class IncomeServiceImpl implements IncomeService {
                 .setCategory(IncomeCategory.valueOf(category))
                 .setUnusual(unusual);
 
-        if(document != null && !document.isEmpty()) {
+        if (document != null && !document.isEmpty()) {
 
             DocumentEntity previousDocument = incomeEntity.getDocument();
 
@@ -104,5 +104,38 @@ public class IncomeServiceImpl implements IncomeService {
             incomeEntity.setDocument(null);
             incomeRepository.save(incomeEntity);
         }
+    }
+
+    @Override
+    public List<TransactionDto> getAllIncomesByDatesBetween(String startDate, String endDate) {
+        String[] startDateTokens = startDate.split("-");
+        int startDateYear = Integer.parseInt(startDateTokens[0]);
+        int startDateMonth = Integer.parseInt(startDateTokens[1]);
+        int startDateDay = Integer.parseInt(startDateTokens[2]);
+
+        String[] endDateTokens = endDate.split("-");
+        int endDateYear = Integer.parseInt(endDateTokens[0]);
+        int endDateMonth = Integer.parseInt(endDateTokens[1]);
+        int endDateDay = Integer.parseInt(endDateTokens[2]);
+
+        return incomeRepository
+                .findAllByUserAndDateBetween(authenticatedUser.get().orElseThrow(),
+                        LocalDateTime.of(startDateYear, startDateMonth, startDateDay, 0, 0),
+                        LocalDateTime.of(endDateYear, endDateMonth, endDateDay, 23, 59)
+                )
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    private TransactionDto toDto(IncomeEntity e) {
+        return new TransactionDto()
+                .setId(e.getId())
+                .setAmount(e.getAmount())
+                .setCategory(e.getCategory().getRepresentation())
+                .setCurrency(e.getCurrency().getRepresentation())
+                .setDate(e.getDate().format(DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss")))
+                .setUnusual(e.isUnusual())
+                .setDocument(e.getDocument() == null ? null : new DocumentDto().setId(e.getDocument().getId()).setContent(e.getDocument().getContent()));
     }
 }

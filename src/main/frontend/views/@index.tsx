@@ -13,31 +13,36 @@ export const config: ViewConfig = {
 
 export default function DashboardsView() {
   const [selectedCurrency, setSelectedCurrency] = useState('лв.');
-  const [totalTransactionsByCategory, setTotalTransactionsByCategory] = useState<{ name: string; value: number }[]>([]);
-  const [transactionsByDates, setTransactionsByDates] = useState<Transaction[]>([]);
+  const [totalExpensesByCategory, setTotalExpensesByCategory] = useState<{ name: string; value: number }[]>([]);
+  const [totalIncomesByCategory, setTotalIncomesByCategory] = useState<{ name: string; value: number }[]>([]);
+  const [expensesByDates, setExpensesByDates] = useState<Transaction[]>([]);
+  const [incomesByDates, setIncomesByDates] = useState<Transaction[]>([]);
 
   return (
     <>
       <ChooserForTransactionCharts
-        transactionsByDates={transactionsByDates}
-        setTransactionsByDates={setTransactionsByDates}
+        expensesByDates={expensesByDates}
+        setExpensesByDates={setExpensesByDates}
+        incomesByDates={incomesByDates}
+        setIncomesByDates={setIncomesByDates}
         selectedCurrency={selectedCurrency}
         setSelectedCurrency={setSelectedCurrency}
-        setTotalTransactionsByCategory={setTotalTransactionsByCategory}
+        setTotalExpensesByCategory={setTotalExpensesByCategory}
+        setTotalIncomesByCategory={setTotalIncomesByCategory}
       />
 
       <div className="flex flex-row justify-around w-full">
         <TransactionChart
           transactionType='Incomes'
-          transactionsByDates={transactionsByDates}
-          totalTransactionsByCategory={totalTransactionsByCategory}
+          transactionsByDates={incomesByDates}
+          totalTransactionsByCategory={totalIncomesByCategory}
           currency={selectedCurrency}
         />
 
         <TransactionChart
           transactionType='Expenses'
-          transactionsByDates={transactionsByDates}
-          totalTransactionsByCategory={totalTransactionsByCategory}
+          transactionsByDates={expensesByDates}
+          totalTransactionsByCategory={totalExpensesByCategory}
           currency={selectedCurrency}
         />
       </div>
