@@ -159,8 +159,7 @@ export default function DashboardsView() {
   return (
     <>
       <div className="flex flex-col items-center mb-4" style={{ height: '200px', marginTop: '1rem', marginBottom: '1rem' }}>
-        <p className="text-sm text-gray-600">Select a timeframe to view expenses/incomes</p>
-
+        <h5 style={{margin: '1rem'}}>Choose a date range to explore your finances:</h5>
         <div className="flex flex-row items-center justify-center space-x-4">
           <DatePicker
             ref={startDatePickerRef}
@@ -187,14 +186,14 @@ export default function DashboardsView() {
             disabled={startDate.value === '' || endDate.value === ''}
             style={{ marginLeft: '1rem' }}
           >
-            Show
+            Display Data
           </Button>
         </div>
 
         <div className="flex flex-col items-center mb-4">
           {fetchedExpenses.length > 0 && (
             <>
-              <p className="text-sm text-gray-600">Select a currency to visualize the chart</p>
+              <h5 style={{margin: '1rem'}}>Choose currency for the charts:</h5>
               <Select
                 value={selectedCurrency}
                 items={currencyOptions}
@@ -241,7 +240,7 @@ export default function DashboardsView() {
 
           {fetchedExpenses.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full">
-              <p className="text-lg text-gray-600 mt-4">No data to display</p>
+              <p className="text-lg text-gray-600 mt-4">There are no expenses in the selected date range</p>
             </div>
           ) : (
             <PieChart width={500} height={500}>
