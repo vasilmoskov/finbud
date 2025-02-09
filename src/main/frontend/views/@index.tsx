@@ -10,33 +10,13 @@ import { formatDateForDatePicker, parseDateForDatePicker } from 'Frontend/util/i
 import { getAllByDatesBetween } from 'Frontend/generated/ExpenseServiceImpl';
 import TransactionDto from 'Frontend/generated/com/example/application/dto/TransactionDto';
 import { DocumentDto } from 'Frontend/types/DocumentDto';
+import TransactionChart from 'Frontend/components/TransactionChart';
 
 export const config: ViewConfig = {
   menu: { order: 0, icon: 'vaadin:pie-chart' },
   title: 'Charts',
   loginRequired: true,
 };
-
-const incomesData = [
-  { name: "Salary", value: 3000 },
-  { name: "Freelance", value: 1200 },
-  { name: "Investments", value: 800 },
-  { name: "Other", value: 200 },
-];
-
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A28EFF"];
-
-type LabelProps = {
-  cx: number;
-  cy: number;
-  midAngle: number;
-  innerRadius: number;
-  outerRadius: number;
-  index: number;
-  value: number;
-};
-
-
 
 const conversionRates: { [key: string]: { [key: string]: number } } = {
   'лв.': { 'лв.': 1, '€': 0.51, '$': 0.53, '£': 0.43 },
@@ -75,8 +55,8 @@ export default function DashboardsView() {
   const { startDate } = useExpenseViewState();
   const { endDate } = useExpenseViewState();
   const [selectedCurrency, setSelectedCurrency] = useState('лв.');
-  const [expensesData, setExpensesData] = useState<{ name: string; value: number }[]>([]);
-  const [fetchedExpenses, setFetchedExpenses] = useState<Transaction[]>([]); // should be const
+  const [totalTransactionsByCategory, setTotalTransactionsByCategory] = useState<{ name: string; value: number }[]>([]);
+  const [transactionsByDates, setTransactionsByDates] = useState<Transaction[]>([]); // should be const
 
   useEffect(() => {
     const datePicker = startDatePickerRef.current;
@@ -102,34 +82,13 @@ export default function DashboardsView() {
     }
   }, [endDatePickerRef.current])
 
-  const formatTooltipValue = (value: number) => {
-    const total = expensesData.reduce((acc, expense) => acc + expense.value, 0);
-    const percent = (value / total) * 100;
-
-    return `${percent.toFixed(2)}%`;
-  };
-
-  const renderCustomizedLabel = ({ cx, cy, midAngle, outerRadius, index, value }: LabelProps) => {
-    const RADIAN = Math.PI / 180;
-    const radius = outerRadius + 30;
-
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    return (
-      <text x={x} y={y} fill={COLORS[index % COLORS.length]} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
-        {`${value.toFixed(2)} ${selectedCurrency}`}
-      </text>
-    );
-  };
-
   const fetchExpensesByDates = () => {
     getAllByDatesBetween(startDate.value, endDate.value).then((expenses) => {
       const mappedExpenses = expenses.map(toDto);
-      setFetchedExpenses(mappedExpenses);
+      setTransactionsByDates(mappedExpenses);
 
       const accumulatedExpenses = accumulateExpensesByCategory(mappedExpenses, selectedCurrency);
-      setExpensesData(accumulatedExpenses);
+      setTotalTransactionsByCategory(accumulatedExpenses);
     });
   }
 
@@ -158,7 +117,7 @@ export default function DashboardsView() {
   return (
     <>
       <div className="flex flex-col items-center mb-4" style={{ height: '200px', marginTop: '1rem', marginBottom: '1rem' }}>
-        <h5 style={{margin: '1rem'}}>Choose a date range to explore your finances:</h5>
+        <h5 style={{ margin: '1rem' }}>Choose a date range to explore your finances:</h5>
         <div className="flex flex-row items-center justify-center space-x-4">
           <DatePicker
             ref={startDatePickerRef}
@@ -190,18 +149,18 @@ export default function DashboardsView() {
         </div>
 
         <div className="flex flex-col items-center mb-4">
-          {fetchedExpenses.length > 0 && (
+          {transactionsByDates.length > 0 && (
             <>
-              <h5 style={{margin: '1rem'}}>Choose currency for the charts:</h5>
+              <h5 style={{ margin: '1rem' }}>Choose currency for the charts:</h5>
               <Select
                 value={selectedCurrency}
                 items={currencyOptions}
-                disabled={fetchedExpenses.length === 0}
+                disabled={transactionsByDates.length === 0}
                 style={{ width: '70px' }}
                 onValueChanged={e => {
                   setSelectedCurrency(e.detail.value);
-                  const accumulatedExpenses = accumulateExpensesByCategory(fetchedExpenses, e.detail.value);
-                  setExpensesData(accumulatedExpenses);
+                  const accumulatedExpenses = accumulateExpensesByCategory(transactionsByDates, e.detail.value);
+                  setTotalTransactionsByCategory(accumulatedExpenses);
                 }}
               />
             </>
@@ -210,59 +169,19 @@ export default function DashboardsView() {
       </div>
 
       <div className="flex flex-row justify-around w-full">
-        <div className="flex flex-col items-center" style={{ width: '50%' }}>
-          <h2>Incomes</h2>
-          <PieChart width={500} height={500}>
-            <Pie data={incomesData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={150}
-              fill="#8884d8"
-              labelLine={true}
-              label={renderCustomizedLabel}>
+        <TransactionChart
+          transactionType='Incomes'
+          transactionsByDates={transactionsByDates}
+          totalTransactionsByCategory={totalTransactionsByCategory}
+          currency={selectedCurrency}
+        />
 
-              {incomesData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-
-            </Pie>
-
-            <Tooltip formatter={formatTooltipValue} />
-            <Legend />
-          </PieChart>
-        </div>
-
-        <div className="flex flex-col items-center" style={{ width: '50%' }}>
-          <h2>Expenses</h2>
-
-          {fetchedExpenses.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full">
-              <p className="text-lg text-gray-600 mt-4">There are no expenses in the selected date range</p>
-            </div>
-          ) : (
-            <PieChart width={500} height={500}>
-              <Pie data={expensesData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={150}
-                fill="#8884d8"
-                label={renderCustomizedLabel}>
-
-                {expensesData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-
-              </Pie>
-
-              <Tooltip formatter={formatTooltipValue} />
-              <Legend />
-            </PieChart>
-          )}
-        </div>
+        <TransactionChart
+          transactionType='Expenses'
+          transactionsByDates={transactionsByDates}
+          totalTransactionsByCategory={totalTransactionsByCategory}
+          currency={selectedCurrency}
+        />
       </div>
     </>
   );
