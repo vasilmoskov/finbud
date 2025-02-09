@@ -50,7 +50,7 @@ export default function TransactionChart({ transactionType, transactionsByDates,
                 {transactionsByDates.length === 0 ? (
                     <p className="text-lg text-gray-600 mt-4">There are no {transactionType.toLowerCase()} in the selected date range</p>
                 ) : (
-                    <PieChart width={500} height={500}>
+                    <PieChart width={800} height={500}>
                         <Pie data={totalTransactionsByCategory}
                             dataKey="value"
                             nameKey="name"
