@@ -20,18 +20,23 @@ type TransactionChartProps = {
 
 export default function TransactionChart({ transactionType, transactionsByDates, totalTransactionsByCategory, currency }: TransactionChartProps) {
     const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A28EFF", "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"];
-
+    
     const renderCustomizedLabel = ({ cx, cy, midAngle, outerRadius, index, value }: LabelProps) => {
         const RADIAN = Math.PI / 180;
-        const radius = outerRadius + 30;
+        const radius = outerRadius + 30 + (index % 2 === 0 ? 0 : 30); // Alternate radius for every second label
 
         const x = cx + radius * Math.cos(-midAngle * RADIAN);
         const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
+        const textAnchor = x > cx ? 'start' : 'end';
+
         return (
-            <text x={x} y={y} fill={COLORS[index % COLORS.length]} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+            <g>
+            <line x1={cx} y1={cy} x2={x} y2={y} stroke={COLORS[index % COLORS.length]} />
+            <text x={x} y={y} fill={COLORS[index % COLORS.length]} textAnchor={textAnchor} dominantBaseline="central">
                 {`${value.toFixed(2)} ${currency}`}
             </text>
+        </g>
         );
     };
 
