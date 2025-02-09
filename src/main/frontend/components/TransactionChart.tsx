@@ -19,7 +19,7 @@ type TransactionChartProps = {
 };
 
 export default function TransactionChart({ transactionType, transactionsByDates, totalTransactionsByCategory, currency }: TransactionChartProps) {
-    const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A28EFF"];
+    const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A28EFF", "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"];
 
     const renderCustomizedLabel = ({ cx, cy, midAngle, outerRadius, index, value }: LabelProps) => {
         const RADIAN = Math.PI / 180;
