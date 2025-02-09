@@ -32,9 +32,7 @@ export const incomeCategoryFilteringOptions : SelectItem[] = [
 export const expenseCategoriesMap = {
     OTHER: "Other",
     RENT: "Rent",
-    UTILITIES: "Utilities",
     GROCERIES: "Groceries",
-    TRANSPORTATION: "Transportation",
     HEALTHCARE: "Healthcare",
     ENTERTAINMENT: "Entertainment",
     TRAVEL: "Travel",
