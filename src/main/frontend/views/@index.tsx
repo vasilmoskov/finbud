@@ -76,8 +76,7 @@ export default function DashboardsView() {
   const { endDate } = useExpenseViewState();
   const [selectedCurrency, setSelectedCurrency] = useState('лв.');
   const [expensesData, setExpensesData] = useState<{ name: string; value: number }[]>([]);
-  let [fetchedExpenses, setFetchedExpenses] = useState<Transaction[]>([]); // should be const
-  // let fetchedExpenses: Transaction[] = [];
+  const [fetchedExpenses, setFetchedExpenses] = useState<Transaction[]>([]); // should be const
 
   useEffect(() => {
     const datePicker = startDatePickerRef.current;
@@ -126,10 +125,10 @@ export default function DashboardsView() {
 
   const fetchExpensesByDates = () => {
     getAllByDatesBetween(startDate.value, endDate.value).then((expenses) => {
+      const mappedExpenses = expenses.map(toDto);
+      setFetchedExpenses(mappedExpenses);
 
-      fetchedExpenses = expenses.map(toDto); // this shouldn't be done - setFetchedExpenses should be enough  
-      setFetchedExpenses(expenses.map(toDto));
-      const accumulatedExpenses = accumulateExpensesByCategory(fetchedExpenses, selectedCurrency);
+      const accumulatedExpenses = accumulateExpensesByCategory(mappedExpenses, selectedCurrency);
       setExpensesData(accumulatedExpenses);
     });
   }
