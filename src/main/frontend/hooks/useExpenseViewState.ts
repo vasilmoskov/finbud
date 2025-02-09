@@ -1,6 +1,6 @@
 import { UploadFile } from "@vaadin/react-components";
 import React, {useEffect, useState} from "react";
-import {deleteExpense, getAll, addExpense, editExpense, deleteExpenseDocument} from "Frontend/generated/ExpenseServiceImpl";
+import {deleteExpense, getAll, addExpense, editExpense, deleteExpenseDocument, getAllByDatesBetween} from "Frontend/generated/ExpenseServiceImpl";
 import {format} from 'date-fns';
 import { useSignal } from "@vaadin/hilla-react-signals";
 import { mapIncomeEntityToDto} from "Frontend/util/incomeUtils";
@@ -255,6 +255,42 @@ export const useExpenseViewState = () => {
             })
     };
 
+    const fetchExpensesByDates = async (fromDate: string, toDate: string): Promise<Transaction[]> => {
+        const expenses = await getAllByDatesBetween(fromDate, toDate);
+        return expenses.map(toDto);
+    }
+
+    const accumulateExpensesByCategory = (expenses: Transaction[], selectedCurrency: string) => {
+        const categoryMap = expenses.reduce((acc: { [key: string]: number }, expense: Transaction) => {
+            const amountInSelectedCurrency = convertToCurrency(expense.amount, expense.currency, selectedCurrency);
+
+            if (acc[expense.category]) {
+                acc[expense.category] += amountInSelectedCurrency;
+            } else {
+                acc[expense.category] = amountInSelectedCurrency;
+            }
+
+            return acc;
+        }, {});
+
+        return Object.keys(categoryMap).map(category => ({
+            name: category,
+            value: categoryMap[category]
+        }));
+    };
+
+    const convertToCurrency = (amount: number, fromCurrency: string, toCurrency: string) => {
+        const rate = conversionRates[fromCurrency]?.[toCurrency];
+        return amount * rate;
+    };
+
+    const conversionRates: { [key: string]: { [key: string]: number } } = {
+        'лв.': { 'лв.': 1, '€': 0.51, '$': 0.53, '£': 0.43 },
+        '€': { '€': 1, 'лв.': 1.96, '$': 1.03, '£': 0.83 },
+        '$': { '$': 1, 'лв.': 1.89, '€': 0.97, '£': 0.81 },
+        '£': { '£': 1, 'лв.': 2.35, '€': 1.2, '$': 1.24 },
+    };
+
     return {
         gridRef,
         expenses,
@@ -296,6 +332,8 @@ export const useExpenseViewState = () => {
         handleEditDialogOpenedChanged,
         handleUploadBefore,
         handleRemoveDocument,
-        confirmRemoveDocument
+        confirmRemoveDocument,
+        fetchExpensesByDates,
+        accumulateExpensesByCategory
     };
 }

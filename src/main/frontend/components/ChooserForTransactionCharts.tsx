@@ -1,9 +1,6 @@
 import { Button, DatePicker, DatePickerElement, Select } from "@vaadin/react-components";
 import { currencyOptions } from "Frontend/constants/constants";
-import TransactionDto from "Frontend/generated/com/example/application/dto/TransactionDto";
-import { getAllByDatesBetween } from "Frontend/generated/ExpenseServiceImpl";
 import { useExpenseViewState } from "Frontend/hooks/useExpenseViewState";
-import { DocumentDto } from "Frontend/types/DocumentDto";
 import { Transaction } from "Frontend/types/Transaction";
 import { formatDateForDatePicker, parseDateForDatePicker } from "Frontend/util/incomeUtils";
 import { useEffect, useRef } from "react";
@@ -27,8 +24,15 @@ export default function ChooserForTransactionCharts({
     const startDatePickerRef = useRef<DatePickerElement>(null);
     const endDatePickerRef = useRef<DatePickerElement>(null);
 
-    const { startDate } = useExpenseViewState();
-    const { endDate } = useExpenseViewState();
+    const { startDate, endDate, fetchExpensesByDates, accumulateExpensesByCategory } = useExpenseViewState();
+
+    const handleFetchExpenses = async () => {
+        const transactions = await fetchExpensesByDates(startDate.value, endDate.value);
+        setTransactionsByDates(transactions);
+
+        const accumulatedExpenses = accumulateExpensesByCategory(transactions, selectedCurrency);
+        setTotalTransactionsByCategory(accumulatedExpenses);
+    };
 
     useEffect(() => {
         const datePicker = startDatePickerRef.current;
@@ -55,69 +59,6 @@ export default function ChooserForTransactionCharts({
         }
     }, [endDatePickerRef.current])
 
-
-    const fetchExpensesByDates = () => {
-        getAllByDatesBetween(startDate.value, endDate.value).then((expenses) => {
-            const mappedExpenses = expenses.map(toDto);
-            setTransactionsByDates(mappedExpenses);
-
-            const accumulatedExpenses = accumulateExpensesByCategory(mappedExpenses, selectedCurrency);
-            setTotalTransactionsByCategory(accumulatedExpenses);
-        });
-    }
-
-    const toDto = (dto: TransactionDto): Transaction => {
-        let doc: DocumentDto | null = null;
-
-        if (dto.document) {
-            doc = {
-                id: dto.document.id,
-                content: dto.document.content
-            }
-        }
-
-        return {
-            id: dto.id,
-            amount: dto.amount!,
-            currency: dto.currency!,
-            category: dto.category!,
-            date: dto.date,
-            document: doc,
-            unusual: dto.unusual
-        };
-    };
-
-    const accumulateExpensesByCategory = (expenses: Transaction[], selectedCurrency: string) => {
-        const categoryMap = expenses.reduce((acc: { [key: string]: number }, expense: Transaction) => {
-            const amountInSelectedCurrency = convertToCurrency(expense.amount, expense.currency, selectedCurrency);
-
-            if (acc[expense.category]) {
-                acc[expense.category] += amountInSelectedCurrency;
-            } else {
-                acc[expense.category] = amountInSelectedCurrency;
-            }
-
-            return acc;
-        }, {});
-
-        return Object.keys(categoryMap).map(category => ({
-            name: category,
-            value: categoryMap[category]
-        }));
-    };
-
-    const convertToCurrency = (amount: number, fromCurrency: string, toCurrency: string) => {
-        const rate = conversionRates[fromCurrency]?.[toCurrency];
-        return amount * rate;
-    };
-
-    const conversionRates: { [key: string]: { [key: string]: number } } = {
-        'лв.': { 'лв.': 1, '€': 0.51, '$': 0.53, '£': 0.43 },
-        '€': { '€': 1, 'лв.': 1.96, '$': 1.03, '£': 0.83 },
-        '$': { '$': 1, 'лв.': 1.89, '€': 0.97, '£': 0.81 },
-        '£': { '£': 1, 'лв.': 2.35, '€': 1.2, '$': 1.24 },
-    };
-
     return (
         <div className="flex flex-col items-center mb-4" style={{ height: '200px', marginTop: '1rem', marginBottom: '1rem' }}>
             <h5 style={{ margin: '1rem' }}>Choose a date range to explore your finances:</h5>
@@ -143,7 +84,7 @@ export default function ChooserForTransactionCharts({
                 />
 
                 <Button
-                    onClick={() => fetchExpensesByDates()}
+                    onClick={handleFetchExpenses}
                     disabled={startDate.value === '' || endDate.value === ''}
                     style={{ marginLeft: '1rem' }}
                 >
