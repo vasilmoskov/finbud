@@ -1,7 +1,7 @@
 import { DatePickerDate } from "@vaadin/react-components";
 import { format, parse } from "date-fns";
 import { incomeCategoriesMap, currencyCodesToSigns } from "Frontend/constants/constants";
-import { Transaction } from "Frontend/types/Transaction";
+import TransactionDto from "Frontend/generated/com/example/application/dto/TransactionDto";
 
 export const formtatCurrency = (currency: string): string => {
     return currencyCodesToSigns[currency] || currency;
@@ -32,14 +32,14 @@ export const getDateWithoutTime = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 };
 
-export const accumulateTransactionsByCategory = (transactions: Transaction[], selectedCurrency: string) => {
-    const categoryMap = transactions.reduce((acc: { [key: string]: number }, transaction: Transaction) => {
-        const amountInSelectedCurrency = convertToCurrency(transaction.amount, transaction.currency, selectedCurrency);
+export const accumulateTransactionsByCategory = (transactions: TransactionDto[], selectedCurrency: string) => {
+    const categoryMap = transactions.reduce((acc: { [key: string]: number }, transaction: TransactionDto) => {
+        const amountInSelectedCurrency = convertToCurrency(transaction.amount!, transaction.currency!, selectedCurrency);
 
-        if (acc[transaction.category]) {
-            acc[transaction.category] += amountInSelectedCurrency;
+        if (acc[transaction.category!]) {
+            acc[transaction.category!] += amountInSelectedCurrency;
         } else {
-            acc[transaction.category] = amountInSelectedCurrency;
+            acc[transaction.category!] = amountInSelectedCurrency;
         }
 
         return acc;

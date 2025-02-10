@@ -7,7 +7,6 @@ import {
 import { currencyOptions } from "Frontend/constants/constants";
 import { useExpense } from "Frontend/hooks/useExpense";
 import { useIncome } from "Frontend/hooks/useIncome";
-import { Transaction } from "Frontend/types/Transaction";
 import {
   accumulateTransactionsByCategory,
   formatDateForDatePicker,
@@ -16,12 +15,13 @@ import {
 import { useEffect, useRef } from "react";
 import { useSignal } from "@vaadin/hilla-react-signals";
 import { format } from "date-fns";
+import TransactionDto from "Frontend/generated/com/example/application/dto/TransactionDto";
 
 interface Props {
-  expensesByDates: Transaction[];
-  setExpensesByDates: (transactions: Transaction[]) => void;
-  incomesByDates: Transaction[];
-  setIncomesByDates: (transactions: Transaction[]) => void;
+  expensesByDates: TransactionDto[];
+  setExpensesByDates: (transactions: TransactionDto[]) => void;
+  incomesByDates: TransactionDto[];
+  setIncomesByDates: (transactions: TransactionDto[]) => void;
   selectedCurrency: string;
   setSelectedCurrency: (currency: string) => void;
   setTotalExpensesByCategory: (

@@ -1,4 +1,4 @@
-import { Transaction } from "Frontend/types/Transaction";
+import TransactionDto from "Frontend/generated/com/example/application/dto/TransactionDto";
 import { Cell, Legend, Pie, PieChart, Tooltip } from "recharts";
 
 type LabelProps = {
@@ -13,7 +13,7 @@ type LabelProps = {
 
 type TransactionChartProps = {
     transactionType: string;
-    transactionsByDates: Transaction[];
+    transactionsByDates: TransactionDto[];
     totalTransactionsByCategory: { name: string; value: number }[];
     currency: string;
 };

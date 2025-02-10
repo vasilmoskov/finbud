@@ -1,14 +1,14 @@
 import { Grid, GridColumn, Icon } from "@vaadin/react-components";
 import TransactionButtonRenderer from "./TransactionButtonRenderer";
-import { Transaction } from "Frontend/types/Transaction";
 import { useState } from "react";
 import { Signal } from "@vaadin/hilla-react-signals";
 import { getDateWithoutTime} from "Frontend/util/transactionUtils";
 import { visualizeDocument } from "Frontend/util/documentUtils";
+import TransactionDto from "Frontend/generated/com/example/application/dto/TransactionDto";
 
 interface Props {
     buttonTheme: string,
-    transactions: Transaction[];
+    transactions: TransactionDto[];
     selectedCategory: string;
     selectedCurrency: string;
     selectedByUsuality: string;
@@ -18,9 +18,9 @@ interface Props {
     isStartDateSelected: boolean;
     endDate: Signal<string>;
     isEndDateSelected: boolean;
-    handleEdit: (transaction: Transaction) => void;
-    handleDelete: (transaction: Transaction) => void;
-    handleRemoveDocument: (transaction: Transaction) => void;
+    handleEdit: (transaction: TransactionDto) => void;
+    handleDelete: (transaction: TransactionDto) => void;
+    handleRemoveDocument: (transaction: TransactionDto) => void;
     gridRef: React.MutableRefObject<any>
   }
 
@@ -75,10 +75,10 @@ export default function TransactionGrid({
                 if (amountFilterValue !== null) {
                     switch (amountFilterType) {
                         case ">":
-                            amountFilter = i.amount > amountFilterValue;
+                            amountFilter = i.amount! > amountFilterValue;
                             break;
                         case "<":
-                            amountFilter = i.amount < amountFilterValue;
+                            amountFilter = i.amount! < amountFilterValue;
                             break;
                         case "=":
                             amountFilter = i.amount === amountFilterValue;
@@ -107,20 +107,20 @@ export default function TransactionGrid({
 
                 if(sortConfig.key === 'amount') {
                     return sortConfig.direction === 'ascending'
-                        ? a.amount - b.amount
-                        : b.amount - a.amount
+                        ? a.amount! - b.amount!
+                        : b.amount! - a.amount!
                 }
 
                 if(sortConfig.key === 'currency') {
                     return sortConfig.direction === 'ascending'
-                        ? a.currency.localeCompare(b.currency)
-                        : b.currency.localeCompare(a.currency);
+                        ? a.currency!.localeCompare(b.currency!)
+                        : b.currency!.localeCompare(a.currency!);
                 }
 
                 if (sortConfig.key === 'category') {
                     return sortConfig.direction === 'ascending'
-                    ? a.category.localeCompare(b.category)
-                    : b.category.localeCompare(a.category);
+                    ? a.category!.localeCompare(b.category!)
+                    : b.category!.localeCompare(a.category!);
                 }
 
                 if(sortConfig.key === 'date') {

@@ -1,12 +1,12 @@
 import { Button, Icon } from "@vaadin/react-components";
-import { Transaction } from 'Frontend/types/Transaction';
+import TransactionDto from "Frontend/generated/com/example/application/dto/TransactionDto";
 
 interface Props {
-  transaction: Transaction;
-  onEdit: (transaction: Transaction) => void;
-  onDelete: (transaction: Transaction) => void;
+  transaction: TransactionDto;
+  onEdit: (transaction: TransactionDto) => void;
+  onDelete: (transaction: TransactionDto) => void;
   visualizeDocument: (document: string) => void;
-  onRemoveDocument: (transaction: Transaction) => void;
+  onRemoveDocument: (transaction: TransactionDto) => void;
 }
 
 export default function TransactionButtonRenderer({ transaction, onEdit, onDelete, visualizeDocument, onRemoveDocument }: Props) {

@@ -1,9 +1,9 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { Transaction } from 'Frontend/types/Transaction';
 import TransactionChart from 'Frontend/components/TransactionChart';
 import ChooserForTransactionCharts from 'Frontend/components/ChooserForTransactionCharts';
 import { useState } from 'react';
+import TransactionDto from 'Frontend/generated/com/example/application/dto/TransactionDto';
 
 export const config: ViewConfig = {
   menu: { order: 0, icon: 'vaadin:pie-chart' },
@@ -15,8 +15,8 @@ export default function DashboardsView() {
   const [selectedCurrency, setSelectedCurrency] = useState('лв.');
   const [totalExpensesByCategory, setTotalExpensesByCategory] = useState<{ name: string; value: number }[]>([]);
   const [totalIncomesByCategory, setTotalIncomesByCategory] = useState<{ name: string; value: number }[]>([]);
-  const [expensesByDates, setExpensesByDates] = useState<Transaction[]>([]);
-  const [incomesByDates, setIncomesByDates] = useState<Transaction[]>([]);
+  const [expensesByDates, setExpensesByDates] = useState<TransactionDto[]>([]);
+  const [incomesByDates, setIncomesByDates] = useState<TransactionDto[]>([]);
 
   return (
     <>

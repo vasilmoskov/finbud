@@ -2,9 +2,7 @@ import { UploadFile } from "@vaadin/react-components";
 import React, {useEffect, useState} from "react";
 import {format} from 'date-fns';
 import { useSignal } from "@vaadin/hilla-react-signals";
-import { Transaction } from "Frontend/types/Transaction";
 import TransactionDto from "Frontend/generated/com/example/application/dto/TransactionDto";
-import DocumentDto from "Frontend/generated/com/example/application/dto/DocumentDto";
 
 interface TransactionService {
     getAll: () => Promise<TransactionDto[]>;
@@ -17,14 +15,14 @@ interface TransactionService {
 
 export const useTransaction = (service: TransactionService) => {
     const gridRef = React.useRef<any>(null);
-    const [transactions, setTransactions] = useState<Transaction[]>([]);
-    const [newTransaction, setNewTransaction] = useState<Transaction>({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: null, unusual: false});
-    const [editedTransaction, setEditedTransaction] = useState<Transaction>({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: null, unusual: false});
+    const [transactions, setTransactions] = useState<TransactionDto[]>([]);
+    const [newTransaction, setNewTransaction] = useState<TransactionDto>({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: undefined, unusual: false});
+    const [editedTransaction, setEditedTransaction] = useState<TransactionDto>({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: undefined, unusual: false});
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
     const [confirmDocumentDialogOpened, setConfirmDocumentDialogOpened] = useState(false);
     const [addDialogOpened, setAddDialogOpened] = useState(false);
     const [editDialogOpened, setEditDialogOpened] = useState(false);
-    const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+    const [selectedTransaction, setSelectedTransaction] = useState<TransactionDto | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
     const [selectedCurrency, setSelectedCurrency] = useState<string>('All');
     const [amountFilterType, setAmountFilterType] = useState<string>('>');
@@ -35,40 +33,15 @@ export const useTransaction = (service: TransactionService) => {
     const [isEndDateSelected, setIsEndDateSelected] = useState(false);
     const [selectedByUsuality, setSelectedByUsuality] = useState<string>('All');
     const [documentFile, setDocumentFile] = useState<UploadFile[]>([]);
-    const [transactionWithDocumentToRemove, setTransactionWithDocumentToRemove] = useState<Transaction | null>(null);
+    const [transactionWithDocumentToRemove, setTransactionWithDocumentToRemove] = useState<TransactionDto | null>(null);
     
     useEffect(() => {
-        service.getAll().then(transactions => {
-            const mappedTransactions = transactions.map(toDto);
-            setTransactions(mappedTransactions)
-        });
+        service.getAll().then(transactions => setTransactions(transactions));
 
         setTimeout(() => {
             gridRef.current?.recalculateColumnWidths();
         }, 100);
     }, []);
-
-    const toDto = (dto: TransactionDto): Transaction => {
-        let doc: DocumentDto | null = null;
-
-        if(dto.document) {
-            doc = {
-                id: dto.document.id,
-                content: dto.document.content
-            }
-        }
-
-        return {
-            id: dto.id,
-            amount: dto.amount!,
-            currency: dto.currency!,
-            category: dto.category!,
-            date: dto.date,
-            document: doc,
-            unusual: dto.unusual
-        };
-    };
-    
 
     const areFiltersDefault = () => {
       return (
@@ -94,7 +67,7 @@ export const useTransaction = (service: TransactionService) => {
       endDate.value = '';
     }
 
-    const handleEdit = (transaction: Transaction) => {
+    const handleEdit = (transaction: TransactionDto) => {
         editedTransaction.id = transaction.id;
         editedTransaction.amount = transaction.amount;
         editedTransaction.currency = transaction.currency;
@@ -116,7 +89,7 @@ export const useTransaction = (service: TransactionService) => {
         setEditDialogOpened(true);
     };
 
-    const handleDelete = (transaction: Transaction) => {
+    const handleDelete = (transaction: TransactionDto) => {
         setSelectedTransaction(transaction);
         setConfirmDialogOpened(true);
     };
@@ -134,7 +107,7 @@ export const useTransaction = (service: TransactionService) => {
     };
 
     const addNewTransaction = () => {
-        const transaction: Transaction = {
+        const transaction: TransactionDto = {
             amount: newTransaction.amount,
             currency: newTransaction.currency,
             category: newTransaction.category,
@@ -148,10 +121,10 @@ export const useTransaction = (service: TransactionService) => {
         setTransactions([...transactions, transaction]);
 
         setDocumentFile([]);
-        setNewTransaction({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: null, unusual: false});
+        setNewTransaction({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: undefined, unusual: false});
         setAddDialogOpened(false);
 
-        service.addTransaction(transaction.amount, transaction.currency, transaction.category, transaction.document?.content!, transaction.unusual)
+        service.addTransaction(transaction.amount!, transaction.currency!, transaction.category!, transaction.document?.content!, transaction.unusual)
             .then((savedTransaction) => {
                     transaction.id = savedTransaction.id
 
@@ -171,7 +144,7 @@ export const useTransaction = (service: TransactionService) => {
     };
 
     const editExistingTransaction = () => {
-        const transaction: Transaction = {
+        const transaction: TransactionDto = {
             id: editedTransaction.id,
             amount: editedTransaction.amount,
             currency: editedTransaction.currency,
@@ -188,7 +161,7 @@ export const useTransaction = (service: TransactionService) => {
 
         setEditDialogOpened(false);
 
-        service.editTransaction(transaction.id!, transaction.amount, transaction.currency, transaction.category, transaction.document?.content!, transaction.unusual)
+        service.editTransaction(transaction.id!, transaction.amount!, transaction.currency!, transaction.category!, transaction.document?.content!, transaction.unusual)
             .then(() => {
                 setDocumentFile([]);
             })
@@ -205,7 +178,7 @@ export const useTransaction = (service: TransactionService) => {
         setAddDialogOpened(detailValue);
 
         if (!detailValue) {
-            setNewTransaction({...newTransaction, id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: null, unusual: false});
+            setNewTransaction({...newTransaction, id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: undefined, unusual: false});
             setDocumentFile([]);
         }
     };
@@ -235,7 +208,7 @@ export const useTransaction = (service: TransactionService) => {
         reader.readAsDataURL(file);
     };
 
-    const handleRemoveDocument = (transaction: Transaction) => {
+    const handleRemoveDocument = (transaction: TransactionDto) => {
         setTransactionWithDocumentToRemove(transaction);
         setConfirmDocumentDialogOpened(true);
       };
@@ -245,7 +218,7 @@ export const useTransaction = (service: TransactionService) => {
             return;
         }
 
-        transactionWithDocumentToRemove.document = null;
+        transactionWithDocumentToRemove.document = undefined;
 
         const previousTransactions = [...transactions];
 
@@ -260,9 +233,8 @@ export const useTransaction = (service: TransactionService) => {
             })
     };
 
-    const fetchTransactionsByDates = async (fromDate: string, toDate: string): Promise<Transaction[]> => {
-        const transactions = await service.getAllByDatesBetween(fromDate, toDate);
-        return transactions.map(toDto);
+    const fetchTransactionsByDates = async (fromDate: string, toDate: string): Promise<TransactionDto[]> => {
+        return await service.getAllByDatesBetween(fromDate, toDate);
     }
 
     return {

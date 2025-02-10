@@ -1,12 +1,12 @@
 import { Button, Checkbox, Dialog, Select, TextField, Upload, UploadFile, VerticalLayout } from "@vaadin/react-components";
 import { incomeCategoryOptions, currencyOptions, expenseCategoryOptions } from "Frontend/constants/constants";
-import { Transaction } from "Frontend/types/Transaction";
+import TransactionDto from "Frontend/generated/com/example/application/dto/TransactionDto";
 
 interface Props {
     transactionType: "Income" | "Expense",
     opened: boolean,
-    transaction: Transaction,
-    onTransactionChange: (transaction: Transaction) => void,
+    transaction: TransactionDto,
+    onTransactionChange: (transaction: TransactionDto) => void,
     onSave: () => void,
     handleOpenChanged: (value:boolean) => void,
     isEdit: boolean,
@@ -46,7 +46,7 @@ export default function AddEditDialog({
         <VerticalLayout style={{alignItems: 'stretch', width: '18rem', maxWidth: '100%'}}>
             <TextField
                 label="Amount"
-                value={transaction.amount.toFixed(2).toString()}
+                value={transaction.amount!.toFixed(2).toString()}
                 onChange={e => onTransactionChange({...transaction, amount: Number(e.target.value)})}
             />
             <Select

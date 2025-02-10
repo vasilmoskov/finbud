@@ -67,8 +67,8 @@ public class IncomeServiceImpl implements IncomeService {
 
         incomeEntity
                 .setAmount(amount)
-                .setCurrency(CurrencyCode.valueOf(currencyCode))
-                .setCategory(IncomeCategory.valueOf(category))
+                .setCurrency(CurrencyCode.fromRepresentation(currencyCode))
+                .setCategory(IncomeCategory.fromRepresentation(category))
                 .setUnusual(unusual);
 
         if (document != null && !document.isEmpty()) {
