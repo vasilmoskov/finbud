@@ -16,7 +16,7 @@ interface TransactionService {
 export const useTransaction = (service: TransactionService) => {
     const gridRef = React.useRef<any>(null);
     const [transactions, setTransactions] = useState<TransactionDto[]>([]);
-    const [newTransaction, setNewTransaction] = useState<TransactionDto>({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: undefined, unusual: false});
+    const [newTransaction, setNewTransaction] = useState<TransactionDto | null>(null);
     const [editedTransaction, setEditedTransaction] = useState<TransactionDto>({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: undefined, unusual: false});
     const [confirmDialogOpened, setConfirmDialogOpened] = useState(false);
     const [confirmDocumentDialogOpened, setConfirmDocumentDialogOpened] = useState(false);
@@ -34,7 +34,8 @@ export const useTransaction = (service: TransactionService) => {
     const [selectedByUsuality, setSelectedByUsuality] = useState<string>('All');
     const [documentFile, setDocumentFile] = useState<UploadFile[]>([]);
     const [transactionWithDocumentToRemove, setTransactionWithDocumentToRemove] = useState<TransactionDto | null>(null);
-    
+    // const [isEditing, setIsEditing] = useState(false);
+
     useEffect(() => {
         service.getAll().then(transactions => setTransactions(transactions));
 
@@ -77,6 +78,7 @@ export const useTransaction = (service: TransactionService) => {
         editedTransaction.unusual = transaction.unusual
 
         setEditedTransaction({
+            ...editedTransaction,
             id: transaction.id,
             amount: transaction.amount,
             currency: transaction.currency,
@@ -108,12 +110,12 @@ export const useTransaction = (service: TransactionService) => {
 
     const addNewTransaction = () => {
         const transaction: TransactionDto = {
-            amount: newTransaction.amount,
-            currency: newTransaction.currency,
-            category: newTransaction.category,
+            amount: newTransaction!.amount,
+            currency: newTransaction!.currency,
+            category: newTransaction!.category,
             date: format(new Date(), "dd MMM yyyy HH:mm:ss"),
-            document: newTransaction.document,
-            unusual: newTransaction.unusual
+            document: newTransaction!.document,
+            unusual: newTransaction!.unusual
         };
 
         const previousTransactions = [...transactions];
@@ -121,7 +123,7 @@ export const useTransaction = (service: TransactionService) => {
         setTransactions([...transactions, transaction]);
 
         setDocumentFile([]);
-        setNewTransaction({id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: undefined, unusual: false});
+        setNewTransaction(null);
         setAddDialogOpened(false);
 
         service.addTransaction(transaction.amount!, transaction.currency!, transaction.category!, transaction.document?.content!, transaction.unusual)
@@ -154,7 +156,6 @@ export const useTransaction = (service: TransactionService) => {
             unusual: editedTransaction.unusual
         };
 
-
         const previousTransactions = [...transactions];
 
         setTransactions(transactions.map(i => i.id === transaction.id ? transaction : i));
@@ -178,7 +179,7 @@ export const useTransaction = (service: TransactionService) => {
         setAddDialogOpened(detailValue);
 
         if (!detailValue) {
-            setNewTransaction({...newTransaction, id: '', amount: 0, currency: 'лв.', category: 'Other', date: '', document: undefined, unusual: false});
+            setNewTransaction(null);
             setDocumentFile([]);
         }
     };
@@ -199,7 +200,7 @@ export const useTransaction = (service: TransactionService) => {
             setDocumentFile(Array.of(file))
 
             if(context === 'add') {
-                setNewTransaction({...newTransaction, document: {content: reader.result as string}});
+                setNewTransaction({...newTransaction!, document: {content: reader.result as string}});
             } else if (context === 'edit') {
                 setEditedTransaction({...editedTransaction, document: {content: reader.result as string}});
             }

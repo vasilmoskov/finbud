@@ -122,7 +122,7 @@ export default function IncomeView() {
             <AddEditDialog
                 transactionType='Income'
                 opened={addDialogOpened}
-                transaction={newTransaction}
+                transaction={newTransaction!}
                 onTransactionChange={setNewTransaction}
                 onSave={addNewTransaction}
                 handleOpenChanged={(value) => handleAddDialogOpenedChanged(value)}

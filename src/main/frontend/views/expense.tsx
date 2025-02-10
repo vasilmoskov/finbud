@@ -121,7 +121,7 @@ export default function ExpenseView() {
             <AddEditDialog
                 transactionType='Expense'
                 opened={addDialogOpened}
-                transaction={newTransaction}
+                transaction={newTransaction!}
                 onTransactionChange={setNewTransaction}
                 onSave={addNewTransaction}
                 handleOpenChanged={(value) => handleAddDialogOpenedChanged(value)}

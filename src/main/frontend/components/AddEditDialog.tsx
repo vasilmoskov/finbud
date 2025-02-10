@@ -46,18 +46,18 @@ export default function AddEditDialog({
         <VerticalLayout style={{alignItems: 'stretch', width: '18rem', maxWidth: '100%'}}>
             <TextField
                 label="Amount"
-                value={transaction.amount!.toFixed(2).toString()}
+                value={transaction?.amount!.toFixed(2).toString()}
                 onChange={e => onTransactionChange({...transaction, amount: Number(e.target.value)})}
             />
             <Select
                 label="Currency"
-                value={transaction.currency}
+                value={transaction?.currency}
                 items={currencyOptions}
                 onValueChanged={e => onTransactionChange({...transaction, currency: e.detail.value})}
             />
             <Select
                 label="Category"
-                value={transaction.category}
+                value={transaction?.category}
                 items={categoryOptions}
                 onValueChanged={e => onTransactionChange({...transaction, category: e.detail.value})}
             />
@@ -69,7 +69,7 @@ export default function AddEditDialog({
             />
             <Checkbox 
                 label={`This ${transactionType.toLowerCase()} is unusual`} 
-                checked={transaction.unusual}
+                checked={transaction?.unusual}
                 onChange={e => onTransactionChange({...transaction, unusual: e.target.checked})}/>
         </VerticalLayout>
     </Dialog>
