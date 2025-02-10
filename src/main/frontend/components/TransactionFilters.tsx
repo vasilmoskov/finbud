@@ -1,5 +1,5 @@
 import { Button, DatePicker, DatePickerElement, Icon, Select, TextField } from "@vaadin/react-components";
-import { formatDateForDatePicker, parseDateForDatePicker } from "Frontend/util/incomeUtils";
+import { formatDateForDatePicker, parseDateForDatePicker } from "Frontend/util/transactionUtils";
 import { useEffect, useRef, useState } from "react";
 import { amountFilterOptions, incomeCategoryFilteringOptions, currencyFilteringOptions, currencySignsToCodes, usualityFilteringOptions, expenseCategoryFilteringOptions } from "Frontend/constants/constants";
 import { Signal } from "@vaadin/hilla-react-signals";

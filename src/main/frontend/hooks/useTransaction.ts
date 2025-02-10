@@ -265,42 +265,6 @@ export const useTransaction = (service: TransactionService) => {
         return transactions.map(toDto);
     }
 
-    // const fetchIncomesByDates = async (fromDate: string, toDate: string): Promise<Transaction[]> => {
-    //     const transactions = await getAllIncomesByDatesBetween(fromDate, toDate);
-    //     return transactions.map(toDto);
-    // }
-
-    const accumulateTransactionsByCategory = (transactions: Transaction[], selectedCurrency: string) => {
-        const categoryMap = transactions.reduce((acc: { [key: string]: number }, transaction: Transaction) => {
-            const amountInSelectedCurrency = convertToCurrency(transaction.amount, transaction.currency, selectedCurrency);
-
-            if (acc[transaction.category]) {
-                acc[transaction.category] += amountInSelectedCurrency;
-            } else {
-                acc[transaction.category] = amountInSelectedCurrency;
-            }
-
-            return acc;
-        }, {});
-
-        return Object.keys(categoryMap).map(category => ({
-            name: category,
-            value: categoryMap[category]
-        }));
-    };
-
-    const convertToCurrency = (amount: number, fromCurrency: string, toCurrency: string) => {
-        const rate = conversionRates[fromCurrency]?.[toCurrency];
-        return amount * rate;
-    };
-
-    const conversionRates: { [key: string]: { [key: string]: number } } = {
-        'лв.': { 'лв.': 1, '€': 0.51, '$': 0.53, '£': 0.43 },
-        '€': { '€': 1, 'лв.': 1.96, '$': 1.03, '£': 0.83 },
-        '$': { '$': 1, 'лв.': 1.89, '€': 0.97, '£': 0.81 },
-        '£': { '£': 1, 'лв.': 2.35, '€': 1.2, '$': 1.24 },
-    };
-
     return {
         gridRef,
         transactions,
@@ -343,8 +307,6 @@ export const useTransaction = (service: TransactionService) => {
         handleUploadBefore,
         handleRemoveDocument,
         confirmRemoveDocument,
-        fetchTransactionsByDates,
-        accumulateTransactionsByCategory,
-        // fetchIncomesByDates
+        fetchTransactionsByDates
     };
 }

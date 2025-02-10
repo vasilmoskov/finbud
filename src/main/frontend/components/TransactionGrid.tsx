@@ -3,7 +3,7 @@ import TransactionButtonRenderer from "./TransactionButtonRenderer";
 import { Transaction } from "Frontend/types/Transaction";
 import { useState } from "react";
 import { Signal } from "@vaadin/hilla-react-signals";
-import { getDateWithoutTime} from "Frontend/util/incomeUtils";
+import { getDateWithoutTime} from "Frontend/util/transactionUtils";
 import { visualizeDocument } from "Frontend/util/documentUtils";
 
 interface Props {
