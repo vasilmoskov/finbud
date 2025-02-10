@@ -6,7 +6,6 @@ import com.example.application.dto.TransactionDto;
 import com.example.application.exception.ResourceNotFoundException;
 import com.example.application.repository.DocumentRepository;
 import com.example.application.repository.ExpenseRepository;
-import com.example.application.repository.IncomeRepository;
 import com.example.application.security.AuthenticatedUser;
 import com.vaadin.hilla.BrowserCallable;
 import jakarta.annotation.security.PermitAll;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,9 +40,76 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public TransactionDto addExpense(BigDecimal amount, String currencyCode, String category, String document, boolean unusual) {
+        ExpenseEntity expense = new ExpenseEntity()
+                .setAmount(amount)
+                .setCurrency(CurrencyCode.fromRepresentation(currencyCode))
+                .setCategory(ExpenseCategory.fromRepresentation(category))
+                .setDate(LocalDateTime.now())
+                .setUnusual(unusual)
+                .setUser(authenticatedUser.get().orElseThrow());
+
+        if(document != null && !document.isEmpty()) {
+            DocumentEntity documentEntity = new DocumentEntity(document);
+            expense.setDocument(documentEntity);
+            documentRepository.save(documentEntity);
+        }
+
+        return toDto(expenseRepository.save(expense));
+    }
 
     @Override
-    public List<TransactionDto> getAllByDatesBetween(String startDate, String endDate) {
+    public TransactionDto editExpense(String id, BigDecimal amount, String currencyCode, String category, String document, boolean unusual) {
+        ExpenseEntity expenseEntity = expenseRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Expense with id %s not found.", id)));
+
+        expenseEntity
+                .setAmount(amount)
+                .setCurrency(CurrencyCode.fromRepresentation(currencyCode))
+                .setCategory(ExpenseCategory.fromRepresentation(category))
+                .setUnusual(unusual);
+
+        if(document != null && !document.isEmpty()) {
+
+            DocumentEntity previousDocument = expenseEntity.getDocument();
+
+            if (previousDocument != null) {
+                documentRepository.delete(previousDocument);
+            }
+
+            DocumentEntity documentEntity = new DocumentEntity(document);
+            expenseEntity.setDocument(documentEntity);
+            documentRepository.save(documentEntity);
+        }
+
+        return toDto(expenseRepository.save(expenseEntity));
+    }
+
+    @Override
+    public void deleteExpense(String id) {
+        expenseRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteExpenseDocument(String id) {
+        ExpenseEntity expenseEntity = expenseRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Expense with id %s not found.", id)));
+
+        DocumentEntity document = expenseEntity.getDocument();
+
+        if (document != null) {
+            documentRepository.deleteById(document.getId());
+
+            expenseEntity.setDocument(null);
+            expenseRepository.save(expenseEntity);
+        }
+    }
+
+    @Override
+    public List<TransactionDto> getAllExpensesByDatesBetween(String startDate, String endDate) {
         String[] startDateTokens = startDate.split("-");
         int startDateYear = Integer.parseInt(startDateTokens[0]);
         int startDateMonth = Integer.parseInt(startDateTokens[1]);
@@ -75,73 +140,4 @@ public class ExpenseServiceImpl implements ExpenseService {
                 .setUnusual(e.isUnusual())
                 .setDocument(e.getDocument() == null ? null : new DocumentDto().setId(e.getDocument().getId()).setContent(e.getDocument().getContent()));
     }
-
-    @Override
-    public ExpenseEntity addExpense(BigDecimal amount, String currencyCode, String category, String document, boolean unusual) {
-        ExpenseEntity expense = new ExpenseEntity()
-                .setAmount(amount)
-                .setCurrency(CurrencyCode.fromRepresentation(currencyCode))
-                .setCategory(ExpenseCategory.fromRepresentation(category))
-                .setDate(LocalDateTime.now())
-                .setUnusual(unusual)
-                .setUser(authenticatedUser.get().orElseThrow());
-
-        if(document != null && !document.isEmpty()) {
-            DocumentEntity documentEntity = new DocumentEntity(document);
-            expense.setDocument(documentEntity);
-            documentRepository.save(documentEntity);
-        }
-
-        return expenseRepository.save(expense);
-    }
-
-    @Override
-    public ExpenseEntity editExpense(String id, BigDecimal amount, String currencyCode, String category, String document, boolean unusual) {
-        ExpenseEntity expenseEntity = expenseRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Expense with id %s not found.", id)));
-
-        expenseEntity
-                .setAmount(amount)
-                .setCurrency(CurrencyCode.fromRepresentation(currencyCode))
-                .setCategory(ExpenseCategory.fromRepresentation(category))
-                .setUnusual(unusual);
-
-        if(document != null && !document.isEmpty()) {
-
-            DocumentEntity previousDocument = expenseEntity.getDocument();
-
-            if (previousDocument != null) {
-                documentRepository.delete(previousDocument);
-            }
-
-            DocumentEntity documentEntity = new DocumentEntity(document);
-            expenseEntity.setDocument(documentEntity);
-            documentRepository.save(documentEntity);
-        }
-
-        return expenseRepository.save(expenseEntity);
-    }
-
-    @Override
-    public void deleteExpense(String id) {
-        expenseRepository.deleteById(id);
-    }
-
-    @Override
-    public void deleteExpenseDocument(String id) {
-        ExpenseEntity expenseEntity = expenseRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Expense with id %s not found.", id)));
-
-        DocumentEntity document = expenseEntity.getDocument();
-
-        if (document != null) {
-            documentRepository.deleteById(document.getId());
-
-            expenseEntity.setDocument(null);
-            expenseRepository.save(expenseEntity);
-        }
-    }
-
 }

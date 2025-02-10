@@ -5,7 +5,7 @@ import ConfirmDeleteDialog from "Frontend/components/ConfirmDeleteDialog";
 import AddEditDialog from "Frontend/components/AddEditDialog";
 import TransactionFilters from "Frontend/components/TransactionFilters";
 import TransactionGrid from "Frontend/components/TransactionGrid";
-import { useIncomeViwState } from "Frontend/hooks/useIncomeViewState";
+import { useIncome } from "Frontend/hooks/useIncome";
 
 export const config: ViewConfig = {
     menu: {order: 1, icon: 'vaadin:plus-circle-o'},
@@ -16,11 +16,11 @@ export const config: ViewConfig = {
 export default function IncomeView() {
     const {
         gridRef,
-        incomes,
-        newIncome,
-        setNewIncome,
-        editedIncome,
-        setEditedIncome,
+        transactions,
+        newTransaction,
+        setNewTransaction,
+        editedTransaction,
+        setEditedTransaction,
         confirmDialogOpened,
         setConfirmDialogOpened,
         confirmDocumentDialogOpened,
@@ -49,14 +49,14 @@ export default function IncomeView() {
         handleEdit,
         handleDelete,
         confirmDelete,
-        addNewIncome,
-        editExistingIncome,
+        addNewTransaction,
+        editExistingTransaction,
         handleAddDialogOpenedChanged,
         handleEditDialogOpenedChanged,
         handleUploadBefore,
         handleRemoveDocument,
         confirmRemoveDocument
-    } = useIncomeViwState();
+    } = useIncome();
 
     const buttonTheme = 'success'
 
@@ -93,7 +93,7 @@ export default function IncomeView() {
 
             <TransactionGrid
                 buttonTheme={buttonTheme}
-                transactions={incomes}
+                transactions={transactions}
                 selectedCategory={selectedCategory}
                 selectedCurrency={selectedCurrency}
                 selectedByUsuality={selectedByUsuality}
@@ -122,9 +122,9 @@ export default function IncomeView() {
             <AddEditDialog
                 transactionType='Income'
                 opened={addDialogOpened}
-                transaction={newIncome}
-                onTransactionChange={setNewIncome}
-                onSave={addNewIncome}
+                transaction={newTransaction}
+                onTransactionChange={setNewTransaction}
+                onSave={addNewTransaction}
                 handleOpenChanged={(value) => handleAddDialogOpenedChanged(value)}
                 isEdit={false}
                 documentFile={documentFile}
@@ -134,9 +134,9 @@ export default function IncomeView() {
             <AddEditDialog
                 transactionType='Income'
                 opened={editDialogOpened}
-                transaction={editedIncome}
-                onTransactionChange={setEditedIncome}
-                onSave={editExistingIncome}
+                transaction={editedTransaction}
+                onTransactionChange={setEditedTransaction}
+                onSave={editExistingTransaction}
                 handleOpenChanged={(value) => handleEditDialogOpenedChanged(value)}
                 isEdit={true}
                 documentFile={documentFile}

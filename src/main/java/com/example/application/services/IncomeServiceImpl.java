@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,18 +31,21 @@ public class IncomeServiceImpl implements IncomeService {
         this.documentRepository = documentRepository;
     }
 
-    // todo: return DTO where enum representations is used
     @Override
-    public List<IncomeEntity> getAll() {
-        return new ArrayList<>(incomeRepository.findAllByUser(authenticatedUser.get().orElseThrow()));
+    public List<TransactionDto> getAll() {
+        return incomeRepository
+                .findAllByUser(authenticatedUser.get().orElseThrow())
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public IncomeEntity addIncome(BigDecimal amount, String currencyCode, String category, String document, boolean unusual) {
+    public TransactionDto addIncome(BigDecimal amount, String currencyCode, String category, String document, boolean unusual) {
         IncomeEntity incomeEntity = new IncomeEntity()
                 .setAmount(amount)
-                .setCurrency(CurrencyCode.valueOf(currencyCode))
-                .setCategory(IncomeCategory.valueOf(category))
+                .setCurrency(CurrencyCode.fromRepresentation(currencyCode))
+                .setCategory(IncomeCategory.fromRepresentation(category))
                 .setDate(LocalDateTime.now())
                 .setUnusual(unusual)
                 .setUser(authenticatedUser.get().orElseThrow());
@@ -54,11 +56,11 @@ public class IncomeServiceImpl implements IncomeService {
             documentRepository.save(documentEntity);
         }
 
-        return incomeRepository.save(incomeEntity);
+        return toDto(incomeRepository.save(incomeEntity));
     }
 
     @Override
-    public IncomeEntity editIncome(String id, BigDecimal amount, String currencyCode, String category, String document, boolean unusual) {
+    public TransactionDto editIncome(String id, BigDecimal amount, String currencyCode, String category, String document, boolean unusual) {
         IncomeEntity incomeEntity = incomeRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Income with id %s not found.", id)));
@@ -82,7 +84,7 @@ public class IncomeServiceImpl implements IncomeService {
             documentRepository.save(documentEntity);
         }
 
-        return incomeRepository.save(incomeEntity);
+        return toDto(incomeRepository.save(incomeEntity));
     }
 
     @Override

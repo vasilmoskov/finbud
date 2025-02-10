@@ -4,7 +4,7 @@ import AddEditDialog from 'Frontend/components/AddEditDialog';
 import ConfirmDeleteDialog from 'Frontend/components/ConfirmDeleteDialog';
 import TransactionFilters from 'Frontend/components/TransactionFilters';
 import TransactionGrid from 'Frontend/components/TransactionGrid';
-import { useExpenseViewState } from 'Frontend/hooks/useExpenseViewState';
+import { useExpense } from 'Frontend/hooks/useExpense';
 
 export const config: ViewConfig = {
   menu: { order: 2, icon: 'vaadin:minus-circle-o' },
@@ -15,11 +15,11 @@ export const config: ViewConfig = {
 export default function ExpenseView() {
       const {
         gridRef,
-        expenses,
-        newExpense,
-        setNewExpense,
-        editedExpense,
-        setEditedExpense,
+        transactions,
+        newTransaction,
+        setNewTransaction,
+        editedTransaction,
+        setEditedTransaction,
         confirmDialogOpened,
         setConfirmDialogOpened,
         confirmDocumentDialogOpened,
@@ -48,14 +48,14 @@ export default function ExpenseView() {
         handleEdit,
         handleDelete,
         confirmDelete,
-        addNewExpense,
-        editExistingExpense,
+        addNewTransaction,
+        editExistingTransaction,
         handleAddDialogOpenedChanged,
         handleEditDialogOpenedChanged,
         handleUploadBefore,
         handleRemoveDocument,
         confirmRemoveDocument
-      } = useExpenseViewState();
+      } = useExpense();
 
     const buttonTheme = 'error';
 
@@ -92,7 +92,7 @@ export default function ExpenseView() {
 
             <TransactionGrid
                 buttonTheme={buttonTheme}
-                transactions={expenses}
+                transactions={transactions}
                 selectedCategory={selectedCategory}
                 selectedCurrency={selectedCurrency}
                 selectedByUsuality={selectedByUsuality}
@@ -121,9 +121,9 @@ export default function ExpenseView() {
             <AddEditDialog
                 transactionType='Expense'
                 opened={addDialogOpened}
-                transaction={newExpense}
-                onTransactionChange={setNewExpense}
-                onSave={addNewExpense}
+                transaction={newTransaction}
+                onTransactionChange={setNewTransaction}
+                onSave={addNewTransaction}
                 handleOpenChanged={(value) => handleAddDialogOpenedChanged(value)}
                 isEdit={false}
                 documentFile={documentFile}
@@ -133,9 +133,9 @@ export default function ExpenseView() {
             <AddEditDialog
                 transactionType='Expense'
                 opened={editDialogOpened}
-                transaction={editedExpense}
-                onTransactionChange={setEditedExpense}
-                onSave={editExistingExpense}
+                transaction={editedTransaction}
+                onTransactionChange={setEditedTransaction}
+                onSave={editExistingTransaction}
                 handleOpenChanged={(value) => handleEditDialogOpenedChanged(value)}
                 isEdit={true}
                 documentFile={documentFile}

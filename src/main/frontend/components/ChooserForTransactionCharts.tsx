@@ -1,6 +1,7 @@
 import { Button, DatePicker, DatePickerElement, Select } from "@vaadin/react-components";
 import { currencyOptions } from "Frontend/constants/constants";
-import { useExpenseViewState } from "Frontend/hooks/useExpenseViewState";
+import { useExpense } from "Frontend/hooks/useExpense";
+import { useIncome } from "Frontend/hooks/useIncome";
 import { Transaction } from "Frontend/types/Transaction";
 import { formatDateForDatePicker, parseDateForDatePicker } from "Frontend/util/incomeUtils";
 import { useEffect, useRef } from "react";
@@ -30,19 +31,20 @@ export default function ChooserForTransactionCharts({
     const startDatePickerRef = useRef<DatePickerElement>(null);
     const endDatePickerRef = useRef<DatePickerElement>(null);
 
-    const { startDate, endDate, fetchExpensesByDates, fetchIncomesByDates, accumulateExpensesByCategory } = useExpenseViewState();
+    const { startDate, endDate, fetchTransactionsByDates: fetchExpensesByDates, accumulateTransactionsByCategory } = useExpense();
+    const { fetchTransactionsByDates: fetchIncomesByDates  } = useIncome();
 
     const handleFetchTransactions = async () => {
         const expenses = await fetchExpensesByDates(startDate.value, endDate.value);
         setExpensesByDates(expenses);
 
-        const accumulatedExpenses = accumulateExpensesByCategory(expenses, selectedCurrency);
+        const accumulatedExpenses = accumulateTransactionsByCategory(expenses, selectedCurrency);
         setTotalExpensesByCategory(accumulatedExpenses);
 
         const incomes = await fetchIncomesByDates(startDate.value, endDate.value);
         setIncomesByDates(incomes);
 
-        const accumulatedIncomes = accumulateExpensesByCategory(incomes, selectedCurrency);
+        const accumulatedIncomes = accumulateTransactionsByCategory(incomes, selectedCurrency);
         setTotalIncomesByCategory(accumulatedIncomes);
     };
 
@@ -115,10 +117,10 @@ export default function ChooserForTransactionCharts({
                             onValueChanged={e => {
                                 setSelectedCurrency(e.detail.value);
 
-                                const accumulatedExpenses = accumulateExpensesByCategory(expensesByDates, e.detail.value);
+                                const accumulatedExpenses = accumulateTransactionsByCategory(expensesByDates, e.detail.value);
                                 setTotalExpensesByCategory(accumulatedExpenses);
 
-                                const accumulatedIncomes = accumulateExpensesByCategory(incomesByDates, e.detail.value);
+                                const accumulatedIncomes = accumulateTransactionsByCategory(incomesByDates, e.detail.value);
                                 setTotalIncomesByCategory(accumulatedIncomes);
 
                             }}

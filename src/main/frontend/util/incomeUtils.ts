@@ -1,8 +1,6 @@
 import { DatePickerDate } from "@vaadin/react-components";
 import { format, parse } from "date-fns";
 import { incomeCategoriesMap, currencyCodesToSigns } from "Frontend/constants/constants";
-import IncomeEntity from "Frontend/generated/com/example/application/data/IncomeEntity";
-import { Transaction } from "Frontend/types/Transaction";
 
 export const formtatCurrency = (currency: string): string => {
     return currencyCodesToSigns[currency] || currency;
@@ -31,16 +29,4 @@ export const parseDateForDatePicker = (inputValue: string) => {
 
 export const getDateWithoutTime = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-};
-
-export const mapIncomeEntityToDto = (income: IncomeEntity): Transaction => {
-    return {
-        id: income.id,
-        amount: income.amount,
-        currency: formtatCurrency(income.currency),
-        category: formatCategory(income.category),
-        date: income.date ? formatDate(income.date) : '',
-        document: income.document,
-        unusual: income.unusual
-    };
 };
