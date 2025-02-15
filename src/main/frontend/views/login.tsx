@@ -9,7 +9,7 @@ export const config: ViewConfig = {
 
 const loginI18n: LoginI18n = {
   ...new LoginOverlayElement().i18n,
-  header: { title: 'Hilla Auth Starter', description: 'Login using user/user or admin/admin' },
+  header: { title: 'FinBud', description: 'The manager for your finances' },
 };
 
 export default function LoginView() {
