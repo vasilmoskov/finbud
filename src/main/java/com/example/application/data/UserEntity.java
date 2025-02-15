@@ -13,16 +13,16 @@ import java.util.Set;
 public class UserEntity extends AbstractEntity<UserEntity> {
 
     private String username;
+
     private String name;
+
     @JsonIgnore
     private String hashedPassword;
-    //TODO: check if annotations are needed when using Mongo
+
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
-    //TODO: check if annotations are needed when using Mongo
-//    @Lob
-//    @Column(length = 1000000)
+
     private byte[] profilePicture;
 
     public String getUsername() {

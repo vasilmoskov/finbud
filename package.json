@@ -28,6 +28,7 @@
     "date-fns": "2.29.3",
     "lit": "3.1.4",
     "proj4": "2.11.0",
+    "promise-file-reader": "^1.0.3",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router-dom": "6.23.1",
@@ -122,7 +123,7 @@
       "workbox-core": "7.1.0",
       "workbox-precaching": "7.1.0"
     },
-    "hash": "89f708e0870732688fd8b9b0c9442d212f7f0703f7c921e22aab9dde1561dcd6"
+    "hash": "c4eee3dd715253952bc2df681670b32f8f96c96c75c8e56fea10a82597b6e849"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -164,6 +165,7 @@
     "@vaadin/vaadin-lumo-styles": "$@vaadin/vaadin-lumo-styles",
     "@vaadin/vaadin-material-styles": "$@vaadin/vaadin-material-styles",
     "@fortawesome/fontawesome-free": "$@fortawesome/fontawesome-free",
-    "recharts": "$recharts"
+    "recharts": "$recharts",
+    "promise-file-reader": "$promise-file-reader"
   }
 }
