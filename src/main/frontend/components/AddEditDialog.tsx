@@ -30,6 +30,7 @@ export default function AddEditDialog({
     const categoryOptions = transactionType === "Income" ? incomeCategoryOptions : expenseCategoryOptions;
 
     const [isValid, setIsValid] = useState(false);
+    const [dialogKey, setDialogKey] = useState(0);
 
     useEffect(() => {
         const isAmountValid = transaction?.amount !== undefined && transaction.amount > 0;
@@ -39,14 +40,23 @@ export default function AddEditDialog({
         setIsValid(isAmountValid && isCurrencyValid && isCategoryValid);
     }, [transaction]);
     
+    const handleDialogClose = (value: boolean) => {
+        handleOpenChanged(value);
+        
+        if (!value) {
+            setDialogKey(prevKey => prevKey + 1);
+        }
+    };
+
     return (
         <Dialog
+        key={dialogKey}
         headerTitle={isEdit ? `Edit ${transactionType}` : `Add ${transactionType}`}
         opened={opened}
-        onOpenedChanged={({detail}) => handleOpenChanged(detail.value)}
+        onOpenedChanged={({detail}) => handleDialogClose(detail.value)}
         footerRenderer={() => (
             <>
-                <Button onClick={() => handleOpenChanged(false)}>Cancel</Button>
+                <Button onClick={() => handleDialogClose(false)}>Cancel</Button>
                 <Button theme="primary" onClick={onSave} disabled={!isValid}>
                     {isEdit ? "Save" : "Add"}
                 </Button>
