@@ -1,6 +1,7 @@
 import { Button, Checkbox, Dialog, Select, TextField, Upload, UploadFile, VerticalLayout } from "@vaadin/react-components";
 import { incomeCategoryOptions, currencyOptions, expenseCategoryOptions } from "Frontend/constants/constants";
 import TransactionDto from "Frontend/generated/com/example/application/dto/TransactionDto";
+import { useEffect, useState } from "react";
 
 interface Props {
     transactionType: "Income" | "Expense",
@@ -18,7 +19,7 @@ export default function AddEditDialog({
     transactionType,
     opened, 
     transaction, 
-    onTransactionChange: onTransactionChange, 
+    onTransactionChange, 
     onSave, 
     handleOpenChanged, 
     isEdit,
@@ -28,6 +29,15 @@ export default function AddEditDialog({
 
     const categoryOptions = transactionType === "Income" ? incomeCategoryOptions : expenseCategoryOptions;
 
+    const [isValid, setIsValid] = useState(false);
+
+    useEffect(() => {
+        const isAmountValid = transaction?.amount !== undefined && transaction.amount > 0;
+        const isCurrencyValid = transaction?.currency !== undefined && transaction.currency !== '';
+        const isCategoryValid = transaction?.category !== undefined && transaction.category !== '';
+
+        setIsValid(isAmountValid && isCurrencyValid && isCategoryValid);
+    }, [transaction]);
     
     return (
         <Dialog
@@ -37,7 +47,7 @@ export default function AddEditDialog({
         footerRenderer={() => (
             <>
                 <Button onClick={() => handleOpenChanged(false)}>Cancel</Button>
-                <Button theme="primary" onClick={onSave}>
+                <Button theme="primary" onClick={onSave} disabled={!isValid}>
                     {isEdit ? "Save" : "Add"}
                 </Button>
             </>
@@ -46,20 +56,26 @@ export default function AddEditDialog({
         <VerticalLayout style={{alignItems: 'stretch', width: '18rem', maxWidth: '100%'}}>
             <TextField
                 label="Amount"
-                value={transaction?.amount!.toFixed(2).toString()}
+                value={transaction?.amount ? transaction?.amount!.toFixed(2).toString() : ''}
                 onChange={e => onTransactionChange({...transaction, amount: Number(e.target.value)})}
+                required
+                errorMessage="Amount is required and must be a positive number"
             />
             <Select
                 label="Currency"
                 value={transaction?.currency}
                 items={currencyOptions}
                 onValueChanged={e => onTransactionChange({...transaction, currency: e.detail.value})}
+                required
+                errorMessage="Currency is required"
             />
             <Select
                 label="Category"
                 value={transaction?.category}
                 items={categoryOptions}
                 onValueChanged={e => onTransactionChange({...transaction, category: e.detail.value})}
+                required
+                errorMessage="Category is required"
             />
             <Upload
                 files={documentFile}

@@ -173,9 +173,7 @@ export const useTransaction = (service: TransactionService) => {
             })
     };
 
-    const handleAddDialogOpenedChanged = (detailValue: boolean) => {
-        console.log(detailValue);
-        
+    const handleAddDialogOpenedChanged = (detailValue: boolean) => {        
         setAddDialogOpened(detailValue);
 
         if (!detailValue) {
