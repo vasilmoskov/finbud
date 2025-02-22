@@ -3,6 +3,7 @@ package com.example.application.services;
 import com.example.application.data.Role;
 import com.example.application.data.UserEntity;
 import com.example.application.dto.RegisterUserDto;
+import com.example.application.exception.UsernameAlreadyExistsException;
 import com.example.application.repository.UserRepository;
 import com.example.application.security.AuthenticatedUser;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -34,6 +35,10 @@ public class UserEndpoint {
     }
 
     public void register(RegisterUserDto dto) {
+        if (userRepository.existsByUsername(dto.getUsername())) {
+            throw new UsernameAlreadyExistsException("Username already exists!");
+        }
+
         String hashedPassword = passwordEncoder.encode(dto.getPassword());
 
         UserEntity user = new UserEntity()

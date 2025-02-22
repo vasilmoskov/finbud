@@ -4,6 +4,9 @@ import {
   Button,
   Dialog,
   EmailField,
+  HorizontalLayout,
+  Icon,
+  Notification,
   PasswordField,
   TextField,
   VerticalLayout,
@@ -11,7 +14,7 @@ import {
 import RegisterUserDto from "Frontend/generated/com/example/application/dto/RegisterUserDto";
 import RegisterUserDtoModel from "Frontend/generated/com/example/application/dto/RegisterUserDtoModel";
 import { UserEndpoint } from "Frontend/generated/endpoints";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const config: ViewConfig = {
@@ -20,12 +23,19 @@ export const config: ViewConfig = {
 
 export default function RegisterView() {
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [notificationOpened, setNotificationOpened] = useState(false);
 
-  const { model, addValidator, field, submit, invalid, submitting, value } =
+  const { model, addValidator, field, submit, invalid, submitting } =
     useForm(RegisterUserDtoModel, {
       onSubmit: async (u) => {
-        await UserEndpoint.register(u);
-        navigate("/login");
+        try {
+          await UserEndpoint.register(u);
+          navigate("/login");
+        } catch (error) {
+            setErrorMessage("Username already exists. Please choose another one.");
+            setNotificationOpened(true);
+          }
       },
     });
 
@@ -48,6 +58,29 @@ export default function RegisterView() {
 
   return (
     <>
+          <Notification
+            theme="error"
+            duration={3000}
+            position="top-center"
+            opened={notificationOpened}
+            onOpenedChanged={(e) => {
+              setNotificationOpened(e.detail.value);
+            }}
+          >
+              <HorizontalLayout theme="spacing" style={{ alignItems: 'center' }}>
+          <div>{errorMessage}</div>
+          <Button
+            theme="tertiary-inline"
+            onClick={() => {
+              setNotificationOpened(false);
+            }}
+            aria-label="Close"
+          >
+            <Icon icon="lumo:cross" />
+          </Button>
+        </HorizontalLayout>
+      </Notification>
+
       <Dialog
         headerTitle='Register'
         opened
