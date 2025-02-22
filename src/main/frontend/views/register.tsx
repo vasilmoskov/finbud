@@ -3,7 +3,6 @@ import { useForm } from "@vaadin/hilla-react-form";
 import {
   Button,
   Dialog,
-  EmailField,
   HorizontalLayout,
   Icon,
   Notification,
@@ -86,7 +85,7 @@ export default function RegisterView() {
         opened
         footerRenderer={() => (
           <>
-            <Button onClick={() => navigateToLogin()}>Login</Button>
+            <Button onClick={() => navigateToLogin()}>Go to Login</Button>
             <Button theme="primary" onClick={submit} disabled={invalid || submitting}>
               Register
             </Button>
