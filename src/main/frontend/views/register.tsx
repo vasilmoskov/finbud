@@ -2,6 +2,7 @@ import { ViewConfig } from "@vaadin/hilla-file-router/types.js";
 import { useForm } from "@vaadin/hilla-react-form";
 import {
   Button,
+  Dialog,
   EmailField,
   PasswordField,
   TextField,
@@ -39,27 +40,38 @@ export default function RegisterView() {
         return [];
       },
     });
-  });
+  }, []);
+
+  const navigateToLogin = () => {
+    navigate("/login");
+  }
 
   return (
     <>
-      <VerticalLayout theme="spacing padding">
-        <TextField label="First Name" {...field(model.firstName)} />
-        <TextField label="Last Name" {...field(model.lastName)} />
-        <TextField label="Username" {...field(model.username)} />
-        <EmailField label="Email" {...field(model.email)} />
-        <PasswordField label="Password" {...field(model.password)} />
-        <PasswordField
-          label="Confirm Password"
-          {...field(model.confirmPassword)}
-        />
-
-        <Button 
-        disabled={invalid || submitting} 
-        onClick={submit}>
-          Register
-        </Button>
-      </VerticalLayout>
+      <Dialog
+        headerTitle='Register'
+        opened
+        footerRenderer={() => (
+          <>
+            <Button onClick={() => navigateToLogin()}>Login</Button>
+            <Button theme="primary" onClick={submit} disabled={invalid || submitting}>
+              Register
+            </Button>
+          </>
+        )}
+      >
+        <VerticalLayout style={{ alignItems: 'stretch', width: '18rem', maxWidth: '100%' }}>
+          <TextField label="First Name" {...field(model.firstName)} />
+          <TextField label="Last Name" {...field(model.lastName)} />
+          <TextField label="Username" {...field(model.username)} />
+          <EmailField label="Email" {...field(model.email)} />
+          <PasswordField label="Password" {...field(model.password)} />
+          <PasswordField
+            label="Confirm Password"
+            {...field(model.confirmPassword)}
+          />
+        </VerticalLayout>
+      </Dialog>
     </>
   );
 }
