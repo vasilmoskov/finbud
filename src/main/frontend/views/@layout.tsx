@@ -52,7 +52,10 @@ export default function MainLayout() {
               </Button>
             </>
           ) : (
-            <Link to="/login">Sign in</Link>
+              <>
+                  <Link to="/login">Sign in</Link>
+                  <Link to="/register">Sign up</Link>
+              </>
           )}
         </footer>
       </div>
