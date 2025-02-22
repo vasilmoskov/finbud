@@ -97,7 +97,6 @@ export default function RegisterView() {
           <TextField label="First Name" {...field(model.firstName)} />
           <TextField label="Last Name" {...field(model.lastName)} />
           <TextField label="Username" {...field(model.username)} />
-          <EmailField label="Email" {...field(model.email)} />
           <PasswordField label="Password" {...field(model.password)} />
           <PasswordField
             label="Confirm Password"

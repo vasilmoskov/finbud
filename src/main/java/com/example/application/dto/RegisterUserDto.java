@@ -15,10 +15,6 @@ public class RegisterUserDto {
     @UniqueUsername
     private String username;
 
-    @NotBlank(message = "Please enter an email.")
-    @Email(message = "Please enter a valid email.")
-    private String email;
-
     @NotBlank(message = "Please enter a password.")
     private String password;
 
@@ -51,15 +47,6 @@ public class RegisterUserDto {
 
     public RegisterUserDto setUsername(String username) {
         this.username = username;
-        return this;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public RegisterUserDto setEmail(String email) {
-        this.email = email;
         return this;
     }
 
