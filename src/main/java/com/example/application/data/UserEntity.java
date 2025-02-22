@@ -1,10 +1,6 @@
 package com.example.application.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Set;
@@ -17,13 +13,9 @@ public class UserEntity extends AbstractEntity<UserEntity> {
     private String name;
 
     @JsonIgnore
-    private String hashedPassword;
+    private String password;
 
-    @Enumerated(EnumType.STRING)
-    @ElementCollection(fetch = FetchType.EAGER)
     private Set<Role> roles;
-
-    private byte[] profilePicture;
 
     public String getUsername() {
         return username;
@@ -43,12 +35,12 @@ public class UserEntity extends AbstractEntity<UserEntity> {
         return this;
     }
 
-    public String getHashedPassword() {
-        return hashedPassword;
+    public String getPassword() {
+        return password;
     }
 
-    public UserEntity setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
+    public UserEntity setPassword(String password) {
+        this.password = password;
         return this;
     }
 
@@ -58,15 +50,6 @@ public class UserEntity extends AbstractEntity<UserEntity> {
 
     public UserEntity setRoles(Set<Role> roles) {
         this.roles = roles;
-        return this;
-    }
-
-    public byte[] getProfilePicture() {
-        return profilePicture;
-    }
-
-    public UserEntity setProfilePicture(byte[] profilePicture) {
-        this.profilePicture = profilePicture;
         return this;
     }
 }
