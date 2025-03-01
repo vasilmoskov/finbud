@@ -16,7 +16,7 @@ spring:
             mode: always
     data:
       mongodb:
-          uri: mongodb+srv://vasil:${MONGO_PASSWORD}@cluster0.qyyaovm.mongodb.net/
+          uri: ${MONGODB_URI}
           database: finbud
 vaadin:
     allowed-packages: com.vaadin,org.vaadin,com.example.application
