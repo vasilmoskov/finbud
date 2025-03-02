@@ -1,0 +1,121 @@
+package com.example.application.services;
+
+import com.example.application.data.*;
+import com.example.application.dto.TransactionDto;
+import com.example.application.exception.ResourceNotFoundException;
+import com.example.application.repository.DocumentRepository;
+import com.example.application.repository.IncomeRepository;
+import com.example.application.security.AuthenticatedUser;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+// @ExtendWith(MockitoExtension.class)
+class IncomeServiceImplTest {
+
+    @Mock
+    private IncomeRepository incomeRepository;
+
+    @Mock
+    private DocumentRepository documentRepository;
+
+    @Mock
+    private AuthenticatedUser authenticatedUser;
+
+    @InjectMocks
+    private IncomeServiceImpl incomeService;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void testGetAll() {
+        IncomeEntity incomeEntity = new IncomeEntity();
+        when(authenticatedUser.get()).thenReturn(Optional.of(new User()));
+        when(incomeRepository.findAllByUser(any(User.class))).thenReturn(List.of(incomeEntity));
+
+        List<TransactionDto> result = incomeService.getAll();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(incomeRepository, times(1)).findAllByUser(any(User.class));
+    }
+
+    @Test
+    void testAddIncome() {
+        when(authenticatedUser.get()).thenReturn(Optional.of(new User()));
+        when(incomeRepository.save(any(IncomeEntity.class))).thenReturn(new IncomeEntity());
+
+        TransactionDto result = incomeService.addIncome(BigDecimal.TEN, "USD", "Salary", "document", false);
+
+        assertNotNull(result);
+        verify(incomeRepository, times(1)).save(any(IncomeEntity.class));
+        verify(documentRepository, times(1)).save(any(DocumentEntity.class));
+    }
+
+    @Test
+    void testEditIncome() {
+        IncomeEntity incomeEntity = new IncomeEntity();
+        when(incomeRepository.findById(anyString())).thenReturn(Optional.of(incomeEntity));
+        when(incomeRepository.save(any(IncomeEntity.class))).thenReturn(incomeEntity);
+
+        TransactionDto result = incomeService.editIncome("1", BigDecimal.TEN, "USD", "Salary", "document", false);
+
+        assertNotNull(result);
+        verify(incomeRepository, times(1)).findById(anyString());
+        verify(incomeRepository, times(1)).save(any(IncomeEntity.class));
+        verify(documentRepository, times(1)).delete(any(DocumentEntity.class));
+        verify(documentRepository, times(1)).save(any(DocumentEntity.class));
+    }
+
+    @Test
+    void testDeleteIncome() {
+        doNothing().when(incomeRepository).deleteById(anyString());
+
+        incomeService.deleteIncome("1");
+
+        verify(incomeRepository, times(1)).deleteById(anyString());
+    }
+
+    @Test
+    void testDeleteIncomeDocument() {
+        IncomeEntity incomeEntity = new IncomeEntity();
+        DocumentEntity documentEntity = new DocumentEntity();
+        incomeEntity.setDocument(documentEntity);
+        when(incomeRepository.findById(anyString())).thenReturn(Optional.of(incomeEntity));
+        doNothing().when(documentRepository).deleteById(anyString());
+
+        incomeService.deleteIncomeDocument("1");
+
+        verify(incomeRepository, times(1)).findById(anyString());
+        verify(documentRepository, times(1)).deleteById(anyString());
+        verify(incomeRepository, times(1)).save(any(IncomeEntity.class));
+    }
+
+    @Test
+    void testGetAllIncomesByDatesBetween() {
+        IncomeEntity incomeEntity = new IncomeEntity();
+        when(authenticatedUser.get()).thenReturn(Optional.of(new User()));
+        when(incomeRepository.findAllByUserAndDateBetween(any(User.class), any(LocalDateTime.class), any(LocalDateTime.class)))
+                .thenReturn(List.of(incomeEntity));
+
+        List<TransactionDto> result = incomeService.getAllIncomesByDatesBetween("2023-01-01", "2023-12-31");
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(incomeRepository, times(1)).findAllByUserAndDateBetween(any(User.class), any(LocalDateTime.class), any(LocalDateTime.class));
+    }
+}
