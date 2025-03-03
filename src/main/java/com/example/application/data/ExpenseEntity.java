@@ -67,8 +67,9 @@ public class ExpenseEntity extends AbstractEntity<ExpenseEntity> {
         return document;
     }
 
-    public void setDocument(DocumentEntity document) {
+    public ExpenseEntity setDocument(DocumentEntity document) {
         this.document = document;
+        return this;
     }
 
     public boolean isUnusual() {
