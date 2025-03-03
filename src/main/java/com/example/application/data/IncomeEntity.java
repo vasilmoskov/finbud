@@ -68,8 +68,9 @@ public class IncomeEntity extends AbstractEntity<IncomeEntity> {
         return document;
     }
 
-    public void setDocument(DocumentEntity document) {
+    public IncomeEntity setDocument(DocumentEntity document) {
         this.document = document;
+        return this;
     }
 
     public boolean isUnusual() {
