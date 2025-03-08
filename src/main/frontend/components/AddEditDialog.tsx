@@ -66,6 +66,7 @@ export default function AddEditDialog({
         <VerticalLayout style={{alignItems: 'stretch', width: '18rem', maxWidth: '100%'}}>
             <TextField
                 label="Amount"
+                id="amount-input-field"
                 value={transaction?.amount ? transaction?.amount!.toFixed(2).toString() : ''}
                 onChange={e => onTransactionChange({...transaction, amount: Number(e.target.value)})}
                 required
