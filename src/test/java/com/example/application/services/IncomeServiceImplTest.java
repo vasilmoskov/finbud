@@ -141,7 +141,7 @@ class IncomeServiceImplTest {
 
     private UserEntity createUser() {
         return new UserEntity()
-                .setName("user")
+                .setFirstName("user")
                 .setUsername("user")
                 .setPassword("pass")
                 .setRoles(Set.of(Role.USER));

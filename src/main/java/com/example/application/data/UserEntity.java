@@ -10,7 +10,9 @@ public class UserEntity extends AbstractEntity<UserEntity> {
 
     private String username;
 
-    private String name;
+    private String firstName;
+
+    private String lastName;
 
     @JsonIgnore
     private String password;
@@ -26,12 +28,21 @@ public class UserEntity extends AbstractEntity<UserEntity> {
         return this;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public UserEntity setName(String name) {
-        this.name = name;
+    public UserEntity setFirstName(String firstName) {
+        this.firstName = firstName;
+        return this;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public UserEntity setLastName(String lastName) {
+        this.lastName = lastName;
         return this;
     }
 

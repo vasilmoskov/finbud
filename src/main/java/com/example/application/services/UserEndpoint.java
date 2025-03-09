@@ -43,7 +43,8 @@ public class UserEndpoint {
 
         UserEntity user = new UserEntity()
                 .setUsername(dto.getUsername())
-                .setName(dto.getFirstName())
+                .setFirstName(dto.getFirstName())
+                .setLastName(dto.getLastName())
                 .setPassword(hashedPassword)
                 .setRoles(Set.of(Role.USER));
 
