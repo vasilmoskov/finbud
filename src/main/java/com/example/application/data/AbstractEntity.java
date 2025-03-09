@@ -1,10 +1,7 @@
 package com.example.application.data;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Version;
 import org.springframework.data.mongodb.core.index.Indexed;
 
@@ -14,8 +11,6 @@ public abstract class AbstractEntity<T> {
     @Id
     @Indexed(unique = true)
     private String id;
-//    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "idgenerator")
-//    @SequenceGenerator(name = "idgenerator", initialValue = 1000)
 
     @Version
     private int version;

@@ -1,7 +1,6 @@
 package com.example.application.dto;
 
 import com.example.application.validation.UniqueUsername;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public class RegisterUserDto {
@@ -20,8 +19,6 @@ public class RegisterUserDto {
 
     @NotBlank(message = "Please enter a confirm password.")
     private String confirmPassword;
-
-    private String profilePicture;
 
     public String getFirstName() {
         return firstName;
@@ -65,15 +62,6 @@ public class RegisterUserDto {
 
     public RegisterUserDto setConfirmPassword(String confirmPassword) {
         this.confirmPassword = confirmPassword;
-        return this;
-    }
-
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public RegisterUserDto setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
         return this;
     }
 }
