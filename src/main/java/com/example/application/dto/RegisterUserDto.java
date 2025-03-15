@@ -1,6 +1,5 @@
 package com.example.application.dto;
 
-import com.example.application.validation.UniqueUsername;
 import jakarta.validation.constraints.NotBlank;
 
 public class RegisterUserDto {
@@ -11,7 +10,6 @@ public class RegisterUserDto {
     private String lastName;
 
     @NotBlank(message = "Please enter a username.")
-    @UniqueUsername
     private String username;
 
     @NotBlank(message = "Please enter a password.")
