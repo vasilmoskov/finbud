@@ -37,10 +37,13 @@ public class LoginPage {
     }
 
     public void navigateToRegister() {
+        Utils.getWait().until(ExpectedConditions.elementToBeClickable(navigateToRegisterButton));
         navigateToRegisterButton.click();
     }
 
     public void refreshPage() {
+        LOGGER.info("Refresh login page.");
+
         WebDriver driver = Utils.getDriver();
         driver.get("http://localhost:8080/login");
         PageFactory.initElements(driver, this);

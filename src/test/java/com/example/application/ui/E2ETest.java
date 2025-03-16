@@ -21,26 +21,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class E2ETest {
     private static final Logger LOGGER = LoggerFactory.getLogger(E2ETest.class);
 
-//    private ConfigurableApplicationContext context;
+    private ConfigurableApplicationContext context;
 
     @BeforeEach
     void setup() {
         Utils.initDriver();
 
-//        LOGGER.info("Starting application.");
-
-//        context = SpringApplication.run(Application.class);
-
-        LOGGER.info("Application is started.");
+        context = SpringApplication.run(Application.class);
     }
 
     @AfterEach
     void tearDown() {
         Utils.closeDriver();
-//
-//        if (context != null) {
-//            context.close();
-//        }
+
+        if (context != null) {
+            context.close();
+        }
     }
 
     @Test

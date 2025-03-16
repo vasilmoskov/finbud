@@ -43,9 +43,6 @@ public class RegisterPage {
     }
 
     public void register(String firstName, String lastName, String username, String password, String confirmPassword) {
-        LOGGER.info(Utils.getDriver().getPageSource());
-        Utils.getWait().until(ExpectedConditions.visibilityOf(registerButton));
-
         Utils.getWait().until(ExpectedConditions.elementToBeClickable(registerButton));
 
         LOGGER.info("Perform register.");
