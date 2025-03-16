@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.time.Duration;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,10 +28,12 @@ class E2ETest {
     void setup() {
         Utils.initDriver();
 
+        LOGGER.info("Starting application.");
+
         context = SpringApplication.run(Application.class);
 
         try {
-            Thread.sleep(20000);
+            Thread.sleep(120000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

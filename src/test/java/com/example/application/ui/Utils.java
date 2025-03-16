@@ -53,13 +53,13 @@ public class Utils {
         driver = new ChromeDriver(options);
 
         driver.manage().window().maximize();
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(60));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(60));
     }
 
     public static WebDriverWait getWait() {
         if (wait == null) {
-            wait = new WebDriverWait(getDriver(), Duration.of(120, ChronoUnit.SECONDS));
+            wait = new WebDriverWait(getDriver(), Duration.of(60, ChronoUnit.SECONDS));
         }
 
         return wait;
