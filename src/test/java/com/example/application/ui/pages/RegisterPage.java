@@ -33,12 +33,9 @@ public class RegisterPage {
     @FindBy(xpath = "//*[@id=\"overlay\"]/div/vaadin-button[2]")
     private WebElement registerButton;
 
-    public RegisterPage(boolean isPageLoaded) {
+    public RegisterPage() {
         WebDriver driver = Utils.getDriver();
-
-        if (!isPageLoaded) {
-            driver.get("http://localhost:8080/register");
-        }
+        driver.get("http://localhost:8080/register");
 
         LOGGER.info("Initializing web elements for register page.");
 
@@ -46,6 +43,9 @@ public class RegisterPage {
     }
 
     public void register(String firstName, String lastName, String username, String password, String confirmPassword) {
+        LOGGER.info(Utils.getDriver().getPageSource());
+        Utils.getWait().until(ExpectedConditions.visibilityOf(registerButton));
+
         Utils.getWait().until(ExpectedConditions.elementToBeClickable(registerButton));
 
         LOGGER.info("Perform register.");

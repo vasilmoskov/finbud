@@ -24,12 +24,25 @@ public class LoginPage {
     @FindBy(xpath = "//*[@id=\"vaadinLoginFormWrapper\"]/vaadin-button[1]")
     private WebElement loginButton;
 
+    @FindBy(xpath = "//*[@id=\"vaadinLoginFormWrapper\"]/p/a")
+    private WebElement navigateToRegisterButton;
+
     public LoginPage() {
         WebDriver driver = Utils.getDriver();
         driver.get("http://localhost:8080/login");
 
         LOGGER.info("Initializing web elements for login page.");
 
+        PageFactory.initElements(driver, this);
+    }
+
+    public void navigateToRegister() {
+        navigateToRegisterButton.click();
+    }
+
+    public void refreshPage() {
+        WebDriver driver = Utils.getDriver();
+        driver.get("http://localhost:8080/login");
         PageFactory.initElements(driver, this);
     }
 

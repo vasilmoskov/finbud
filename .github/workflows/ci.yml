@@ -47,8 +47,31 @@ jobs:
     - name: Set up ChromeDriver
       uses: nanasess/setup-chromedriver@v2
 
-    - name: Run tests
+    # - name: Run Application in Background
+    #   run: mvn spring-boot:run &
+
+    # - name: Wait for Application to be Up
+    #   run: |
+    #     for i in {1..60}; do
+    #       curl -s http://localhost:8080/register && break
+    #       echo "Waiting for app to start..."
+    #       sleep 2
+    #     done
+
+    - name: Run Application
+      run: mvn spring-boot:run &
       env:
         MONGODB_URI: ${{ secrets.MONGODB_URI }}
+
+    - name: Wait for Application to be Up
+      run: |
+        for i in {1..120}; do
+          curl -s http://localhost:8080/register && break
+          echo "Waiting for app to start..."
+          sleep 2
+        done
+
+    - name: Run tests
+      env:
         WEBDRIVER_PATH: /usr/local/bin/chromedriver
       run: mvn test

@@ -45,6 +45,7 @@ public class Utils {
 
             options.addArguments("--no-sandbox");
             options.addArguments("--headless");
+            options.addArguments("--window-size=1920,1080");
             options.addArguments("--disable-gpu");
             options.addArguments("--disable-dev-shm-usage");
             options.addArguments("--user-data-dir=/tmp/chrome-user-data");

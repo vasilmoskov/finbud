@@ -21,15 +21,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class E2ETest {
     private static final Logger LOGGER = LoggerFactory.getLogger(E2ETest.class);
 
-    private ConfigurableApplicationContext context;
+//    private ConfigurableApplicationContext context;
 
     @BeforeEach
     void setup() {
         Utils.initDriver();
 
-        LOGGER.info("Starting application.");
+//        LOGGER.info("Starting application.");
 
-        context = SpringApplication.run(Application.class);
+//        context = SpringApplication.run(Application.class);
 
         LOGGER.info("Application is started.");
     }
@@ -37,25 +37,29 @@ class E2ETest {
     @AfterEach
     void tearDown() {
         Utils.closeDriver();
-
-        if (context != null) {
-            context.close();
-        }
+//
+//        if (context != null) {
+//            context.close();
+//        }
     }
 
     @Test
     void testApp() {
-        LOGGER.info("Step 1: Register");
+        LOGGER.info("Step 0: Navigate to register");
 
-        RegisterPage registerPage = new RegisterPage(false);
+        LoginPage loginPage = new LoginPage();
+        loginPage.navigateToRegister();
+
+        LOGGER.info("Step 1: Register");
+        RegisterPage registerPage = new RegisterPage();
 
         String username = generateUsername();
 
         registerPage.register(username, username, username, "test", "test");
 
+        loginPage.refreshPage();
         LOGGER.info("Step 2: Login");
 
-        LoginPage loginPage = new LoginPage();
         loginPage.login(username, "test");
 
         Sidebar sidebar = new Sidebar();
