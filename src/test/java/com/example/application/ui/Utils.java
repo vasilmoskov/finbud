@@ -52,13 +52,14 @@ public class Utils {
             options.addArguments("--window-size=1920x1080"); // Headless mode sometimes doesn't have a viewport
             options.addArguments("--disable-extensions");
             options.addArguments("--disable-infobars");
+            options.addArguments("--disable-features=NetworkService,OutOfBlinkCors");
         }
 
         driver = new ChromeDriver(options);
 
         driver.manage().window().maximize();
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(120));
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(120));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
     }
 
     public static WebDriverWait getWait() {
