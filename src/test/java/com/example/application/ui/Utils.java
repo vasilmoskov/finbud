@@ -48,11 +48,6 @@ public class Utils {
             options.addArguments("--disable-dev-shm-usage");
             options.addArguments("--user-data-dir=/tmp/chrome-user-data");
             options.addArguments("--remote-allow-origins=*");
-            options.addArguments("--disable-gpu"); // For better stability on Linux
-            options.addArguments("--window-size=1920x1080"); // Headless mode sometimes doesn't have a viewport
-            options.addArguments("--disable-extensions");
-            options.addArguments("--disable-infobars");
-            options.addArguments("--disable-features=NetworkService,OutOfBlinkCors");
         }
 
         driver = new ChromeDriver(options);

@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import java.time.Duration;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

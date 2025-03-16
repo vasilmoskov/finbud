@@ -46,6 +46,8 @@ public class RegisterPage {
     }
 
     public void register(String firstName, String lastName, String username, String password, String confirmPassword) {
+        Utils.getWait().until(ExpectedConditions.elementToBeClickable(registerButton));
+
         LOGGER.info("Perform register.");
 
         firstNameField.sendKeys(firstName);
