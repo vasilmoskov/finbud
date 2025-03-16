@@ -44,7 +44,7 @@ public class Utils {
             LOGGER.info("Setting Options for Linux Execution");
 
             options.addArguments("--no-sandbox");
-            options.addArguments("--headless=new");
+//            options.addArguments("--headless=new");
             options.addArguments("--disable-dev-shm-usage");
             options.addArguments("--user-data-dir=/tmp/chrome-user-data");
             options.addArguments("--remote-allow-origins=*");
