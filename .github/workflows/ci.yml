@@ -38,6 +38,11 @@ jobs:
       with:
         distribution: 'zulu'
         java-version: '17'
+        
+    - name: Install Chrome
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
 
     - name: Set up ChromeDriver
       uses: nanasess/setup-chromedriver@v2

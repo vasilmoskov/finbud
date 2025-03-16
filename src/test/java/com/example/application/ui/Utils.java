@@ -7,8 +7,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
@@ -42,13 +40,14 @@ public class Utils {
 
         LOGGER.info("Operating System: {}", osName);
 
-        if (osName.contains("linux")) {
-            try {
-                Path tempDir = Files.createTempDirectory("chrome-user-data");
-                options.addArguments("--user-data-dir=" + tempDir.toString());
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to create temporary user data directory", e);
-            }
+        if (osName.equals("linux")) {
+            LOGGER.info("Setting Options for Linux Execution");
+
+            options.addArguments("--no-sandbox");
+            options.addArguments("--headless");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--user-data-dir=/tmp/chrome-user-data");
+            options.addArguments("--remote-allow-origins=*");
         }
 
         driver = new ChromeDriver(options);
