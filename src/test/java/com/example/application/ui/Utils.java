@@ -48,18 +48,22 @@ public class Utils {
             options.addArguments("--disable-dev-shm-usage");
             options.addArguments("--user-data-dir=/tmp/chrome-user-data");
             options.addArguments("--remote-allow-origins=*");
+            options.addArguments("--disable-gpu"); // For better stability on Linux
+            options.addArguments("--window-size=1920x1080"); // Headless mode sometimes doesn't have a viewport
+            options.addArguments("--disable-extensions");
+            options.addArguments("--disable-infobars");
         }
 
         driver = new ChromeDriver(options);
 
         driver.manage().window().maximize();
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(60));
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(60));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(120));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(120));
     }
 
     public static WebDriverWait getWait() {
         if (wait == null) {
-            wait = new WebDriverWait(getDriver(), Duration.of(60, ChronoUnit.SECONDS));
+            wait = new WebDriverWait(getDriver(), Duration.of(120, ChronoUnit.SECONDS));
         }
 
         return wait;
