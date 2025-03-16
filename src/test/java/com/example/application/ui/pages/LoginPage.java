@@ -6,8 +6,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LoginPage {
+    private static final Logger LOGGER = LoggerFactory.getLogger(LoginPage.class);
 
     @FindBy(xpath = "//*[@id=\"vaadinLoginFormWrapper\"]//section/h2")
     private WebElement loginHeader;
@@ -24,10 +27,15 @@ public class LoginPage {
     public LoginPage() {
         WebDriver driver = Utils.getDriver();
         driver.get("http://localhost:8080/login");
+
+        LOGGER.info("Initializing web elements for login page.");
+
         PageFactory.initElements(driver, this);
     }
 
     public void login(String username, String password) {
+        LOGGER.info("Perform login.");
+
         Utils.getWait().until(ExpectedConditions.elementToBeClickable(loginButton));
 
         usernameInputField.sendKeys(username);

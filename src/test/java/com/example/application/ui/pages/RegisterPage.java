@@ -6,8 +6,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RegisterPage {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RegisterPage.class);
+
     @FindBy(xpath = "//*[@id=\"overlay\"]/h2")
     private WebElement pageHeader;
 
@@ -36,10 +40,14 @@ public class RegisterPage {
             driver.get("http://localhost:8080/register");
         }
 
+        LOGGER.info("Initializing web elements for register page.");
+
         PageFactory.initElements(driver, this);
     }
 
     public void register(String firstName, String lastName, String username, String password, String confirmPassword) {
+        LOGGER.info("Perform register.");
+
         Utils.getWait().until(ExpectedConditions.elementToBeClickable(registerButton));
 
         firstNameField.sendKeys(firstName);

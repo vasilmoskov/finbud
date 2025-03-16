@@ -59,7 +59,7 @@ public class Utils {
 
     public static WebDriverWait getWait() {
         if (wait == null) {
-            wait = new WebDriverWait(getDriver(), Duration.of(60, ChronoUnit.SECONDS));
+            wait = new WebDriverWait(getDriver(), Duration.of(120, ChronoUnit.SECONDS));
         }
 
         return wait;

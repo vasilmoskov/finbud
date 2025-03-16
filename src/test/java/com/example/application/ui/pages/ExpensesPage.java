@@ -6,8 +6,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExpensesPage {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExpensesPage.class);
+
     @FindBy(xpath = "//*[@id=\"outlet\"]/vaadin-app-layout/h1")
     private WebElement pageHeader;
 
@@ -81,6 +85,8 @@ public class ExpensesPage {
             driver.get("http://localhost:8080/expense");
         }
 
+        LOGGER.info("Initializing web elements for expenses page.");
+
         PageFactory.initElements(driver, this);
     }
 
@@ -90,9 +96,14 @@ public class ExpensesPage {
     }
 
     public void addExpense(String amount, String currency, String category) {
+        LOGGER.info("Perform add expense.");
+
         Utils.getWait().until(ExpectedConditions.elementToBeClickable(addExpenseButton));
 
+        LOGGER.info("Click add expense button.");
         addExpenseButton.click();
+
+        LOGGER.info("Set amount.");
         amountField.sendKeys(amount);
 
         selectCurrency(currency);
@@ -102,6 +113,8 @@ public class ExpensesPage {
     }
 
     private void selectCurrency(String currency) {
+        LOGGER.info("Select currency.");
+
         Utils.getWait().until(ExpectedConditions.elementToBeClickable(currencyDropDownButton));
 
         currencyDropDownButton.click();
@@ -126,6 +139,8 @@ public class ExpensesPage {
     }
 
     private void selectCategory(String category) {
+        LOGGER.info("Select category.");
+
         Utils.getWait().until(ExpectedConditions.elementToBeClickable(categoryDropDownButton));
 
         categoryDropDownButton.click();
@@ -149,6 +164,8 @@ public class ExpensesPage {
     }
 
     private void clickSubmitButton() {
+        LOGGER.info("Click submit button.");
+
         Utils.getWait().until(ExpectedConditions.elementToBeClickable(dialogAddButton));
         dialogAddButton.click();
     }

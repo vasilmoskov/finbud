@@ -6,8 +6,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IncomesPage {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IncomesPage.class);
+
     @FindBy(xpath = "//*[@id=\"outlet\"]/vaadin-app-layout/h1")
     private WebElement pageHeader;
 
@@ -81,9 +85,10 @@ public class IncomesPage {
             driver.get("http://localhost:8080/income");
         }
 
+        LOGGER.info("Initializing web elements for incomes page.");
+
         PageFactory.initElements(driver, this);
     }
-
 
     public String getHeaderText() {
         Utils.getWait().until(ExpectedConditions.visibilityOf(pageHeader));
@@ -91,9 +96,14 @@ public class IncomesPage {
     }
 
     public void addIncome(String amount, String currency, String category) {
+        LOGGER.info("Perform add income.");
+
         Utils.getWait().until(ExpectedConditions.elementToBeClickable(addIncomeButton));
 
+        LOGGER.info("Click add income button.");
         addIncomeButton.click();
+
+        LOGGER.info("Set amount.");
         amountField.sendKeys(amount);
 
         selectCurrency(currency);
@@ -103,6 +113,8 @@ public class IncomesPage {
     }
 
     private void selectCurrency(String currency) {
+        LOGGER.info("Select currency.");
+
         Utils.getWait().until(ExpectedConditions.elementToBeClickable(currencyDropDownButton));
 
         currencyDropDownButton.click();
@@ -127,6 +139,8 @@ public class IncomesPage {
     }
 
     private void selectCategory(String category) {
+        LOGGER.info("Select category.");
+
         Utils.getWait().until(ExpectedConditions.elementToBeClickable(categoryDropDownButton));
 
         categoryDropDownButton.click();
@@ -150,6 +164,8 @@ public class IncomesPage {
     }
 
     private void clickSubmitButton() {
+        LOGGER.info("Click submit button.");
+
         Utils.getWait().until(ExpectedConditions.elementToBeClickable(dialogAddButton));
         dialogAddButton.click();
     }
