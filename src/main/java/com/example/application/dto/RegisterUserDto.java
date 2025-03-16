@@ -3,10 +3,8 @@ package com.example.application.dto;
 import jakarta.validation.constraints.NotBlank;
 
 public class RegisterUserDto {
-    @NotBlank(message = "Please enter a first name.")
     private String firstName;
 
-    @NotBlank(message = "Please enter a last name.")
     private String lastName;
 
     @NotBlank(message = "Please enter a username.")
