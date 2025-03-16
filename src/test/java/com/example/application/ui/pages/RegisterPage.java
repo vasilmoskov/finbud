@@ -43,6 +43,8 @@ public class RegisterPage {
         LOGGER.info("Initializing web elements for register page.");
 
         PageFactory.initElements(driver, this);
+
+        Utils.getWait().until(ExpectedConditions.visibilityOf(pageHeader));
     }
 
     public void register(String firstName, String lastName, String username, String password, String confirmPassword) {
