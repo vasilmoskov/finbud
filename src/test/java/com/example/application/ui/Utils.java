@@ -23,7 +23,7 @@ public class Utils {
     }
 
     public static void initDriver() {
-        String driverPath = System.getProperty("WEBDRIVER_PATH");
+        String driverPath = System.getenv("WEBDRIVER_PATH");
 
         System.setProperty("webdriver.chrome.driver", driverPath);
 
