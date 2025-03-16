@@ -29,6 +29,12 @@ class E2ETest {
 
         context = SpringApplication.run(Application.class);
 
+        try {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         LOGGER.info("Application is started.");
     }
 
