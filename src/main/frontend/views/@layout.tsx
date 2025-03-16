@@ -42,6 +42,7 @@ export default function MainLayout() {
         <footer className="flex flex-col gap-s">
           {state.user ? (
             <>
+              <p className="text-sm">Hi, {state.user.username}! 👋</p>
               <Button
                 onClick={async () => {
                   await logout();
