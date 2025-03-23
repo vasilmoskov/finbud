@@ -1,7 +1,6 @@
 import { createMenuItems, useViewConfig } from '@vaadin/hilla-file-router/runtime.js';
 import { effect, signal } from '@vaadin/hilla-react-signals';
 import { AppLayout, DrawerToggle, Icon, SideNav, SideNavItem } from '@vaadin/react-components';
-import { Avatar } from '@vaadin/react-components/Avatar.js';
 import { Button } from '@vaadin/react-components/Button.js';
 import { useAuth } from 'Frontend/util/auth.js';
 import { Suspense, useEffect } from 'react';
@@ -11,7 +10,6 @@ const defaultTitle = document.title;
 const documentTitleSignal = signal('');
 effect(() => (document.title = documentTitleSignal.value));
 
-// Publish for Vaadin to use
 (window as any).Vaadin.documentTitleSignal = documentTitleSignal;
 
 export default function MainLayout() {
