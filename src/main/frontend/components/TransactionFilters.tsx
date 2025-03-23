@@ -1,4 +1,4 @@
-import { Button, DatePicker, DatePickerElement, Icon, Select, TextField } from "@vaadin/react-components";
+import { Button, DatePicker, DatePickerElement, Select, TextField } from "@vaadin/react-components";
 import { formatDateForDatePicker, parseDateForDatePicker } from "Frontend/util/transactionUtils";
 import { useEffect, useRef, useState } from "react";
 import { amountFilterOptions, incomeCategoryFilteringOptions, currencyFilteringOptions, usualityFilteringOptions, expenseCategoryFilteringOptions } from "Frontend/constants/constants";
@@ -93,7 +93,8 @@ export default function TransactionFilters({
                 style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
             >
                 {filtersVisible ? 'Hide Filters' : 'Show Filters'}
-                <Icon icon={`vaadin:${filtersVisible ? 'angle-down' : 'angle-right'}`}/>
+                <i className={`fa-solid ${filtersVisible ? 'fa-chevron-down' : 'fa-chevron-right'}`} 
+                    style={{ marginLeft: '0.5rem' }}></i>
             </Button>
 
             <Button 

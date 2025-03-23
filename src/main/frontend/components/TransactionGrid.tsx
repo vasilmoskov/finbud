@@ -1,4 +1,4 @@
-import { Grid, GridColumn, Icon } from "@vaadin/react-components";
+import { Grid, GridColumn } from "@vaadin/react-components";
 import TransactionButtonRenderer from "./TransactionButtonRenderer";
 import { useState } from "react";
 import { Signal } from "@vaadin/hilla-react-signals";
@@ -132,7 +132,7 @@ export default function TransactionGrid({
                 return 0;
             })
             } ref={gridRef}>
-                <GridColumn header={<div onClick={() => handleSort('amount')}>Amount <Icon icon="vaadin:sort"/></div>} autoWidth>
+                <GridColumn header={<div onClick={() => handleSort('amount')}>Amount <i className="fa-solid fa-sort" style={{ marginLeft: '0.5rem' }}></i></div>} autoWidth>
                     {({item}) => (
                         <div>
                             <span
@@ -143,8 +143,8 @@ export default function TransactionGrid({
                                 {Number(item.amount).toFixed(2)}
                             </span>
                             {item.unusual && 
-                                <Icon 
-                                    icon="vaadin:star" 
+                                <i 
+                                    className="fa-solid fa-star" 
                                     style={{marginLeft: '0.5rem', fontSize: '0.8rem', color: 'gold'}}
                                     title="This transaction is unusual"
                                 />
@@ -153,15 +153,15 @@ export default function TransactionGrid({
                     )}
                 </GridColumn>
 
-                <GridColumn header={<div onClick={() => handleSort('currency')}>Currency <Icon icon="vaadin:sort"/></div>} autoWidth>
+                <GridColumn header={<div onClick={() => handleSort('currency')}>Currency <i className="fa-solid fa-sort" style={{ marginLeft: '0.5rem' }}></i></div>} autoWidth>
                     {({item}) => item.currency}
                 </GridColumn>
 
-                <GridColumn header={<div onClick={() => handleSort('category')}>Category <Icon icon="vaadin:sort"/></div>} autoWidth>
+                <GridColumn header={<div onClick={() => handleSort('category')}>Category <i className="fa-solid fa-sort" style={{ marginLeft: '0.5rem' }}></i></div>} autoWidth>
                     {({item}) => item.category}
                 </GridColumn>
 
-                <GridColumn header={<div onClick={() => handleSort('date')}>Date <Icon icon="vaadin:sort"/></div>} autoWidth>
+                <GridColumn header={<div onClick={() => handleSort('date')}>Date <i className="fa-solid fa-sort" style={{ marginLeft: '0.5rem' }}></i></div>} autoWidth>
                     {({item}) => item.date}
                 </GridColumn>
 

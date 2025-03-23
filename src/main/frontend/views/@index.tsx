@@ -6,7 +6,7 @@ import { useState } from 'react';
 import TransactionDto from 'Frontend/generated/com/example/application/dto/TransactionDto';
 
 export const config: ViewConfig = {
-  menu: { order: 0, icon: 'vaadin:pie-chart' },
+  menu: { order: 0, icon: 'fa-solid fa-chart-pie' },
   title: 'Charts',
   loginRequired: true,
 };

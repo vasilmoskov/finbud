@@ -1,4 +1,3 @@
-import { Icon } from "@vaadin/react-components";
 import {ViewConfig} from "@vaadin/hilla-file-router/types.js";
 import {Button} from "@vaadin/react-components/Button.js";
 import ConfirmDeleteDialog from "Frontend/components/ConfirmDeleteDialog";
@@ -8,7 +7,7 @@ import TransactionGrid from "Frontend/components/TransactionGrid";
 import { useIncome } from "Frontend/hooks/useIncome";
 
 export const config: ViewConfig = {
-    menu: {order: 1, icon: 'vaadin:plus-circle-o'},
+    menu: {order: 1, icon: 'fa-solid fa-circle-plus'},
     title: 'Incomes',
     loginRequired: true,
 };
@@ -68,7 +67,7 @@ export default function IncomeView() {
                 style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
             >
                 Add Income
-                <Icon icon="vaadin:plus-circle-o"/>
+                <i className="fa-solid fa-circle-plus" style={{ marginLeft: '0.5rem' }}></i>
             </Button>
 
             <TransactionFilters

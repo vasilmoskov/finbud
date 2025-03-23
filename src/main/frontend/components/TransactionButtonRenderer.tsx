@@ -1,4 +1,4 @@
-import { Button, Icon } from "@vaadin/react-components";
+import { Button } from "@vaadin/react-components";
 import TransactionDto from "Frontend/generated/com/example/application/dto/TransactionDto";
 
 interface Props {
@@ -13,18 +13,18 @@ export default function TransactionButtonRenderer({ transaction, onEdit, onDelet
   return (
     <div>
       <Button title='Edit' theme="icon" onClick={() => onEdit(transaction)}>
-        <Icon icon="vaadin:edit" />
+        <i className="fa-solid fa-pen" style={{ marginLeft: '0.5rem' }}></i>
       </Button>
       <Button title='Delete' theme="icon" onClick={() => onDelete(transaction)}>
-        <Icon icon="vaadin:trash" />
+        <i className="fa-solid fa-trash" style={{ marginLeft: '0.5rem' }}></i>
       </Button>
       {transaction.document && (
         <>
           <Button title='View Document' theme="icon" onClick={() => visualizeDocument(transaction.document?.content!)}>
-            <Icon icon="vaadin:file-text-o" />
+            <i className="fa-solid fa-file-pdf" style={{ marginLeft: '0.5rem' }}></i>
           </Button>
           <Button title='Remove Document' theme="icon" onClick={() => onRemoveDocument(transaction)}>
-            <Icon icon="vaadin:file-remove" />
+            <i className="fa-solid fa-file-circle-xmark" style={{ marginLeft: '0.5rem' }}></i>
           </Button>
         </>
       )}

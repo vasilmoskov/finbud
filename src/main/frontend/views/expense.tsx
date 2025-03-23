@@ -1,5 +1,5 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
-import { Button, Icon } from '@vaadin/react-components';
+import { Button } from '@vaadin/react-components';
 import AddEditDialog from 'Frontend/components/AddEditDialog';
 import ConfirmDeleteDialog from 'Frontend/components/ConfirmDeleteDialog';
 import TransactionFilters from 'Frontend/components/TransactionFilters';
@@ -7,7 +7,7 @@ import TransactionGrid from 'Frontend/components/TransactionGrid';
 import { useExpense } from 'Frontend/hooks/useExpense';
 
 export const config: ViewConfig = {
-  menu: { order: 2, icon: 'vaadin:minus-circle-o' },
+  menu: { order: 2, icon: 'fa-solid fa-circle-minus' },
   title: 'Expenses',
   loginRequired: true,
 };
@@ -67,7 +67,7 @@ export default function ExpenseView() {
                 style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
             >
                 Add Expense
-                <Icon icon="vaadin:minus-circle-o"/>
+                <i className="fa-solid fa-circle-minus" style={{ marginLeft: '0.5rem' }}></i>
             </Button>
 
             <TransactionFilters

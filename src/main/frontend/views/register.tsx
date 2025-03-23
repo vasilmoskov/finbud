@@ -4,7 +4,6 @@ import {
   Button,
   Dialog,
   HorizontalLayout,
-  Icon,
   Notification,
   PasswordField,
   TextField,
@@ -75,7 +74,7 @@ export default function RegisterView() {
             }}
             aria-label="Close"
           >
-            <Icon icon="lumo:cross" />
+            <i className="fa-solid fa-xmark" style={{ marginLeft: '0.5rem' }}></i>
           </Button>
         </HorizontalLayout>
       </Notification>
