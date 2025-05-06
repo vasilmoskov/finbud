@@ -44,14 +44,11 @@ export default function TransactionFilters({
     setSelectedByUsuality
 } : Proprs) {
 
-    let buttonTheme;
     let categoryFilteringOptions;
 
     if(transactionType === 'income') {
-        buttonTheme = 'success';
         categoryFilteringOptions = incomeCategoryFilteringOptions;
     } else {
-        buttonTheme = 'error';
         categoryFilteringOptions = expenseCategoryFilteringOptions;
     }
 
@@ -88,7 +85,7 @@ export default function TransactionFilters({
     return (
         <>
         <Button 
-                theme={buttonTheme}
+                theme='contrast'
                 onClick={() => setFiltersVisible(!filtersVisible)} 
                 style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
             >
@@ -98,7 +95,7 @@ export default function TransactionFilters({
             </Button>
 
             <Button 
-                theme={buttonTheme}
+                theme='contrast'
                 disabled={areFiltersDefault()} 
                 onClick={() => clearFilters()} 
                 style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}

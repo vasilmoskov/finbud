@@ -62,12 +62,12 @@ export default function ExpenseView() {
     return (
         <>
             <Button
-                theme={buttonTheme}
+                theme='contrast'
                 onClick={() => handleAddDialogOpenedChanged(true)}
                 style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
             >
                 Add Expense
-                <i className="fa-solid fa-circle-minus" style={{ marginLeft: '0.5rem' }}></i>
+                <i className="fa-solid fa-sack-xmark" style={{ marginLeft: '0.5rem' }}></i>
             </Button>
 
             <TransactionFilters

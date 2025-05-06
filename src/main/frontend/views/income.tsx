@@ -62,12 +62,12 @@ export default function IncomeView() {
     return (
         <>
             <Button
-                theme={buttonTheme}
+                theme='contrast'
                 onClick={() => handleAddDialogOpenedChanged(true)}
                 style={{marginLeft: '1rem', marginTop: '1rem', marginBottom: '1rem'}}
             >
                 Add Income
-                <i className="fa-solid fa-circle-plus" style={{ marginLeft: '0.5rem' }}></i>
+                <i className="fa-solid fa-sack-dollar" style={{ marginLeft: '0.5rem' }}></i>
             </Button>
 
             <TransactionFilters
