@@ -79,3 +79,8 @@ export const usualityFilteringOptions : SelectItem[] = [
     { label: 'Unusual', value: 'unusual' }
 ];
 
+export const STORAGE_KEYS = {
+    START_DATE: 'chartStartDate',
+    END_DATE: 'chartEndDate',
+    CURRENCY: 'chartCurrency'
+};

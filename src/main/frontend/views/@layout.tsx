@@ -2,6 +2,7 @@ import { createMenuItems, useViewConfig } from '@vaadin/hilla-file-router/runtim
 import { effect, signal } from '@vaadin/hilla-react-signals';
 import { AppLayout, DrawerToggle, Icon, SideNav, SideNavItem } from '@vaadin/react-components';
 import { Button } from '@vaadin/react-components/Button.js';
+import { STORAGE_KEYS } from 'Frontend/constants/constants';
 import { useAuth } from 'Frontend/util/auth.js';
 import { Suspense, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -23,6 +24,15 @@ export default function MainLayout() {
 
   const { state, logout } = useAuth();
 
+  const handleLogout = async () => {
+    localStorage.removeItem(STORAGE_KEYS.START_DATE);
+    localStorage.removeItem(STORAGE_KEYS.END_DATE);
+    localStorage.removeItem(STORAGE_KEYS.CURRENCY);
+    
+    await logout();
+    document.location.reload();
+  };
+
   return (
     <AppLayout primarySection="drawer">
       <div slot="drawer" className="flex flex-col justify-between h-full p-m">
@@ -41,12 +51,7 @@ export default function MainLayout() {
           {state.user ? (
             <>
               <p className="text-sm">Hi, {state.user.username}! 👋</p>
-              <Button
-                onClick={async () => {
-                  await logout();
-                  document.location.reload();
-                }}
-              >
+              <Button onClick={handleLogout}>
                 Sign out
               </Button>
             </>

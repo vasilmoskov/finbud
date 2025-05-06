@@ -4,7 +4,7 @@ import {
   DatePickerElement,
   Select,
 } from "@vaadin/react-components";
-import { currencyOptions } from "Frontend/constants/constants";
+import { currencyOptions, STORAGE_KEYS } from "Frontend/constants/constants";
 import { useExpense } from "Frontend/hooks/useExpense";
 import { useIncome } from "Frontend/hooks/useIncome";
 import {
@@ -14,7 +14,7 @@ import {
 } from "Frontend/util/transactionUtils";
 import { useEffect, useRef } from "react";
 import { useSignal } from "@vaadin/hilla-react-signals";
-import { format } from "date-fns";
+import { format, startOfMonth, parse, isValid } from "date-fns";
 import TransactionDto from "Frontend/generated/com/example/application/dto/TransactionDto";
 
 interface Props {
@@ -42,8 +42,27 @@ export default function ChooserForTransactionCharts({
   setTotalExpensesByCategory,
   setTotalIncomesByCategory,
 }: Props) {
-  const startDate = useSignal(format(new Date(), "dd/MM/yyyy"));
-  const endDate = useSignal(format(new Date(), "dd/MM/yyyy"));
+  const getInitialDates = () => {
+    const savedStartDate = localStorage.getItem(STORAGE_KEYS.START_DATE);
+    const savedEndDate = localStorage.getItem(STORAGE_KEYS.END_DATE);
+    
+    if (savedStartDate && savedEndDate) {
+      return {
+        start: savedStartDate,
+        end: savedEndDate
+      };
+    }
+    
+    const today = new Date();
+    return {
+      start: format(startOfMonth(today), "yyyy-MM-dd"),
+      end: format(today, "yyyy-MM-dd")
+    };
+  };
+
+  const initialDates = getInitialDates();
+  const startDate = useSignal(initialDates.start);
+  const endDate = useSignal(initialDates.end);
 
   const startDatePickerRef = useRef<DatePickerElement>(null);
   const endDatePickerRef = useRef<DatePickerElement>(null);
@@ -51,29 +70,66 @@ export default function ChooserForTransactionCharts({
   const { fetchTransactionsByDates: fetchExpensesByDates } = useExpense();
   const { fetchTransactionsByDates: fetchIncomesByDates } = useIncome();
 
+  const fetchData = async (start: string, end: string) => {
+    try {
+      let startDateObj, endDateObj;
+
+      try {
+        startDateObj = parse(start, "yyyy-MM-dd", new Date());
+        endDateObj = parse(end, "yyyy-MM-dd", new Date());
+      } catch (parseError) {
+        return;
+      }
+
+      if (!isValid(startDateObj) || !isValid(endDateObj)) {
+        return;
+      }
+
+      const formattedStartDate = format(startDateObj, "yyyy-MM-dd");
+      const formattedEndDate = format(endDateObj, "yyyy-MM-dd");
+
+      const expenses = await fetchExpensesByDates(formattedStartDate, formattedEndDate);
+      setExpensesByDates(expenses);
+
+      const accumulatedExpenses = accumulateTransactionsByCategory(
+        expenses,
+        selectedCurrency
+      );
+      setTotalExpensesByCategory(accumulatedExpenses);
+
+      const incomes = await fetchIncomesByDates(formattedStartDate, formattedEndDate);
+      setIncomesByDates(incomes);
+
+      const accumulatedIncomes = accumulateTransactionsByCategory(
+        incomes,
+        selectedCurrency
+      );
+      setTotalIncomesByCategory(accumulatedIncomes);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    }
+  };
+
+  useEffect(() => {
+    const savedCurrency = localStorage.getItem(STORAGE_KEYS.CURRENCY);
+    if (savedCurrency) {
+      setSelectedCurrency(savedCurrency);
+    }
+  }, []);
+
   const handleFetchTransactions = async () => {
-    const expenses = await fetchExpensesByDates(startDate.value, endDate.value);
-    setExpensesByDates(expenses);
+    if (!startDate.value || !endDate.value) {
+      return;
+    }
 
-    const accumulatedExpenses = accumulateTransactionsByCategory(
-      expenses,
-      selectedCurrency
-    );
-    setTotalExpensesByCategory(accumulatedExpenses);
+    localStorage.setItem(STORAGE_KEYS.START_DATE, startDate.value);
+    localStorage.setItem(STORAGE_KEYS.END_DATE, endDate.value);
 
-    const incomes = await fetchIncomesByDates(startDate.value, endDate.value);
-    setIncomesByDates(incomes);
-
-    const accumulatedIncomes = accumulateTransactionsByCategory(
-      incomes,
-      selectedCurrency
-    );
-    setTotalIncomesByCategory(accumulatedIncomes);
+    await fetchData(startDate.value, endDate.value);
   };
 
   useEffect(() => {
     const datePicker = startDatePickerRef.current;
-
     if (datePicker) {
       datePicker.i18n = {
         ...datePicker.i18n,
@@ -85,7 +141,6 @@ export default function ChooserForTransactionCharts({
 
   useEffect(() => {
     const datePicker = endDatePickerRef.current;
-
     if (datePicker) {
       datePicker.i18n = {
         ...datePicker.i18n,
@@ -94,6 +149,10 @@ export default function ChooserForTransactionCharts({
       };
     }
   }, [endDatePickerRef.current]);
+
+  useEffect(() => {
+    fetchData(startDate.value, endDate.value);
+  }, []);
 
   return (
     <div
@@ -125,8 +184,9 @@ export default function ChooserForTransactionCharts({
         />
 
         <Button
+          theme="contrast"
           onClick={() => handleFetchTransactions()}
-          disabled={startDate.value === "" || endDate.value === ""}
+          disabled={!startDate.value || !endDate.value}
           style={{ marginLeft: "1rem" }}
         >
           Display Data
@@ -143,17 +203,19 @@ export default function ChooserForTransactionCharts({
               disabled={expensesByDates.length === 0}
               style={{ width: "70px" }}
               onValueChanged={(e) => {
-                setSelectedCurrency(e.detail.value);
+                const newCurrency = e.detail.value;
+                setSelectedCurrency(newCurrency);
+                localStorage.setItem(STORAGE_KEYS.CURRENCY, newCurrency);
 
                 const accumulatedExpenses = accumulateTransactionsByCategory(
                   expensesByDates,
-                  e.detail.value
+                  newCurrency
                 );
                 setTotalExpensesByCategory(accumulatedExpenses);
 
                 const accumulatedIncomes = accumulateTransactionsByCategory(
                   incomesByDates,
-                  e.detail.value
+                  newCurrency
                 );
                 setTotalIncomesByCategory(accumulatedIncomes);
               }}
