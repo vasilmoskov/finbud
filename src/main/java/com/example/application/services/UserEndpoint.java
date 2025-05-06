@@ -43,10 +43,19 @@ public class UserEndpoint {
 
         UserEntity user = new UserEntity()
                 .setUsername(dto.getUsername())
-                .setFirstName(dto.getFirstName())
-                .setLastName(dto.getLastName())
                 .setPassword(hashedPassword)
                 .setRoles(Set.of(Role.USER));
+
+        String firstName = dto.getFirstName();
+        String lastName = dto.getLastName();
+
+        if(firstName != null && !firstName.isEmpty()) {
+            user.setFirstName(firstName);
+        }
+
+        if(lastName != null && !lastName.isEmpty()) {
+            user.setLastName(lastName);
+        }
 
         this.userRepository.save(user);
     }

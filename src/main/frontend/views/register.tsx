@@ -13,7 +13,7 @@ import RegisterUserDto from "Frontend/generated/com/example/application/dto/Regi
 import RegisterUserDtoModel from "Frontend/generated/com/example/application/dto/RegisterUserDtoModel";
 import { UserEndpoint } from "Frontend/generated/endpoints";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const config: ViewConfig = {
   menu: { exclude: true },
@@ -31,9 +31,9 @@ export default function RegisterView() {
           await UserEndpoint.register(u);
           navigate("/login");
         } catch (error) {
-            setErrorMessage("Username already exists. Please choose another one.");
-            setNotificationOpened(true);
-          }
+          setErrorMessage("Username already exists. Please choose another one.");
+          setNotificationOpened(true);
+        }
       },
     });
 
@@ -44,7 +44,6 @@ export default function RegisterView() {
         if (value.password != value.confirmPassword) {
           return [{ property: model.password }];
         }
-
         return [];
       },
     });
@@ -55,17 +54,29 @@ export default function RegisterView() {
   }
 
   return (
-    <>
-          <Notification
-            theme="error"
-            duration={3000}
-            position="top-center"
-            opened={notificationOpened}
-            onOpenedChanged={(e) => {
-              setNotificationOpened(e.detail.value);
-            }}
-          >
-              <HorizontalLayout theme="spacing" style={{ alignItems: 'center' }}>
+    <div style={{
+      position: 'fixed',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}>
+      <style>
+        {`
+          vaadin-app-layout {
+            display: none !important;
+          }
+        `}
+      </style>
+      <Notification
+        theme="error"
+        duration={3000}
+        position="top-center"
+        opened={notificationOpened}
+        onOpenedChanged={(e) => {
+          setNotificationOpened(e.detail.value);
+        }}
+      >
+        <HorizontalLayout theme="spacing" style={{ alignItems: 'center' }}>
           <div>{errorMessage}</div>
           <Button
             theme="tertiary-inline"
@@ -80,28 +91,34 @@ export default function RegisterView() {
       </Notification>
 
       <Dialog
-        headerTitle='Register'
+        headerTitle="Register"
         opened
+        noCloseOnEsc
+        noCloseOnOutsideClick
         footerRenderer={() => (
-          <>
-            <Button onClick={() => navigateToLogin()}>Go to Login</Button>
+          <VerticalLayout theme="spacing-xs" style={{ alignItems: 'stretch', width: '100%' }}>
             <Button theme="primary" onClick={submit} disabled={invalid || submitting}>
               Register
             </Button>
-          </>
+            <p className="text-center">
+              <Link to="/login">Already have an account? Login</Link>
+            </p>
+          </VerticalLayout>
         )}
       >
-        <VerticalLayout style={{ alignItems: 'stretch', width: '18rem', maxWidth: '100%' }}>
-          <TextField label="First Name" {...field(model.firstName)} />
-          <TextField label="Last Name" {...field(model.lastName)} />
-          <TextField label="Username" {...field(model.username)} />
-          <PasswordField label="Password" {...field(model.password)} />
-          <PasswordField
-            label="Confirm Password"
-            {...field(model.confirmPassword)}
-          />
-        </VerticalLayout>
+        <div style={{ width: '20rem' }}>
+          <VerticalLayout theme="spacing-xs" style={{ alignItems: 'stretch', width: '100%' }}>
+            <TextField label="First Name" {...field(model.firstName)} />
+            <TextField label="Last Name" {...field(model.lastName)} />
+            <TextField label="Username" {...field(model.username)} />
+            <PasswordField label="Password" {...field(model.password)} />
+            <PasswordField
+              label="Confirm Password"
+              {...field(model.confirmPassword)}
+            />
+          </VerticalLayout>
+        </div>
       </Dialog>
-    </>
+    </div>
   );
 }
