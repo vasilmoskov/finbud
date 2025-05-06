@@ -172,7 +172,7 @@ export default function TransactionFilters({
                         />
                     </div>
                     <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
-                        <label style={{marginRight: '0.5rem'}}>Filter by usuality:</label>
+                        <label style={{marginRight: '0.5rem'}}>Filter usual/unusual:</label>
                         <Select
                             items={usualityFilteringOptions}
                             value={selectedByUsuality}
