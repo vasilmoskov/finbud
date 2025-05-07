@@ -1,6 +1,7 @@
 import { ViewConfig } from '@vaadin/hilla-file-router/types.js';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import TransactionChart from 'Frontend/components/TransactionChart';
+import BalanceChart from 'Frontend/components/BalanceChart';
 import ChooserForTransactionCharts from 'Frontend/components/ChooserForTransactionCharts';
 import { useState } from 'react';
 import TransactionDto from 'Frontend/generated/com/example/application/dto/TransactionDto';
@@ -43,6 +44,14 @@ export default function DashboardsView() {
           transactionType='Expenses'
           transactionsByDates={expensesByDates}
           totalTransactionsByCategory={totalExpensesByCategory}
+          currency={selectedCurrency}
+        />
+      </div>
+
+      <div className="w-full px-4 mb-8">
+        <BalanceChart
+          totalExpensesByCategory={totalExpensesByCategory}
+          totalIncomesByCategory={totalIncomesByCategory}
           currency={selectedCurrency}
         />
       </div>
