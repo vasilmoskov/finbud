@@ -48,18 +48,19 @@ export default function MainLayout() {
           </SideNav>
         </header>
         <footer className="flex flex-col gap-s">
-          {state.user ? (
+          {state.user && (
             <>
-              <p className="text-sm">Hi, {state.user.username}! 👋</p>
+              <p className="text-sm">
+                {state.user.firstName ? (
+                  `Hello, ${state.user.firstName}!`
+                ) : (
+                  `Hello, ${state.user.username}!`
+                )}
+              </p>
               <Button onClick={handleLogout}>
                 Sign out
               </Button>
             </>
-          ) : (
-              <>
-                  <Link to="/login">Sign in</Link>
-                  <Link to="/register">Sign up</Link>
-              </>
           )}
         </footer>
       </div>
