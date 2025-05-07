@@ -31,7 +31,7 @@ export default function DashboardsView() {
         setTotalIncomesByCategory={setTotalIncomesByCategory}
       />
 
-      <div className="flex flex-row justify-around w-full">
+      <div className="flex flex-col xl:flex-row justify-between xl:justify-between justify-center items-center w-full px-4">
         <TransactionChart
           transactionType='Incomes'
           transactionsByDates={incomesByDates}

@@ -48,36 +48,36 @@ export default function TransactionChart({ transactionType, transactionsByDates,
     };
 
     return (
-        <div className="flex flex-col items-center" style={{ width: '50%' }}>
-            <h2>{transactionType}</h2>
+        <div className="flex flex-col items-center w-full">
+            <h2 className="text-center w-full">{transactionType}</h2>
 
-            <div>
+            <div className="w-full flex justify-center">
                 {transactionsByDates.length === 0 ? (
-                    <p className="text-lg text-gray-600 mt-4">There are no {transactionType.toLowerCase()} in the selected date range</p>
+                    <p className="text-lg text-gray-600 mt-4 text-center">There are no {transactionType.toLowerCase()} in the selected date range</p>
                 ) : (
-                    <PieChart width={800} height={500}>
-                        <Pie data={totalTransactionsByCategory}
-                            dataKey="value"
-                            nameKey="name"
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={150}
-                            fill="#8884d8"
-                            label={renderCustomizedLabel}>
+                    <div className="w-full flex justify-center">
+                        <PieChart width={Math.min(800, window.innerWidth * 0.4)} height={500}>
+                            <Pie data={totalTransactionsByCategory}
+                                dataKey="value"
+                                nameKey="name"
+                                cx="50%"
+                                cy="50%"
+                                outerRadius={150}
+                                fill="#8884d8"
+                                label={renderCustomizedLabel}>
 
-                            {totalTransactionsByCategory.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
+                                {totalTransactionsByCategory.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
 
-                        </Pie>
+                            </Pie>
 
-                        <Tooltip formatter={formatTooltipValue} />
-                        <Legend />
-                    </PieChart>
-
+                            <Tooltip formatter={formatTooltipValue} />
+                            <Legend />
+                        </PieChart>
+                    </div>
                 )}
             </div>
-
         </div>
     )
 }

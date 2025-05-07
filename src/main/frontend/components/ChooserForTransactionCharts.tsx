@@ -157,12 +157,12 @@ export default function ChooserForTransactionCharts({
   return (
     <div
       className="flex flex-col items-center mb-4"
-      style={{ height: "200px", marginTop: "1rem", marginBottom: "1rem" }}
+      style={{ marginTop: "1rem", marginBottom: "1rem" }}
     >
       <h5 style={{ margin: "1rem" }}>
         Choose a date range to explore your finances:
       </h5>
-      <div className="flex flex-row items-center justify-center space-x-4">
+      <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 mb-4">
         <DatePicker
           ref={startDatePickerRef}
           placeholder="From"
