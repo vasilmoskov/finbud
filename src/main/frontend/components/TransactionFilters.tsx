@@ -105,8 +105,7 @@ export default function TransactionFilters({
             </Button>
 
             {filtersVisible && (
-
-                <div style={{display: 'flex', alignItems: 'start', marginBottom: '1rem'}}>
+                <div className="flex flex-wrap gap-4" style={{display: 'flex', alignItems: 'start', marginBottom: '1rem'}}>
                     <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
                         <label style={{marginRight: '0.5rem'}}>Filter by amount:</label>
                         <Select
@@ -124,20 +123,17 @@ export default function TransactionFilters({
                     </div>
 
                     <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
-
                         <label style={{marginRight: '0.5rem'}}>Filter by currency:</label>
-
                         <Select
                             items={currencyFilteringOptions}
                             value={selectedCurrency}
                             onValueChanged={e => setSelectedCurrency(e.detail.value)}
                             style={{maxWidth: '200px'}}
-
                         />
                     </div>
 
                     <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
-                        <label style={{marginRight: '0.5rem'}}>Filter by catergory:</label>
+                        <label style={{marginRight: '0.5rem'}}>Filter by category:</label>
                         <Select
                             items={categoryFilteringOptions}
                             value={selectedCategory}
@@ -145,6 +141,7 @@ export default function TransactionFilters({
                             style={{maxWidth: '200px'}}
                         />
                     </div>
+
                     <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
                         <label style={{marginRight: '0.5rem'}}>Filter by date:</label>
                         <DatePicker
@@ -168,6 +165,7 @@ export default function TransactionFilters({
                             style={{maxWidth: '200px'}}
                         />
                     </div>
+
                     <div style={{display: 'flex', flexDirection: 'column', marginLeft: '1rem'}}>
                         <label style={{marginRight: '0.5rem'}}>Filter usual/unusual:</label>
                         <Select
