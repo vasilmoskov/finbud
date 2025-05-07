@@ -56,13 +56,13 @@ export default function TransactionChart({ transactionType, transactionsByDates,
                     <p className="text-lg text-gray-600 mt-4 text-center">There are no {transactionType.toLowerCase()} in the selected date range</p>
                 ) : (
                     <div className="w-full flex justify-center">
-                        <PieChart width={Math.min(800, window.innerWidth * 0.4)} height={500}>
+                        <PieChart width={500} height={500}>
                             <Pie data={totalTransactionsByCategory}
                                 dataKey="value"
                                 nameKey="name"
                                 cx="50%"
                                 cy="50%"
-                                outerRadius={150}
+                                outerRadius={120}
                                 fill="#8884d8"
                                 label={renderCustomizedLabel}>
 
