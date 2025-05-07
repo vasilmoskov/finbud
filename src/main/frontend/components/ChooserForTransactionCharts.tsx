@@ -114,8 +114,23 @@ export default function ChooserForTransactionCharts({
     const savedCurrency = localStorage.getItem(STORAGE_KEYS.CURRENCY);
     if (savedCurrency) {
       setSelectedCurrency(savedCurrency);
+      // Recalculate values with the saved currency
+      if (expensesByDates.length > 0) {
+        const accumulatedExpenses = accumulateTransactionsByCategory(
+          expensesByDates,
+          savedCurrency
+        );
+        setTotalExpensesByCategory(accumulatedExpenses);
+      }
+      if (incomesByDates.length > 0) {
+        const accumulatedIncomes = accumulateTransactionsByCategory(
+          incomesByDates,
+          savedCurrency
+        );
+        setTotalIncomesByCategory(accumulatedIncomes);
+      }
     }
-  }, []);
+  }, [expensesByDates, incomesByDates]);
 
   const handleFetchTransactions = async () => {
     if (!startDate.value || !endDate.value) {
@@ -189,7 +204,7 @@ export default function ChooserForTransactionCharts({
           disabled={!startDate.value || !endDate.value}
           style={{ marginLeft: "1rem" }}
         >
-          Display Data
+          View Finances
         </Button>
       </div>
 
