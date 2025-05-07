@@ -25,7 +25,7 @@ export default function BalanceChart({ totalExpensesByCategory, totalIncomesByCa
     };
 
     return (
-        <div className="flex flex-col items-center w-full">
+        <div className="flex flex-col items-center w-full" style={{ marginBottom: '2rem' }}>
             <h2 className="text-center w-full">Balance</h2>
 
             <div className="w-full flex justify-center">
@@ -42,7 +42,11 @@ export default function BalanceChart({ totalExpensesByCategory, totalIncomesByCa
                                 <Legend />
                                 <Bar dataKey="incomes" name="Total Incomes" fill="#00C49F" />
                                 <Bar dataKey="expenses" name="Total Expenses" fill="#FF6384" />
-                                <Bar dataKey="balance" name="Net Balance" fill="#8884d8" />
+                                <Bar 
+                                    dataKey="balance" 
+                                    name="Net Balance" 
+                                    fill={balance >= 0 ? "#4682B4" : "#BC8F8F"} 
+                                />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

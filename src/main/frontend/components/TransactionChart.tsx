@@ -48,7 +48,7 @@ export default function TransactionChart({ transactionType, transactionsByDates,
     };
 
     return (
-        <div className="flex flex-col items-center w-full">
+        <div className="flex flex-col items-center w-full" style={{ marginBottom: '4rem' }}>
             <h2 className="text-center w-full">{transactionType}</h2>
 
             <div className="w-full flex justify-center">
@@ -56,7 +56,7 @@ export default function TransactionChart({ transactionType, transactionsByDates,
                     <p className="text-lg text-gray-600 mt-4 text-center">There are no {transactionType.toLowerCase()} in the selected date range</p>
                 ) : (
                     <div className="w-full flex justify-center">
-                        <PieChart width={500} height={500}>
+                        <PieChart width={550} height={450}>
                             <Pie data={totalTransactionsByCategory}
                                 dataKey="value"
                                 nameKey="name"
@@ -73,7 +73,12 @@ export default function TransactionChart({ transactionType, transactionsByDates,
                             </Pie>
 
                             <Tooltip formatter={formatTooltipValue} />
-                            <Legend />
+                            <Legend 
+                                layout="horizontal" 
+                                verticalAlign="bottom" 
+                                align="center"
+                                wrapperStyle={{ width: '100%', paddingTop: '20px' }}
+                            />
                         </PieChart>
                     </div>
                 )}
