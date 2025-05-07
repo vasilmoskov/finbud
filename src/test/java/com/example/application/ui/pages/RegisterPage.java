@@ -12,9 +12,6 @@ import org.slf4j.LoggerFactory;
 public class RegisterPage {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterPage.class);
 
-    @FindBy(xpath = "//*[@id=\"overlay\"]/h2")
-    private WebElement pageHeader;
-
     @FindBy(xpath = "//*[@id=\"input-vaadin-text-field-16\"]")
     private WebElement firstNameField;
 
@@ -30,7 +27,7 @@ public class RegisterPage {
     @FindBy(xpath = "//*[@id=\"input-vaadin-password-field-20\"]")
     private WebElement confirmPasswordField;
 
-    @FindBy(xpath = "//*[@id=\"overlay\"]/div/vaadin-button[2]")
+    @FindBy(xpath = "//*[@id=\"overlay\"]/div[1]/vaadin-vertical-layout/vaadin-button")
     private WebElement registerButton;
 
     public RegisterPage() {
