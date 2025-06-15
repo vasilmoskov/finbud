@@ -21,7 +21,7 @@ export default function TransactionButtonRenderer({ transaction, onEdit, onDelet
       {transaction.document && (
         <>
           <Button title='View Document' theme="icon" onClick={() => visualizeDocument(transaction.document?.content!)}>
-            <i className="fa-solid fa-file-pdf" style={{ marginLeft: '0.5rem' }}></i>
+            <i className="fa-solid fa-file-image" style={{ marginLeft: '0.5rem' }}></i>
           </Button>
           <Button title='Remove Document' theme="icon" onClick={() => onRemoveDocument(transaction)}>
             <i className="fa-solid fa-file-circle-xmark" style={{ marginLeft: '0.5rem' }}></i>

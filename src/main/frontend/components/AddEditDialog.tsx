@@ -90,7 +90,7 @@ export default function AddEditDialog({
             />
             <Upload
                 files={documentFile}
-                accept=".pdf"
+                accept=".pdf,.jpg,.jpeg,.png"
                 maxFiles={1}
                 onUploadBefore={handleUploadBefore}
             />
